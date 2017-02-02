@@ -7,7 +7,9 @@
     <android.support.v7.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/cvSong">
+        android:id="@+id/cvSong"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:clickable="true">
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"

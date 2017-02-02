@@ -106,7 +106,7 @@ public class SongListFragment extends Fragment implements SongListAdapter.ClickL
         getActivity().getMenuInflater().inflate(R.menu.search_menu, menu);
 
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
-        
+
         searchView.setBackgroundColor(getResources().getColor(R.color.colorTextSecondary));
         searchView.setOnQueryTextListener(this);
     }

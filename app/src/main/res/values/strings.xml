@@ -8,6 +8,8 @@
     <string name="album_name">album_name</string>
     <string name="albumart">albumart</string>
     <string name="searchmenutext">Search</string>
+    <string name="album_title">album_title</string>
+    <string name="album_artist">album_artist</string>
 
 
 </resources>
