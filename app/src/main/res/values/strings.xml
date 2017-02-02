@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Cosmo</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="tvSongArtistNullTag">TextView</string>
+    <string name="tvSongTitleNullTag">song_name</string>
+    <string name="album_name">album_name</string>
+    <string name="albumart">albumart</string>
+    <string name="searchmenutext">Search</string>
+
+
+</resources>
