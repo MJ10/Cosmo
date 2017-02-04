@@ -8,6 +8,8 @@
     <android.support.v7.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:clickable="true"
+        android:foreground="?android:attr/selectableItemBackground"
         android:id="@+id/cvAlbum">
         <RelativeLayout
             android:layout_width="match_parent"
@@ -25,15 +27,15 @@
                 android:textSize="19sp"
                 android:textAllCaps="true"
                 android:layout_height="wrap_content"
-                android:id="@+id/tvAlbumTitle"
+                android:id="@+id/tvAlbumCardTitle"
                 android:layout_below="@+id/ivAlbumArt"/>
 
             <TextView
                 android:text="@string/tvSongArtistNullTag"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/tvArtist"
-                android:layout_below="@id/tvAlbumTitle"/>
+                android:id="@+id/tvAlbumCardArtist"
+                android:layout_below="@id/tvAlbumCardTitle"/>
         </RelativeLayout>
     </android.support.v7.widget.CardView>
 

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,6 +33,7 @@ public class AlbumListAdapter extends RecyclerView.Adapter<AlbumListAdapter.View
     public AlbumListAdapter(ArrayList<Album> albumList, Context context) {
         this.context = context;
         this.albumList = albumList;
+        Log.d("Adapter", "AlbumListAdapter: " + albumList.size());
     }
 
     public void setClickListener(albClickListener clickListener) {
@@ -47,14 +49,16 @@ public class AlbumListAdapter extends RecyclerView.Adapter<AlbumListAdapter.View
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         Album alb = albumList.get(position);
-        holder.tvAlbumTitle.setText(alb.getAlbumTitle());
-        holder.tvArtist.setText(alb.getArtist());
-        Uri sArtworkUri = Uri
-                .parse("content://media/external/audio/albumart");
-        Glide.with(context)
-                .loadFromMediaStore(ContentUris.withAppendedId(sArtworkUri, alb.getAlbumId()))
-                .crossFade()
-                .into(holder.ivAlbumArt);
+        if(alb != null) {
+            holder.tvAlbumTitle.setText(alb.getAlbumTitle());
+            holder.tvArtist.setText(alb.getArtist());
+            Uri sArtworkUri = Uri
+                    .parse("content://media/external/audio/albumart");
+            Glide.with(context)
+                    .loadFromMediaStore(ContentUris.withAppendedId(sArtworkUri, alb.getAlbumId()))
+                    .crossFade()
+                    .into(holder.ivAlbumArt);
+        }
     }
 
     @Override
@@ -70,8 +74,8 @@ public class AlbumListAdapter extends RecyclerView.Adapter<AlbumListAdapter.View
         ViewHolder(View itemView) {
             super(itemView);
 
-            tvAlbumTitle = (TextView) itemView.findViewById(R.id.tvAlbumTitle);
-            tvArtist = (TextView) itemView.findViewById(R.id.tvArtist);
+            tvAlbumTitle = (TextView) itemView.findViewById(R.id.tvAlbumCardTitle);
+            tvArtist = (TextView) itemView.findViewById(R.id.tvAlbumCardArtist);
             ivAlbumArt = (ImageView) itemView.findViewById(R.id.ivAlbumArt);
 
             cvAlbum = (CardView) itemView.findViewById(R.id.cvAlbum);

@@ -46,7 +46,8 @@ public class LibraryLoader {
     public ArrayList<Song> getSongList() {
         ArrayList<Song> songList = new ArrayList<>();
         Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        Cursor cursor = resolver.query(uri, null, null, null, null);
+        String sortOrder = MediaStore.Audio.AudioColumns.TITLE + " COLLATE LOCALIZED ASC";
+        Cursor cursor = resolver.query(uri, null, null, null, sortOrder);
         if(cursor != null && cursor.moveToFirst()) {
             int titleColumn = cursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
             int artistColumn = cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);

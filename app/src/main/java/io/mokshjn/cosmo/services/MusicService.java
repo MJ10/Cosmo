@@ -111,7 +111,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         try {
             StorageUtils storage = new StorageUtils(getApplicationContext());
             songList = storage.loadSongs();
-            //songList = new LibraryLoader(getContentResolver()).getSongList();
+
             songPosition = storage.loadSongPosition();
 
             if (songPosition != -1 && songPosition < songList.size()) {
@@ -572,6 +572,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         IntentFilter intentFilter = new IntentFilter(SongListFragment.Broadcast_PLAY_NEW_AUDIO);
         registerReceiver(playNewAudio, intentFilter);
     }
+
 
     public enum PlaybackStatus{
         PLAYING,

@@ -27,7 +27,6 @@ tools:context=".activities.MainActivity">
             app:tabTextColor="@color/colorTextSecondary"/>
 
     </android.support.design.widget.AppBarLayout>
-    <include
-        layout="@layout/main_content" />
+    <include layout="@layout/main_content" />
 
 </android.support.design.widget.CoordinatorLayout>

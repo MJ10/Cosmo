@@ -1,10 +1,12 @@
 package io.mokshjn.cosmo.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +14,7 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 
 import io.mokshjn.cosmo.R;
+import io.mokshjn.cosmo.activities.AlbumViewActivity;
 import io.mokshjn.cosmo.adapters.AlbumListAdapter;
 import io.mokshjn.cosmo.loader.LibraryLoader;
 import io.mokshjn.cosmo.models.Album;
@@ -41,14 +44,16 @@ public class AlbumListFragment extends Fragment implements AlbumListAdapter.albC
         albumList = new ArrayList<>();
         rvAlbumList = (RecyclerView) rootView.findViewById(R.id.rvSongList);
         loadAlbums();
-        initalizeRecyclerView();
 
+
+        initalizeRecyclerView();
         return rootView;
     }
 
     private void loadAlbums() {
         loader = new LibraryLoader(getActivity().getContentResolver());
         albumList = loader.getAlbumList();
+        Log.d("AlbumLoader", "loadAlbums: "+ albumList.size());
 
     }
 
@@ -61,6 +66,8 @@ public class AlbumListFragment extends Fragment implements AlbumListAdapter.albC
 
     @Override
     public void onAlbumClick(View v, int pos) {
-
+        Intent intent = new Intent(getActivity(), AlbumViewActivity.class);
+        intent.putExtra("albumId", albumList.get(pos).getAlbumId());
+        startActivity(intent);
     }
 }
