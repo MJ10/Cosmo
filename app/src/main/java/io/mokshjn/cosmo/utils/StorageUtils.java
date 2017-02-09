@@ -2,23 +2,9 @@ package io.mokshjn.cosmo.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.net.Uri;
-import android.provider.MediaStore;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
-import com.google.gson.TypeAdapter;
 import com.google.gson.reflect.TypeToken;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.lang.reflect.Type;
 
@@ -73,23 +59,5 @@ public class StorageUtils {
         SharedPreferences.Editor editor = preferences.edit();
         editor.clear();
         editor.commit();
-    }
-
-    public final class SongAdapter extends TypeAdapter<ArrayList<Song>> {
-
-        @Override
-        public void write(JsonWriter out, ArrayList<Song> value) throws IOException {
-
-        }
-
-        @Override
-        public ArrayList<Song> read(JsonReader in) throws IOException {
-            ArrayList<Song> songList = new ArrayList<>();
-            in.beginObject();
-            while (in.hasNext()) {
-                in.beginObject();
-            }
-            return songList;
-        }
     }
 }

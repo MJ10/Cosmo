@@ -1,9 +1,7 @@
 package io.mokshjn.cosmo.adapters;
 
-import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.content.Context;
-import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,15 +9,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
+import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
-import java.io.File;
 import java.util.ArrayList;
 
 import io.mokshjn.cosmo.R;
 import io.mokshjn.cosmo.models.Song;
 
-public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.ViewHolder> {
+public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.ViewHolder> implements FastScrollRecyclerView.SectionedAdapter {
     private ArrayList<Song> songList;
 
     private ClickListener clickListener;
@@ -50,6 +47,12 @@ public class SongListAdapter extends RecyclerView.Adapter<SongListAdapter.ViewHo
 
     public void setClickListener(ClickListener clickListener) {
         this.clickListener = clickListener;
+    }
+
+    @NonNull
+    @Override
+    public String getSectionName(int position) {
+        return songList.get(position).getTitle().substring(0 ,1);
     }
 
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {

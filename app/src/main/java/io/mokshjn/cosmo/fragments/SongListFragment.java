@@ -1,24 +1,16 @@
 package io.mokshjn.cosmo.fragments;
 
-import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.database.Cursor;
-import android.graphics.Color;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,6 +18,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+
+import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import java.util.ArrayList;
 
@@ -36,12 +31,10 @@ import io.mokshjn.cosmo.models.Song;
 import io.mokshjn.cosmo.services.MusicService;
 import io.mokshjn.cosmo.utils.StorageUtils;
 
-import static android.content.Context.SEARCH_SERVICE;
-
 public class SongListFragment extends Fragment implements SongListAdapter.ClickListener, SearchView.OnQueryTextListener {
 
     public static final String Broadcast_PLAY_NEW_AUDIO = "io.mokshjn.cosmo.PlayNewAudio";
-    private RecyclerView rvSongsList;
+    private FastScrollRecyclerView rvSongsList;
     private SongListAdapter songAdapter;
     private LibraryLoader loader;
     private ArrayList<Song> songList;
@@ -62,17 +55,6 @@ public class SongListFragment extends Fragment implements SongListAdapter.ClickL
         }
     };
 
-    /*@Override
-    public void onStart() {
-        super.onStart();
-        if(playIntent == null) {
-            playIntent = new Intent(getContext(), MusicService.class);
-            getActivity().bindService(playIntent, musicServiceConnection, Context.BIND_AUTO_CREATE);
-            getActivity().startService(playIntent);
-        }
-
-    }*/
-
     public static SongListFragment newInstance() {
         SongListFragment fragment = new SongListFragment();
         Bundle args = new Bundle();
@@ -86,8 +68,8 @@ public class SongListFragment extends Fragment implements SongListAdapter.ClickL
 
         View rootView = inflater.inflate(R.layout.fragment_song_list, container, false);
         songList = new ArrayList<>();
-        rvSongsList = (RecyclerView) rootView.findViewById(R.id.rvSongList);
-        //initSongList();
+        rvSongsList = (FastScrollRecyclerView) rootView.findViewById(R.id.rvSongList);
+
         loadAudio();
         initalizeRecyclerView();
 
@@ -113,17 +95,14 @@ public class SongListFragment extends Fragment implements SongListAdapter.ClickL
 
     private void initalizeRecyclerView() {
 
-        rvSongsList.setLayoutManager(new LinearLayoutManager(getContext()));
+        LinearLayoutManager manager = new LinearLayoutManager(getContext());
+        manager.setOrientation(LinearLayout.VERTICAL);
+        rvSongsList.setLayoutManager(manager);
         songAdapter = new SongListAdapter(songList);
         rvSongsList.setAdapter(songAdapter);
         songAdapter.setClickListener(this);
+        rvSongsList.setHasFixedSize(true);
     }
-
-    /*private void initSongList() {
-        cr = getActivity().getContentResolver();
-        loader = new LibraryLoader(cr);
-        songList = loader.getSongList();
-    }*/
 
     @Override
     public void onSongClick(View view, int id) {
@@ -135,7 +114,6 @@ public class SongListFragment extends Fragment implements SongListAdapter.ClickL
             StorageUtils storage = new StorageUtils(getContext());
             storage.storeSong(songList);
             storage.storeAudioIndex(position);
-            Log.d("SongFrag", "playSong: " + "done" + songList.size());
 
             Intent playerIntent = new Intent(getContext(), io.mokshjn.cosmo.services.MusicService.class);
             getActivity().startService(playerIntent);

@@ -30,12 +30,9 @@ import android.util.Log;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Random;
 
 import io.mokshjn.cosmo.R;
-import io.mokshjn.cosmo.activities.MainActivity;
 import io.mokshjn.cosmo.fragments.SongListFragment;
-import io.mokshjn.cosmo.loader.LibraryLoader;
 import io.mokshjn.cosmo.models.Song;
 import io.mokshjn.cosmo.utils.StorageUtils;
 
@@ -99,10 +96,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         callStateListener();
         registerBecomingNoisyReciever();
         register_playNewAudio();
-
-        //songPosition = 0;
-        //player = new MediaPlayer();
-        //initMediaPlayer();
     }
 
     @Override
@@ -146,8 +139,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     public void onDestroy() {
         super.onDestroy();
         if(player != null) {
-            //player.stop();
-            //player.reset();
             player.release();
         }
 
@@ -266,28 +257,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         player.prepareAsync();
     }
 
-    // public void setSongList(ArrayList<Song> songList) {
-       // this.songList = songList;
-    // }
-
-    //public void setSong(int songPosition) {
-      //  this.songPosition = songPosition;
-    //}
-
     public void playSong() {
-        /*
-        Song currSong = songList.get(songPosition);
-        long currSongId = currSong.getId();
-
-        Uri trackUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, currSongId);
-
-        try {
-            player.setDataSource(getApplicationContext(), trackUri);
-        } catch (IOException e) {
-            Log.e("Music Service", "Error setting data source", e);
-        }
-        player.prepareAsync();
-        */
         if(!player.isPlaying()){
             player.start();
         }

@@ -1,6 +1,5 @@
 package io.mokshjn.cosmo.models;
 
-import android.net.Uri;
 
 import java.io.Serializable;
 

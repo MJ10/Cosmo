@@ -3,6 +3,7 @@ package io.mokshjn.cosmo.adapters;
 import android.content.ContentUris;
 import android.content.Context;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -13,8 +14,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
-import java.io.File;
 import java.util.ArrayList;
 
 import io.mokshjn.cosmo.R;
@@ -24,7 +25,7 @@ import io.mokshjn.cosmo.models.Album;
  * Created by moksh on 1/2/17.
  */
 
-public class AlbumListAdapter extends RecyclerView.Adapter<AlbumListAdapter.ViewHolder> {
+public class AlbumListAdapter extends RecyclerView.Adapter<AlbumListAdapter.ViewHolder> implements FastScrollRecyclerView.SectionedAdapter {
 
     private ArrayList<Album> albumList;
     private Context context;
@@ -33,7 +34,6 @@ public class AlbumListAdapter extends RecyclerView.Adapter<AlbumListAdapter.View
     public AlbumListAdapter(ArrayList<Album> albumList, Context context) {
         this.context = context;
         this.albumList = albumList;
-        Log.d("Adapter", "AlbumListAdapter: " + albumList.size());
     }
 
     public void setClickListener(albClickListener clickListener) {
@@ -64,6 +64,12 @@ public class AlbumListAdapter extends RecyclerView.Adapter<AlbumListAdapter.View
     @Override
     public int getItemCount() {
         return albumList.size();
+    }
+
+    @NonNull
+    @Override
+    public String getSectionName(int position) {
+        return albumList.get(position).getAlbumTitle().substring(0, 1);
     }
 
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {

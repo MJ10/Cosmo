@@ -3,11 +3,12 @@
     android:layout_width="match_parent" android:layout_height="wrap_content"
     android:paddingLeft="10dp"
     android:paddingRight="10dp"
-    android:paddingTop="2dp">
+    android:paddingTop="5dp">
     <android.support.v7.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/cvSong"
+        android:elevation="10dp"
         android:foreground="?android:attr/selectableItemBackground"
         android:clickable="true">
         <RelativeLayout
@@ -17,7 +18,7 @@
             <TextView
                 android:text="@string/tvSongTitleNullTag"
                 android:layout_width="match_parent"
-                android:textSize="25sp"
+                android:textSize="20sp"
                 android:layout_height="wrap_content"
                 android:id="@+id/tvTitle"/>
 

@@ -11,6 +11,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
+
 import java.util.ArrayList;
 
 import io.mokshjn.cosmo.R;
@@ -25,7 +27,7 @@ import io.mokshjn.cosmo.models.Album;
 
 public class AlbumListFragment extends Fragment implements AlbumListAdapter.albClickListener {
 
-    private RecyclerView rvAlbumList;
+    private FastScrollRecyclerView rvAlbumList;
     private ArrayList<Album> albumList;
     private AlbumListAdapter adapter;
     private LibraryLoader loader;
@@ -40,11 +42,11 @@ public class AlbumListFragment extends Fragment implements AlbumListAdapter.albC
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_song_list, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_album_list, container, false);
         albumList = new ArrayList<>();
-        rvAlbumList = (RecyclerView) rootView.findViewById(R.id.rvSongList);
-        loadAlbums();
+        rvAlbumList = (FastScrollRecyclerView) rootView.findViewById(R.id.rvAlbumList);
 
+        loadAlbums();
 
         initalizeRecyclerView();
         return rootView;
@@ -53,7 +55,6 @@ public class AlbumListFragment extends Fragment implements AlbumListAdapter.albC
     private void loadAlbums() {
         loader = new LibraryLoader(getActivity().getContentResolver());
         albumList = loader.getAlbumList();
-        Log.d("AlbumLoader", "loadAlbums: "+ albumList.size());
 
     }
 
