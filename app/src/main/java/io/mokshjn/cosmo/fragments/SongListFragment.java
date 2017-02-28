@@ -39,7 +39,7 @@ public class SongListFragment extends Fragment implements SongListAdapter.ClickL
     private LibraryLoader loader;
     private ArrayList<Song> songList;
     private MusicService service;
-    private boolean musicBound = false;
+    public boolean musicBound = false;
 
     private ServiceConnection musicServiceConnection = new ServiceConnection() {
         @Override

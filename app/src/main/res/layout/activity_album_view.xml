@@ -22,6 +22,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:id="@+id/ivAlbumArt"
+                android:transitionName="albumArt"
                 android:scaleType="centerCrop"
                 android:fitsSystemWindows="true"
                 android:src="@drawable/nav_bg"

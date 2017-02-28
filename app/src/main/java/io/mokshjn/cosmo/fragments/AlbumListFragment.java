@@ -3,6 +3,7 @@ package io.mokshjn.cosmo.fragments;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -69,6 +70,7 @@ public class AlbumListFragment extends Fragment implements AlbumListAdapter.albC
     public void onAlbumClick(View v, int pos) {
         Intent intent = new Intent(getActivity(), AlbumViewActivity.class);
         intent.putExtra("albumId", albumList.get(pos).getAlbumId());
-        startActivity(intent);
+        ActivityOptionsCompat optionsCompat = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(), v.findViewById(R.id.ivAlbumArt), "albumArt");
+        startActivity(intent, optionsCompat.toBundle());
     }
 }

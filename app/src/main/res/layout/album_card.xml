@@ -20,6 +20,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/ivAlbumArt"
+                android:transitionName="albumArt"
                 android:src="@drawable/nav_bg"
                 android:contentDescription="@string/albumart"/>
             <TextView
