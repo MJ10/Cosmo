@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import io.mokshjn.cosmo.R;
 import io.mokshjn.cosmo.activities.AlbumViewActivity;
 import io.mokshjn.cosmo.adapters.AlbumListAdapter;
+import io.mokshjn.cosmo.interfaces.LibraryInterface;
+import io.mokshjn.cosmo.loader.AlbumListLoader;
 import io.mokshjn.cosmo.loader.LibraryLoader;
 import io.mokshjn.cosmo.models.Album;
 
@@ -26,7 +28,7 @@ import io.mokshjn.cosmo.models.Album;
  * Created by moksh on 1/2/17.
  */
 
-public class AlbumListFragment extends Fragment implements AlbumListAdapter.albClickListener {
+public class AlbumListFragment extends Fragment implements AlbumListAdapter.albClickListener, LibraryInterface.onLoadAlbums {
 
     private FastScrollRecyclerView rvAlbumList;
     private ArrayList<Album> albumList;
@@ -54,9 +56,9 @@ public class AlbumListFragment extends Fragment implements AlbumListAdapter.albC
     }
 
     private void loadAlbums() {
-        loader = new LibraryLoader(getActivity().getContentResolver());
-        albumList = loader.getAlbumList();
-
+//        loader = new LibraryLoader(getActivity().getContentResolver());
+//        albumList = loader.getAlbumList();
+        new AlbumListLoader(this, getActivity().getContentResolver()).execute();
     }
 
     private void initalizeRecyclerView() {
@@ -72,5 +74,12 @@ public class AlbumListFragment extends Fragment implements AlbumListAdapter.albC
         intent.putExtra("albumId", albumList.get(pos).getAlbumId());
         ActivityOptionsCompat optionsCompat = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(), v.findViewById(R.id.ivAlbumArt), "albumArt");
         startActivity(intent, optionsCompat.toBundle());
+    }
+
+    @Override
+    public void setAlbums(ArrayList<Album> albums) {
+        albumList.clear();
+        albumList.addAll(albums);
+        adapter.notifyDataSetChanged();
     }
 }

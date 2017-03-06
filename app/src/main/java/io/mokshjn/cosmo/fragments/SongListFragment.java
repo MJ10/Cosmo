@@ -9,13 +9,8 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.SearchView;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -26,20 +21,26 @@ import java.util.ArrayList;
 
 import io.mokshjn.cosmo.R;
 import io.mokshjn.cosmo.adapters.SongListAdapter;
-import io.mokshjn.cosmo.loader.LibraryLoader;
+import io.mokshjn.cosmo.interfaces.LibraryInterface;
+import io.mokshjn.cosmo.loader.SongListLoader;
 import io.mokshjn.cosmo.models.Song;
 import io.mokshjn.cosmo.services.MusicService;
 import io.mokshjn.cosmo.utils.StorageUtils;
 
-public class SongListFragment extends Fragment implements SongListAdapter.ClickListener, SearchView.OnQueryTextListener {
+public class SongListFragment extends Fragment implements SongListAdapter.ClickListener, LibraryInterface.onLoadSongs {
 
     public static final String Broadcast_PLAY_NEW_AUDIO = "io.mokshjn.cosmo.PlayNewAudio";
     private FastScrollRecyclerView rvSongsList;
     private SongListAdapter songAdapter;
-    private LibraryLoader loader;
     private ArrayList<Song> songList;
     private MusicService service;
     public boolean musicBound = false;
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putBoolean("MUSIC_BOUND_STATE", false);
+        super.onSaveInstanceState(outState);
+    }
 
     private ServiceConnection musicServiceConnection = new ServiceConnection() {
         @Override
@@ -67,6 +68,9 @@ public class SongListFragment extends Fragment implements SongListAdapter.ClickL
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.fragment_song_list, container, false);
+        if(savedInstanceState != null){
+            musicBound = savedInstanceState.getBoolean("MUSIC_BOUND_STATE");
+        }
         songList = new ArrayList<>();
         rvSongsList = (FastScrollRecyclerView) rootView.findViewById(R.id.rvSongList);
 
@@ -82,16 +86,6 @@ public class SongListFragment extends Fragment implements SongListAdapter.ClickL
         setHasOptionsMenu(true);
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        getActivity().getMenuInflater().inflate(R.menu.search_menu, menu);
-
-        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(menu.findItem(R.id.action_search));
-
-        searchView.setBackgroundColor(getResources().getColor(R.color.colorTextSecondary));
-        searchView.setOnQueryTextListener(this);
-    }
 
     private void initalizeRecyclerView() {
 
@@ -129,8 +123,7 @@ public class SongListFragment extends Fragment implements SongListAdapter.ClickL
 
     private void loadAudio() {
         ContentResolver contentResolver = getActivity().getContentResolver();
-        loader = new LibraryLoader(contentResolver);
-        songList = loader.getSongList();
+        new SongListLoader(this, contentResolver).execute();
     }
 
     @Override
@@ -144,12 +137,9 @@ public class SongListFragment extends Fragment implements SongListAdapter.ClickL
     }
 
     @Override
-    public boolean onQueryTextSubmit(String query) {
-        return false;
-    }
-
-    @Override
-    public boolean onQueryTextChange(String newText) {
-        return false;
+    public void setSongs(ArrayList<Song> songs) {
+        songList.clear();
+        songList.addAll(songs);
+        songAdapter.notifyDataSetChanged();
     }
 }

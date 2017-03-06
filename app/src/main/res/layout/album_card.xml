@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="wrap_content"
-    android:paddingLeft="10dp"
-    android:paddingRight="10dp"
-    android:paddingTop="2dp"
+    android:paddingLeft="5dp"
+    android:paddingRight="5dp"
     android:layout_weight="0.3">
     <android.support.v7.widget.CardView
+        xmlns:card_view="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:clickable="true"
-        android:elevation="5dp"
         android:foreground="?android:attr/selectableItemBackground"
-        android:id="@+id/cvAlbum">
+        android:id="@+id/cvAlbum"
+        card_view:cardUseCompatPadding="true"
+        card_view:cardElevation="3dp"
+        card_view:cardCornerRadius="1dp">
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
