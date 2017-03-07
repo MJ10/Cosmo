@@ -1,5 +1,6 @@
 package io.mokshjn.cosmo.fragments;
 
+import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -9,8 +10,13 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -27,12 +33,12 @@ import io.mokshjn.cosmo.models.Song;
 import io.mokshjn.cosmo.services.MusicService;
 import io.mokshjn.cosmo.utils.StorageUtils;
 
-public class SongListFragment extends Fragment implements SongListAdapter.ClickListener, LibraryInterface.onLoadSongs {
+public class SongListFragment extends Fragment implements SongListAdapter.ClickListener, LibraryInterface.onLoadSongs, SearchView.OnQueryTextListener{
 
     public static final String Broadcast_PLAY_NEW_AUDIO = "io.mokshjn.cosmo.PlayNewAudio";
     private FastScrollRecyclerView rvSongsList;
     private SongListAdapter songAdapter;
-    private ArrayList<Song> songList;
+    private ArrayList<Song> songList, backupList;
     private MusicService service;
     public boolean musicBound = false;
 
@@ -72,6 +78,7 @@ public class SongListFragment extends Fragment implements SongListAdapter.ClickL
             musicBound = savedInstanceState.getBoolean("MUSIC_BOUND_STATE");
         }
         songList = new ArrayList<>();
+        backupList = new ArrayList<>();
         rvSongsList = (FastScrollRecyclerView) rootView.findViewById(R.id.rvSongList);
 
         loadAudio();
@@ -86,6 +93,28 @@ public class SongListFragment extends Fragment implements SongListAdapter.ClickL
         setHasOptionsMenu(true);
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, final MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.search_menu, menu);
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        searchView.setOnQueryTextListener(this);
+        MenuItemCompat.setOnActionExpandListener(searchItem, new MenuItemCompat.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                songList.clear();
+                songList.addAll(backupList);
+                songAdapter.notifyDataSetChanged();
+                return true;
+            }
+        });
+    }
 
     private void initalizeRecyclerView() {
 
@@ -114,6 +143,7 @@ public class SongListFragment extends Fragment implements SongListAdapter.ClickL
             getActivity().bindService(playerIntent, musicServiceConnection, Context.BIND_AUTO_CREATE);
         } else {
             StorageUtils storage = new StorageUtils(getContext());
+            storage.storeSong(songList);
             storage.storeAudioIndex(position);
 
             Intent broadcastIntent = new Intent(Broadcast_PLAY_NEW_AUDIO);
@@ -140,6 +170,26 @@ public class SongListFragment extends Fragment implements SongListAdapter.ClickL
     public void setSongs(ArrayList<Song> songs) {
         songList.clear();
         songList.addAll(songs);
+        backupList.addAll(songs);
         songAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        ArrayList<Song> searchList = new ArrayList<>();
+        for(Song s: backupList){
+            if(s.getTitle().toLowerCase().contains(newText.toLowerCase())){
+                searchList.add(s);
+            }
+        }
+        songList.clear();
+        songList.addAll(searchList);
+        songAdapter.notifyDataSetChanged();
+        return true;
     }
 }

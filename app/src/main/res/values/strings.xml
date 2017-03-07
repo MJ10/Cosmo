@@ -10,6 +10,7 @@
     <string name="searchmenutext">Search</string>
     <string name="album_title">album_title</string>
     <string name="album_artist">album_artist</string>
+    <string name="search_hint">Search &#8230;</string>
 
 
 </resources>
