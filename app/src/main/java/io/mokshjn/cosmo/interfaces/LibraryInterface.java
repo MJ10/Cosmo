@@ -3,6 +3,7 @@ package io.mokshjn.cosmo.interfaces;
 import java.util.ArrayList;
 
 import io.mokshjn.cosmo.models.Album;
+import io.mokshjn.cosmo.models.Artist;
 import io.mokshjn.cosmo.models.Song;
 
 /**
@@ -17,5 +18,9 @@ public class LibraryInterface {
 
     public interface onLoadAlbums {
         void setAlbums(ArrayList<Album> albums);
+    }
+
+    public interface onLoadArtists {
+        void setArtists(ArrayList<Artist> artists);
     }
 }

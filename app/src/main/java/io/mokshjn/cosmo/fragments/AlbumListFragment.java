@@ -33,7 +33,6 @@ public class AlbumListFragment extends Fragment implements AlbumListAdapter.albC
     private FastScrollRecyclerView rvAlbumList;
     private ArrayList<Album> albumList;
     private AlbumListAdapter adapter;
-    private LibraryLoader loader;
 
     public static AlbumListFragment newInstance() {
         AlbumListFragment fragment = new AlbumListFragment();
@@ -56,8 +55,6 @@ public class AlbumListFragment extends Fragment implements AlbumListAdapter.albC
     }
 
     private void loadAlbums() {
-//        loader = new LibraryLoader(getActivity().getContentResolver());
-//        albumList = loader.getAlbumList();
         new AlbumListLoader(this, getActivity().getContentResolver()).execute();
     }
 

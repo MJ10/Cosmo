@@ -11,6 +11,8 @@
     <string name="album_title">album_title</string>
     <string name="album_artist">album_artist</string>
     <string name="search_hint">Search &#8230;</string>
+    <string name="discog_template">x Songs | y Albums</string>
+    <string name="artist_name_null">artist_name</string>
 
 
 </resources>

@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import io.mokshjn.cosmo.R;
 import io.mokshjn.cosmo.fragments.AlbumListFragment;
+import io.mokshjn.cosmo.fragments.ArtistListFragment;
 import io.mokshjn.cosmo.fragments.SongListFragment;
 
 public class MainActivity extends AppCompatActivity {
@@ -58,11 +59,7 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean checkPermission() {
         int result = ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE);
-        if (result == PackageManager.PERMISSION_GRANTED) {
-            return true;
-        } else {
-            return false;
-        }
+        return result == PackageManager.PERMISSION_GRANTED;
     }
 
 
@@ -115,8 +112,10 @@ public class MainActivity extends AppCompatActivity {
                     return SongListFragment.newInstance();
                 case 1:
                     return AlbumListFragment.newInstance();
+                case 2:
+                    return ArtistListFragment.newInstance();
                 default:
-                    return AlbumListFragment.newInstance();
+                    return null;
             }
         }
 
