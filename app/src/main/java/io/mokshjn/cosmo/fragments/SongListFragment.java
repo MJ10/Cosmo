@@ -1,6 +1,5 @@
 package io.mokshjn.cosmo.fragments;
 
-import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -25,6 +24,7 @@ import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import java.util.ArrayList;
 
+import butterknife.BindView;
 import io.mokshjn.cosmo.R;
 import io.mokshjn.cosmo.adapters.SongListAdapter;
 import io.mokshjn.cosmo.interfaces.LibraryInterface;
@@ -72,8 +72,8 @@ public class SongListFragment extends Fragment implements SongListAdapter.ClickL
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
         View rootView = inflater.inflate(R.layout.fragment_song_list, container, false);
+
         if(savedInstanceState != null){
             musicBound = savedInstanceState.getBoolean("MUSIC_BOUND_STATE");
         }
@@ -90,31 +90,31 @@ public class SongListFragment extends Fragment implements SongListAdapter.ClickL
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        setHasOptionsMenu(true);
+//        setHasOptionsMenu(true);
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, final MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.search_menu, menu);
-        MenuItem searchItem = menu.findItem(R.id.action_search);
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
-        searchView.setOnQueryTextListener(this);
-        MenuItemCompat.setOnActionExpandListener(searchItem, new MenuItemCompat.OnActionExpandListener() {
-            @Override
-            public boolean onMenuItemActionExpand(MenuItem item) {
-                return true;
-            }
-
-            @Override
-            public boolean onMenuItemActionCollapse(MenuItem item) {
-                songList.clear();
-                songList.addAll(backupList);
-                songAdapter.notifyDataSetChanged();
-                return true;
-            }
-        });
-    }
+//    @Override
+//    public void onCreateOptionsMenu(Menu menu, final MenuInflater inflater) {
+//        super.onCreateOptionsMenu(menu, inflater);
+//        inflater.inflate(R.menu.search_menu, menu);
+//        MenuItem searchItem = menu.findItem(R.id.action_search);
+//        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+//        searchView.setOnQueryTextListener(this);
+//        MenuItemCompat.setOnActionExpandListener(searchItem, new MenuItemCompat.OnActionExpandListener() {
+//            @Override
+//            public boolean onMenuItemActionExpand(MenuItem item) {
+//                return true;
+//            }
+//
+//            @Override
+//            public boolean onMenuItemActionCollapse(MenuItem item) {
+//                songList.clear();
+//                songList.addAll(backupList);
+//                songAdapter.notifyDataSetChanged();
+//                return true;
+//            }
+//        });
+//    }
 
     private void initalizeRecyclerView() {
 

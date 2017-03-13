@@ -21,6 +21,8 @@ import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import io.mokshjn.cosmo.R;
 import io.mokshjn.cosmo.adapters.SongListAdapter;
 import io.mokshjn.cosmo.fragments.SongListFragment;
@@ -32,8 +34,8 @@ import io.mokshjn.cosmo.utils.StorageUtils;
 public class AlbumViewActivity extends AppCompatActivity implements SongListAdapter.ClickListener {
 
     public static final String Broadcast_PLAY_NEW_AUDIO = "io.mokshjn.cosmo.PlayNewAudio";
-    private RecyclerView rvAlbumSongs;
-    private ImageView ivAlbumArt;
+    @BindView(R.id.rvAlbumSongs) RecyclerView rvAlbumSongs;
+    @BindView(R.id.ivAlbumArt) ImageView ivAlbumArt;
     private ArrayList<Song> albumSongs;
     private long albumId;
     private MusicService service;
@@ -57,6 +59,7 @@ public class AlbumViewActivity extends AppCompatActivity implements SongListAdap
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_album_view);
+        ButterKnife.bind(this);
 
         albumId = getIntent().getLongExtra("albumId", -1);
 
@@ -67,8 +70,6 @@ public class AlbumViewActivity extends AppCompatActivity implements SongListAdap
     }
 
     private void initializeViews() {
-        ivAlbumArt = (ImageView) findViewById(R.id.ivAlbumArt);
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.avToolbar);
         setSupportActionBar(toolbar);
         setTitle(albumSongs.get(0).getAlbum());
@@ -89,7 +90,6 @@ public class AlbumViewActivity extends AppCompatActivity implements SongListAdap
     }
 
     private void initializeRecycler() {
-        rvAlbumSongs = (RecyclerView) findViewById(R.id.rvAlbumSongs);
         rvAlbumSongs.setLayoutManager(new LinearLayoutManager(this));
         SongListAdapter adapter = new SongListAdapter(albumSongs);
         rvAlbumSongs.setAdapter(adapter);

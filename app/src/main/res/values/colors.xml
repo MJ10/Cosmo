@@ -9,4 +9,11 @@
     <color name="colorTextSecondary">#ffffff</color>
     <color name="icons">#FFFFFF</color>
     <color name="divider">#BDBDBD</color>
+    <color name="scrim">#99323232</color>
+    <color name="background_super_dark">#ff292929</color>
+    <color name="background_dark">#ff333333</color>
+    <color name="dark_icon">#ff292929</color>
+    <color name="text_primary_light">#ffffff</color>
+    <color name="text_secondary_dark">#ff353535</color>
+    <color name="ripple_dark">#ff282828</color>
 </resources>

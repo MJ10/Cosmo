@@ -1,6 +1,8 @@
 package io.mokshjn.cosmo.activities;
 
 import android.Manifest;
+import android.app.ActivityOptions;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.PersistableBundle;
@@ -15,8 +17,14 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import io.mokshjn.cosmo.R;
 import io.mokshjn.cosmo.fragments.AlbumListFragment;
 import io.mokshjn.cosmo.fragments.ArtistListFragment;
@@ -26,27 +34,43 @@ public class MainActivity extends AppCompatActivity {
     private ViewPager mViewPager;
     private PagerAdapter mPagerAdapter;
     private boolean serviceBound;
+    private Toolbar toolbar;
 
+    private static final int RC_SEARCH = 0;
     private static final int PERMISSION_REQUEST_CODE = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        ButterKnife.bind(this);
         setContentView(R.layout.activity_main);
-
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         if(Build.VERSION.SDK_INT >= 23){
             if(checkPermission()){
-                
+
             } else {
                 askPermission();
             }
         }
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         intializePager();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.search_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        View searchMenuView = toolbar.findViewById(R.id.action_search);
+        Bundle options = ActivityOptions.makeSceneTransitionAnimation(this, searchMenuView,
+                getString(R.string.transition_search_back)).toBundle();
+        startActivityForResult(new Intent(this, SearchActivity.class), RC_SEARCH, options);
+        return true;
     }
 
     private void askPermission() {
@@ -66,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
-            case 1: {
+            case PERMISSION_REQUEST_CODE: {
                 if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 }
                 else {
@@ -74,6 +98,18 @@ public class MainActivity extends AppCompatActivity {
                     finish();
                 }
             }
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode){
+            case RC_SEARCH:
+                View searchMenuView = toolbar.findViewById(R.id.action_search);
+                if (searchMenuView != null) {
+                    searchMenuView.setAlpha(1f);
+                }
+                break;
         }
     }
 

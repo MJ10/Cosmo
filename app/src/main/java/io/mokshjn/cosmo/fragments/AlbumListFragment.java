@@ -1,5 +1,6 @@
 package io.mokshjn.cosmo.fragments;
 
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -16,6 +17,8 @@ import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import java.util.ArrayList;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import io.mokshjn.cosmo.R;
 import io.mokshjn.cosmo.activities.AlbumViewActivity;
 import io.mokshjn.cosmo.adapters.AlbumListAdapter;
@@ -45,9 +48,9 @@ public class AlbumListFragment extends Fragment implements AlbumListAdapter.albC
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_album_list, container, false);
+        ButterKnife.bind(rootView);
         albumList = new ArrayList<>();
         rvAlbumList = (FastScrollRecyclerView) rootView.findViewById(R.id.rvAlbumList);
-
         loadAlbums();
 
         initalizeRecyclerView();
@@ -69,8 +72,7 @@ public class AlbumListFragment extends Fragment implements AlbumListAdapter.albC
     public void onAlbumClick(View v, int pos) {
         Intent intent = new Intent(getActivity(), AlbumViewActivity.class);
         intent.putExtra("albumId", albumList.get(pos).getAlbumId());
-        ActivityOptionsCompat optionsCompat = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(), v.findViewById(R.id.ivAlbumArt), "albumArt");
-        startActivity(intent, optionsCompat.toBundle());
+        startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(getActivity(), v.findViewById(R.id.ivAlbumArt), "albumArt").toBundle());
     }
 
     @Override
