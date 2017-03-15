@@ -116,7 +116,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             stopSelf();
         }
 
-        if(requestAudioFocus() == false) {
+        if(!requestAudioFocus()) {
             stopSelf();
         }
 
