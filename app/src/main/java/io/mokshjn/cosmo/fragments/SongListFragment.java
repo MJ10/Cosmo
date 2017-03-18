@@ -33,7 +33,7 @@ import io.mokshjn.cosmo.models.Song;
 import io.mokshjn.cosmo.services.MusicService;
 import io.mokshjn.cosmo.utils.StorageUtils;
 
-public class SongListFragment extends Fragment implements SongListAdapter.ClickListener, LibraryInterface.onLoadSongs, SearchView.OnQueryTextListener{
+public class SongListFragment extends Fragment implements SongListAdapter.ClickListener, LibraryInterface.onLoadSongs{
 
     public static final String Broadcast_PLAY_NEW_AUDIO = "io.mokshjn.cosmo.PlayNewAudio";
     private FastScrollRecyclerView rvSongsList;
@@ -93,28 +93,7 @@ public class SongListFragment extends Fragment implements SongListAdapter.ClickL
 //        setHasOptionsMenu(true);
     }
 
-//    @Override
-//    public void onCreateOptionsMenu(Menu menu, final MenuInflater inflater) {
-//        super.onCreateOptionsMenu(menu, inflater);
-//        inflater.inflate(R.menu.search_menu, menu);
-//        MenuItem searchItem = menu.findItem(R.id.action_search);
-//        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
-//        searchView.setOnQueryTextListener(this);
-//        MenuItemCompat.setOnActionExpandListener(searchItem, new MenuItemCompat.OnActionExpandListener() {
-//            @Override
-//            public boolean onMenuItemActionExpand(MenuItem item) {
-//                return true;
-//            }
-//
-//            @Override
-//            public boolean onMenuItemActionCollapse(MenuItem item) {
-//                songList.clear();
-//                songList.addAll(backupList);
-//                songAdapter.notifyDataSetChanged();
-//                return true;
-//            }
-//        });
-//    }
+
 
     private void initalizeRecyclerView() {
 
@@ -172,24 +151,5 @@ public class SongListFragment extends Fragment implements SongListAdapter.ClickL
         songList.addAll(songs);
         backupList.addAll(songs);
         songAdapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public boolean onQueryTextSubmit(String query) {
-        return false;
-    }
-
-    @Override
-    public boolean onQueryTextChange(String newText) {
-        ArrayList<Song> searchList = new ArrayList<>();
-        for(Song s: backupList){
-            if(s.getTitle().toLowerCase().contains(newText.toLowerCase())){
-                searchList.add(s);
-            }
-        }
-        songList.clear();
-        songList.addAll(searchList);
-        songAdapter.notifyDataSetChanged();
-        return true;
     }
 }

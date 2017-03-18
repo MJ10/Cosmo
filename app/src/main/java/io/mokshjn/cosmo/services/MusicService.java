@@ -412,6 +412,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 super.onSeekTo(pos);
             }
         });
+        mediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
     }
 
     private void updateMetaData() {
