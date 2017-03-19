@@ -28,7 +28,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.mokshjn.cosmo.R;
+import io.mokshjn.cosmo.helpers.CarHelper;
 import io.mokshjn.cosmo.helpers.LogHelper;
+import io.mokshjn.cosmo.helpers.MediaNotificationManager;
+import io.mokshjn.cosmo.helpers.PackageValidator;
+import io.mokshjn.cosmo.helpers.TvHelper;
 import io.mokshjn.cosmo.helpers.WearHelper;
 import io.mokshjn.cosmo.playback.CastPlayback;
 import io.mokshjn.cosmo.playback.LocalPlayback;
@@ -259,9 +263,9 @@ public class MusicService extends MediaBrowserServiceCompat implements
         } else {
             // otherwise, only return results when the music library is retrieved
             result.detach();
-            mMusicProvider.retrieveMediaAsync(new MusicProvider.Callback() {
+            mMusicProvider.retrieveMediaAsync(new LibraryProvider.Callback() {
                 @Override
-                public void onMusicCatalogReady(boolean success) {
+                public void onMusicLoaded(boolean success) {
                     result.sendResult(mMusicProvider.getChildren(parentMediaId, getResources()));
                 }
             });
