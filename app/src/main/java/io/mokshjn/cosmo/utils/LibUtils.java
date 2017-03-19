@@ -20,7 +20,7 @@ public class LibUtils {
         return ContentUris.withAppendedId(sArtworkUri, albumId);
     }
 
-    public static Uri getSongFileUri(int songId) {
+    public static Uri getSongFileUri(long songId) {
         return ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, songId);
     }
 

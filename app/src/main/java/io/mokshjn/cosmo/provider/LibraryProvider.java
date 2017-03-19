@@ -41,6 +41,7 @@ public class LibraryProvider {
     private ConcurrentMap<String, List<MediaMetadataCompat>> mMusicListbyAlbum;
     private ConcurrentMap<String, List<MediaMetadataCompat>> mMusicListbyArtist;
     private ConcurrentMap<String, MutableMediaMetadata> mMusicListById;
+    private ConcurrentMap<String, List<MediaMetadataCompat>> mMusicListByGenre;
 
     enum State {
         NON_INITIALIZED, INITIALIZING, INITIALIZED
@@ -59,6 +60,7 @@ public class LibraryProvider {
         mMusicListById = new ConcurrentHashMap<>();
         mMusicListbyAlbum = new ConcurrentHashMap<>();
         mMusicListbyArtist = new ConcurrentHashMap<>();
+        mMusicListByGenre = new ConcurrentHashMap<>();
     }
 
     public Iterable<String> getAlbums(){
@@ -147,15 +149,16 @@ public class LibraryProvider {
     }
 
     public void retrieveMediaAsync(final Callback callback) {
-        Log.d(TAG, "retrieveMediaAsync called");
+        LogHelper.d("ASYNC");
         if (mCurrentState == State.INITIALIZED) {
+            LogHelper.d("tHIS OPT");
             if (callback != null) {
                 // Nothing to do, execute callback immediately
                 callback.onMusicLoaded(true);
             }
             return;
         }
-
+        LogHelper.d("ASYNC TASK");
         // Asynchronously load the music catalog in a separate thread
         new AsyncTask<Void, Void, State>() {
             @Override
@@ -171,20 +174,22 @@ public class LibraryProvider {
                 }
             }
         }.execute();
+        Log.d(TAG, "retrieveMediaAsync: Extecuted");
     }
 
     private synchronized void retrieveMedia() {
         try {
             if (mCurrentState == State.NON_INITIALIZED) {
                 mCurrentState = State.INITIALIZING;
-
+                LogHelper.d("here");
                 Iterator<MediaMetadataCompat> tracks = mSource.iterator();
                 while (tracks.hasNext()) {
+                    Log.d(TAG, "Here at track");
                     MediaMetadataCompat item = tracks.next();
                     String musicId = item.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID);
                     mMusicListById.put(musicId, new MutableMediaMetadata(musicId, item));
                 }
-                buildListsByAlbum();
+                buildListsByGenre();
                 mCurrentState = State.INITIALIZED;
             }
         } finally {
@@ -194,6 +199,35 @@ public class LibraryProvider {
                 mCurrentState = State.NON_INITIALIZED;
             }
         }
+    }
+
+    private synchronized void buildListsByGenre() {
+        ConcurrentMap<String, List<MediaMetadataCompat>> newMusicListByGenre = new ConcurrentHashMap<>();
+
+        for (MutableMediaMetadata m : mMusicListById.values()) {
+            String genre = m.metadata.getString(MediaMetadataCompat.METADATA_KEY_GENRE);
+            List<MediaMetadataCompat> list = newMusicListByGenre.get(genre);
+            if (list == null) {
+                list = new ArrayList<>();
+                newMusicListByGenre.put(genre, list);
+            }
+            list.add(m.metadata);
+        }
+        mMusicListByGenre = newMusicListByGenre;
+    }
+
+    public Iterable<MediaMetadataCompat> getMusicsByGenre(String genre) {
+        if (mCurrentState != State.INITIALIZED || !mMusicListByGenre.containsKey(genre)) {
+            return Collections.emptyList();
+        }
+        return mMusicListByGenre.get(genre);
+    }
+
+    public Iterable<String> getGenres() {
+        if (mCurrentState != State.INITIALIZED) {
+            return Collections.emptyList();
+        }
+        return mMusicListByGenre.keySet();
     }
 
     private synchronized void buildListsByAlbum() {
@@ -220,6 +254,18 @@ public class LibraryProvider {
 
         if (MEDIA_ID_ROOT.equals(mediaId)) {
             mediaItems.add(createBrowsableMediaItemForRoot(resources));
+
+        } else if (MEDIA_ID_MUSICS_BY_GENRE.equals(mediaId)) {
+            for (String genre : getGenres()) {
+                mediaItems.add(createBrowsableMediaItemForGenre(genre, resources));
+            }
+
+        } else if (mediaId.startsWith(MEDIA_ID_MUSICS_BY_GENRE)) {
+            String genre = MediaIDHelper.getHierarchy(mediaId)[1];
+            for (MediaMetadataCompat metadata : getMusicsByGenre(genre)) {
+                mediaItems.add(createMediaItem(metadata));
+            }
+
         } else {
             LogHelper.w(TAG, "Skipping unmatched mediaId: ", mediaId);
         }
@@ -256,7 +302,7 @@ public class LibraryProvider {
         // when we get a onPlayFromMusicID call, so we can create the proper queue based
         // on where the music was selected from (by artist, by genre, random, etc)
         String genre = metadata.getString(MediaMetadataCompat.METADATA_KEY_GENRE);
-        String hierarchyAwareMediaID = createMediaID(
+        String hierarchyAwareMediaID = MediaIDHelper.createMediaID(
                 metadata.getDescription().getMediaId(), MEDIA_ID_MUSICS_BY_GENRE, genre);
         MediaMetadataCompat copy = new MediaMetadataCompat.Builder(metadata)
                 .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, hierarchyAwareMediaID)
@@ -265,4 +311,5 @@ public class LibraryProvider {
                 MediaBrowserCompat.MediaItem.FLAG_PLAYABLE);
 
     }
+
 }

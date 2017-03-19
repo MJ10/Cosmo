@@ -1,6 +1,7 @@
 package io.mokshjn.cosmo.playback;
 
 import android.content.BroadcastReceiver;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -8,10 +9,12 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.wifi.WifiManager;
 import android.os.PowerManager;
+import android.provider.MediaStore;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.text.TextUtils;
+import android.util.Log;
 
 import java.io.IOException;
 
@@ -169,7 +172,8 @@ public class LocalPlayback implements Playback, AudioManager.OnAudioFocusChangeL
                 mState = PlaybackStateCompat.STATE_BUFFERING;
 
                 mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-                mMediaPlayer.setDataSource(source);
+                Log.d(TAG, "play: " + source);
+                mMediaPlayer.setDataSource(mContext, ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, Long.parseLong(MediaIDHelper.extractMusicIDFromMediaID(mediaId))));
 
                 // Starts preparing the media player in the background. When
                 // it's done, it will call our OnPreparedListener (that is,

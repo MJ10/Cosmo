@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.List;
 
 import io.mokshjn.cosmo.R;
+import io.mokshjn.cosmo.helpers.AlbumArtCache;
 import io.mokshjn.cosmo.helpers.LogHelper;
 import io.mokshjn.cosmo.helpers.MediaIDHelper;
 import io.mokshjn.cosmo.helpers.QueueHelper;

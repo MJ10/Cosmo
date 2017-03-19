@@ -42,12 +42,14 @@ public class QueueHelper {
 
         Iterable<MediaMetadataCompat> tracks = null;
         // This sample only supports genre and by_search category types.
-        if (categoryType.equals(MEDIA_ID_MUSICS_BY_SEARCH)) {
+        if (categoryType.equals(MEDIA_ID_MUSICS_BY_GENRE)) {
+            tracks = musicProvider.getMusicsByGenre(categoryValue);
+        } else if (categoryType.equals(MEDIA_ID_MUSICS_BY_SEARCH)) {
             tracks = musicProvider.searchMusicBySongTitle(categoryValue);
         }
 
         if (tracks == null) {
-            LogHelper.e(TAG, "Unrecognized category type: ", categoryType, " for media ", mediaId);
+            LogHelper.e(TAG, "Unrecognized category type: ", categoryType, " for media ", mediaId, "hahahah");
             return null;
         }
 

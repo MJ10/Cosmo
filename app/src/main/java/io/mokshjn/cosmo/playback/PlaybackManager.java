@@ -7,6 +7,7 @@ import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.util.Log;
 
 import io.mokshjn.cosmo.R;
 import io.mokshjn.cosmo.helpers.LogHelper;
@@ -262,7 +263,7 @@ public class PlaybackManager implements Playback.Callback {
 
         @Override
         public void onPlayFromMediaId(String mediaId, Bundle extras) {
-            LogHelper.d(TAG, "playFromMediaId mediaId:", mediaId, "  extras=", extras);
+            Log.d(TAG, "playFromMediaId mediaId:" + mediaId+ "  extras="+ extras);
             mQueueManager.setQueueFromMusic(mediaId);
             handlePlayRequest();
         }

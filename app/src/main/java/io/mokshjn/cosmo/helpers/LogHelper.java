@@ -80,7 +80,7 @@ public class LogHelper {
                 }
                 message = sb.toString();
             }
-            Log.println(level, tag, message);
+            Log.d(tag, message);
         }
     }
 }

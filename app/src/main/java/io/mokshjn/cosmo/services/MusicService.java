@@ -17,6 +17,7 @@ import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.media.MediaRouter;
+import android.util.Log;
 
 import com.google.android.gms.cast.framework.CastContext;
 import com.google.android.gms.cast.framework.CastSession;
@@ -28,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.mokshjn.cosmo.R;
+import io.mokshjn.cosmo.activities.NowPlayingActivity;
 import io.mokshjn.cosmo.helpers.CarHelper;
 import io.mokshjn.cosmo.helpers.LogHelper;
 import io.mokshjn.cosmo.helpers.MediaNotificationManager;
@@ -99,6 +101,7 @@ public class MusicService extends MediaBrowserServiceCompat implements
         // To make the app more responsive, fetch and cache catalog information now.
         // This can help improve the response time in the method
         // {@link #onLoadChildren(String, Result<List<MediaItem>>) onLoadChildren()}.
+        Log.d(TAG, "reter");
         mMusicProvider.retrieveMediaAsync(null /* Callback */);
 
         mPackageValidator = new PackageValidator(this);
@@ -266,6 +269,7 @@ public class MusicService extends MediaBrowserServiceCompat implements
         } else {
             // otherwise, only return results when the music library is retrieved
             result.detach();
+            Log.d(TAG, "Reteriever");
             mMusicProvider.retrieveMediaAsync(new LibraryProvider.Callback() {
                 @Override
                 public void onMusicLoaded(boolean success) {
