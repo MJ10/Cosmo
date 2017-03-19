@@ -9,13 +9,8 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -24,13 +19,12 @@ import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import java.util.ArrayList;
 
-import butterknife.BindView;
 import io.mokshjn.cosmo.R;
 import io.mokshjn.cosmo.adapters.SongListAdapter;
 import io.mokshjn.cosmo.interfaces.LibraryInterface;
 import io.mokshjn.cosmo.loader.SongListLoader;
 import io.mokshjn.cosmo.models.Song;
-import io.mokshjn.cosmo.services.MusicService;
+import io.mokshjn.cosmo.services.MusicServiceOld;
 import io.mokshjn.cosmo.utils.StorageUtils;
 
 public class SongListFragment extends Fragment implements SongListAdapter.ClickListener, LibraryInterface.onLoadSongs{
@@ -39,7 +33,7 @@ public class SongListFragment extends Fragment implements SongListAdapter.ClickL
     private FastScrollRecyclerView rvSongsList;
     private SongListAdapter songAdapter;
     private ArrayList<Song> songList, backupList;
-    private MusicService service;
+    private MusicServiceOld service;
     public boolean musicBound = false;
 
     @Override
@@ -51,7 +45,7 @@ public class SongListFragment extends Fragment implements SongListAdapter.ClickL
     private ServiceConnection musicServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            MusicService.MusicBinder binder = (MusicService.MusicBinder) iBinder;
+            MusicServiceOld.MusicBinder binder = (MusicServiceOld.MusicBinder) iBinder;
             service = binder.getService();
             musicBound = true;
         }
@@ -117,7 +111,7 @@ public class SongListFragment extends Fragment implements SongListAdapter.ClickL
             storage.storeSong(songList);
             storage.storeAudioIndex(position);
 
-            Intent playerIntent = new Intent(getContext(), io.mokshjn.cosmo.services.MusicService.class);
+            Intent playerIntent = new Intent(getContext(), MusicServiceOld.class);
             getActivity().startService(playerIntent);
             getActivity().bindService(playerIntent, musicServiceConnection, Context.BIND_AUTO_CREATE);
         } else {
