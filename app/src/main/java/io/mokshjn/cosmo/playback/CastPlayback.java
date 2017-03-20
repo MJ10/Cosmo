@@ -21,7 +21,7 @@ import org.json.JSONObject;
 import io.mokshjn.cosmo.helpers.LogHelper;
 import io.mokshjn.cosmo.helpers.MediaIDHelper;
 import io.mokshjn.cosmo.provider.LibraryProvider;
-import io.mokshjn.cosmo.provider.MusicProviderSource;
+import io.mokshjn.cosmo.utils.LibUtils;
 
 /**
  * Created by moksh on 19/3/17.
@@ -56,6 +56,46 @@ public class CastPlayback implements Playback {
         mRemoteMediaClientListener = new CastMediaClientListener();
     }
 
+    /**
+     * Helper method to convert a {@link android.media.MediaMetadata} to a
+     * {@link com.google.android.gms.cast.MediaInfo} used for sending media to the receiver app.
+     *
+     * @param track      {@link com.google.android.gms.cast.MediaMetadata}
+     * @param customData custom data specifies the local mediaId used by the player.
+     * @return mediaInfo {@link com.google.android.gms.cast.MediaInfo}
+     */
+    private static MediaInfo toCastMediaMetadata(MediaMetadataCompat track,
+                                                 JSONObject customData) {
+        MediaMetadata mediaMetadata = new MediaMetadata(MediaMetadata.MEDIA_TYPE_MUSIC_TRACK);
+        mediaMetadata.putString(MediaMetadata.KEY_TITLE,
+                track.getDescription().getTitle() == null ? "" :
+                        track.getDescription().getTitle().toString());
+        mediaMetadata.putString(MediaMetadata.KEY_SUBTITLE,
+                track.getDescription().getSubtitle() == null ? "" :
+                        track.getDescription().getSubtitle().toString());
+        mediaMetadata.putString(MediaMetadata.KEY_ALBUM_ARTIST,
+                track.getString(MediaMetadataCompat.METADATA_KEY_ALBUM_ARTIST));
+        mediaMetadata.putString(MediaMetadata.KEY_ALBUM_TITLE,
+                track.getString(MediaMetadataCompat.METADATA_KEY_ALBUM));
+        WebImage image = new WebImage(
+                new Uri.Builder().encodedPath(
+                        track.getString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI))
+                        .build());
+        // First image is used by the receiver for showing the audio album art.
+        mediaMetadata.addImage(image);
+        // Second image is used by Cast Companion Library on the full screen activity that is shown
+        // when the cast dialog is clicked.
+        mediaMetadata.addImage(image);
+        long id = Long.parseLong(MediaIDHelper.extractMusicIDFromMediaID(track.getDescription().getMediaId()));
+        //noinspection ResourceType
+        return new MediaInfo.Builder(LibUtils.getSongFileUri(id).toString())
+                .setContentType(MIME_TYPE_AUDIO_MPEG)
+                .setStreamType(MediaInfo.STREAM_TYPE_BUFFERED)
+                .setMetadata(mediaMetadata)
+                .setCustomData(customData)
+                .build();
+    }
+
     @Override
     public void start() {
         mRemoteMediaClient.addListener(mRemoteMediaClientListener);
@@ -68,11 +108,6 @@ public class CastPlayback implements Playback {
         if (notifyListeners && mCallback != null) {
             mCallback.onPlaybackStatusChanged(mState);
         }
-    }
-
-    @Override
-    public void setState(int state) {
-        this.mState = state;
     }
 
     @Override
@@ -151,13 +186,13 @@ public class CastPlayback implements Playback {
     }
 
     @Override
-    public void setCurrentMediaId(String mediaId) {
-        this.mCurrentMediaId = mediaId;
+    public String getCurrentMediaId() {
+        return mCurrentMediaId;
     }
 
     @Override
-    public String getCurrentMediaId() {
-        return mCurrentMediaId;
+    public void setCurrentMediaId(String mediaId) {
+        this.mCurrentMediaId = mediaId;
     }
 
     @Override
@@ -182,6 +217,11 @@ public class CastPlayback implements Playback {
         return mState;
     }
 
+    @Override
+    public void setState(int state) {
+        this.mState = state;
+    }
+
     private void loadMedia(String mediaId, boolean autoPlay) throws JSONException {
         String musicId = MediaIDHelper.extractMusicIDFromMediaID(mediaId);
         MediaMetadataCompat track = mMusicProvider.getMusic(musicId);
@@ -196,46 +236,6 @@ public class CastPlayback implements Playback {
         customData.put(ITEM_ID, mediaId);
         MediaInfo media = toCastMediaMetadata(track, customData);
         mRemoteMediaClient.load(media, autoPlay, mCurrentPosition, customData);
-    }
-
-    /**
-     * Helper method to convert a {@link android.media.MediaMetadata} to a
-     * {@link com.google.android.gms.cast.MediaInfo} used for sending media to the receiver app.
-     *
-     * @param track {@link com.google.android.gms.cast.MediaMetadata}
-     * @param customData custom data specifies the local mediaId used by the player.
-     * @return mediaInfo {@link com.google.android.gms.cast.MediaInfo}
-     */
-    private static MediaInfo toCastMediaMetadata(MediaMetadataCompat track,
-                                                 JSONObject customData) {
-        MediaMetadata mediaMetadata = new MediaMetadata(MediaMetadata.MEDIA_TYPE_MUSIC_TRACK);
-        mediaMetadata.putString(MediaMetadata.KEY_TITLE,
-                track.getDescription().getTitle() == null ? "" :
-                        track.getDescription().getTitle().toString());
-        mediaMetadata.putString(MediaMetadata.KEY_SUBTITLE,
-                track.getDescription().getSubtitle() == null ? "" :
-                        track.getDescription().getSubtitle().toString());
-        mediaMetadata.putString(MediaMetadata.KEY_ALBUM_ARTIST,
-                track.getString(MediaMetadataCompat.METADATA_KEY_ALBUM_ARTIST));
-        mediaMetadata.putString(MediaMetadata.KEY_ALBUM_TITLE,
-                track.getString(MediaMetadataCompat.METADATA_KEY_ALBUM));
-        WebImage image = new WebImage(
-                new Uri.Builder().encodedPath(
-                        track.getString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI))
-                        .build());
-        // First image is used by the receiver for showing the audio album art.
-        mediaMetadata.addImage(image);
-        // Second image is used by Cast Companion Library on the full screen activity that is shown
-        // when the cast dialog is clicked.
-        mediaMetadata.addImage(image);
-
-        //noinspection ResourceType
-        return new MediaInfo.Builder(track.getString(MusicProviderSource.CUSTOM_METADATA_TRACK_SOURCE))
-                .setContentType(MIME_TYPE_AUDIO_MPEG)
-                .setStreamType(MediaInfo.STREAM_TYPE_BUFFERED)
-                .setMetadata(mediaMetadata)
-                .setCustomData(customData)
-                .build();
     }
 
     private void setMetadataFromRemote() {

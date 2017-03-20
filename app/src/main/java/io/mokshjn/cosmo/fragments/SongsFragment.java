@@ -23,8 +23,6 @@ import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import io.mokshjn.cosmo.R;
 import io.mokshjn.cosmo.adapters.SongAdapter;
 import io.mokshjn.cosmo.helpers.LogHelper;
@@ -40,10 +38,11 @@ public class SongsFragment extends Fragment implements SongAdapter.ClickListener
     private static final String TAG = LogHelper.makeLogTag(MediaBrowserFragment.class);
 
     private static final String ARG_MEDIA_ID = "media_id";
-    @BindView(R.id.rvSongList)
-    FastScrollRecyclerView rvSongList;
+
+    private FastScrollRecyclerView rvSongList;
     private ArrayList<MediaBrowserCompat.MediaItem> tracks;
     private SongAdapter adapter;
+
     private final MediaControllerCompat.Callback mMediaControllerCallback =
             new MediaControllerCompat.Callback() {
                 @Override
@@ -100,13 +99,13 @@ public class SongsFragment extends Fragment implements SongAdapter.ClickListener
         mMediaFragmentlistener = (MediaFragmentListener) context;
     }
 
+
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
 //        return super.onCreateView(inflater, container, savedInstanceState);
         View rootView = inflater.inflate(R.layout.fragment_song_list, container, false);
-        ButterKnife.bind(getActivity());
         rvSongList = (FastScrollRecyclerView) rootView.findViewById(R.id.rvSongList);
         rvSongList.setLayoutManager(new LinearLayoutManager(getContext()));
         return rootView;
@@ -168,15 +167,6 @@ public class SongsFragment extends Fragment implements SongAdapter.ClickListener
         }
         updateTitle();
 
-        // Unsubscribing before subscribing is required if this mediaId already has a subscriber
-        // on this MediaBrowser instance. Subscribing to an already subscribed mediaId will replace
-        // the callback, but won't trigger the initial callback.onChildrenLoaded.
-        //
-        // This is temporary: A bug is being fixed that will make subscribe
-        // consistently call onChildrenLoaded initially, no matter if it is replacing an existing
-        // subscriber or not. Currently this only happens if the mediaID has no previous
-        // subscriber or if the media content changes on the service side, so we need to
-        // unsubscribe first.
         mMediaFragmentlistener.getMediaBrowser().unsubscribe(mMediaId);
 
         mMediaFragmentlistener.getMediaBrowser().subscribe(mMediaId, mSubscriptionCallback);

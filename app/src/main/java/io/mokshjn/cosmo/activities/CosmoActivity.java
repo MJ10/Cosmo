@@ -62,8 +62,6 @@ public class CosmoActivity extends BaseActivity implements MediaBrowserFragment.
         if (item.isPlayable()) {
             getSupportMediaController().getTransportControls()
                     .playFromMediaId(item.getMediaId(), null);
-        } else if (item.isBrowsable()) {
-            navigateToBrowser(item.getMediaId());
         } else {
             LogHelper.w(TAG, "Ignoring MediaItem that is neither browsable nor playable: ",
                     "mediaId=", item.getMediaId());
