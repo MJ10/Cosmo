@@ -2,13 +2,13 @@ package io.mokshjn.cosmo.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
-import java.lang.reflect.Type;
 
 import io.mokshjn.cosmo.models.Song;
+
+//import com.google.gson.Gson;
+//import com.google.gson.reflect.TypeToken;
 
 /**
  * Created by moksh on 31/1/17.
@@ -26,20 +26,21 @@ public class StorageUtils {
     }
 
     public void storeSong(ArrayList<Song> arrayList) {
-        preferences = context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        Gson gson = new Gson();
-        String json = gson.toJson(arrayList);
-        editor.putString("audioArrayList", json);
-        editor.apply();
+//        preferences = context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
+//        SharedPreferences.Editor editor = preferences.edit();
+//        Gson gson = new Gson();
+//        String json = gson.toJson(arrayList);
+//        editor.putString("audioArrayList", json);
+//        editor.apply();
     }
 
     public ArrayList<Song> loadSongs() {
-        preferences = context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
-        String json = preferences.getString("audioArrayList", null);
-        Type type = new TypeToken<ArrayList<Song>>() {}.getType();
-        Gson gson = new Gson();
-        return gson.fromJson(json, type);
+//        preferences = context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
+//        String json = preferences.getString("audioArrayList", null);
+//        Type type = new TypeToken<ArrayList<Song>>() {}.getType();
+//        Gson gson = new Gson();
+//        return gson.fromJson(json, type);
+        return null;
     }
 
     public void storeAudioIndex(int index) {

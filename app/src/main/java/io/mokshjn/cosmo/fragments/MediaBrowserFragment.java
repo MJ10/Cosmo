@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.mokshjn.cosmo.R;
+import io.mokshjn.cosmo.adapters.SongAdapter;
 import io.mokshjn.cosmo.helpers.LogHelper;
 import io.mokshjn.cosmo.helpers.MediaIDHelper;
 import io.mokshjn.cosmo.interfaces.MediaBrowserProvider;
@@ -38,7 +39,7 @@ import io.mokshjn.cosmo.models.MediaItemViewHolder;
 
 public class MediaBrowserFragment extends Fragment {
 
-    private static final String TAG = LogHelper.makeLogTag(MediaBrowserFragment.class);
+    private static final String TAG = LogHelper.makeLogTag(SongAdapter.class);
 
     private static final String ARG_MEDIA_ID = "media_id";
 
@@ -267,6 +268,12 @@ public class MediaBrowserFragment extends Fragment {
         });
     }
 
+    public interface MediaFragmentListener extends MediaBrowserProvider {
+        void onMediaItemSelected(MediaBrowserCompat.MediaItem item);
+
+        void setToolbarTitle(CharSequence title);
+    }
+
     // An adapter for showing the list of browsed MediaItem's
     private static class BrowseAdapter extends ArrayAdapter<MediaBrowserCompat.MediaItem> {
 
@@ -280,11 +287,6 @@ public class MediaBrowserFragment extends Fragment {
             return MediaItemViewHolder.setupListView((Activity) getContext(), convertView, parent,
                     item);
         }
-    }
-
-    public interface MediaFragmentListener extends MediaBrowserProvider {
-        void onMediaItemSelected(MediaBrowserCompat.MediaItem item);
-        void setToolbarTitle(CharSequence title);
     }
 
 }

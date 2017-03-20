@@ -11,27 +11,25 @@ import android.util.Log;
 
 import io.mokshjn.cosmo.R;
 import io.mokshjn.cosmo.fragments.MediaBrowserFragment;
+import io.mokshjn.cosmo.fragments.SongsFragment;
 import io.mokshjn.cosmo.helpers.LogHelper;
 
 /**
  * Created by moksh on 19/3/17.
  */
 
-public class CosmoActivity extends BaseActivity implements MediaBrowserFragment.MediaFragmentListener {
-    private static final String TAG = LogHelper.makeLogTag(CosmoActivity.class);
-    private static final String SAVED_MEDIA_ID="com.example.android.uamp.MEDIA_ID";
-    private static final String FRAGMENT_TAG = "uamp_list_container";
-
+public class CosmoActivity extends BaseActivity implements MediaBrowserFragment.MediaFragmentListener, SongsFragment.MediaFragmentListener {
     public static final String EXTRA_START_FULLSCREEN =
             "com.example.android.uamp.EXTRA_START_FULLSCREEN";
-
     /**
      * Optionally used with {@link #EXTRA_START_FULLSCREEN} to carry a MediaDescription to
      * while the {@link android.support.v4.media.session.MediaControllerCompat} is connecting.
      */
     public static final String EXTRA_CURRENT_MEDIA_DESCRIPTION =
             "com.example.android.uamp.CURRENT_MEDIA_DESCRIPTION";
-
+    private static final String TAG = LogHelper.makeLogTag(CosmoActivity.class);
+    private static final String SAVED_MEDIA_ID = "com.example.android.uamp.MEDIA_ID";
+    private static final String FRAGMENT_TAG = "uamp_list_container";
     private Bundle mVoiceSearchParams;
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -120,10 +118,10 @@ public class CosmoActivity extends BaseActivity implements MediaBrowserFragment.
 
     private void navigateToBrowser(String mediaId) {
         LogHelper.d(TAG, "navigateToBrowser, mediaId=" + mediaId);
-        MediaBrowserFragment fragment = getBrowseFragment();
+        SongsFragment fragment = getBrowseFragment();
 
         if (fragment == null || !TextUtils.equals(fragment.getMediaId(), mediaId)) {
-            fragment = new MediaBrowserFragment();
+            fragment = new SongsFragment();
             fragment.setMediaId(mediaId);
             FragmentTransaction transaction = getFragmentManager().beginTransaction();
             transaction.setCustomAnimations(
@@ -140,15 +138,15 @@ public class CosmoActivity extends BaseActivity implements MediaBrowserFragment.
     }
 
     public String getMediaId() {
-        MediaBrowserFragment fragment = getBrowseFragment();
+        SongsFragment fragment = getBrowseFragment();
         if (fragment == null) {
             return null;
         }
         return fragment.getMediaId();
     }
 
-    private MediaBrowserFragment getBrowseFragment() {
-        return (MediaBrowserFragment) getFragmentManager().findFragmentByTag(FRAGMENT_TAG);
+    private SongsFragment getBrowseFragment() {
+        return (SongsFragment) getFragmentManager().findFragmentByTag(FRAGMENT_TAG);
     }
 
     @Override

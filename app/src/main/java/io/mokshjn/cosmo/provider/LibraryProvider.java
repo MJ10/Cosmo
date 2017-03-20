@@ -11,7 +11,6 @@ import android.support.v4.media.MediaMetadataCompat;
 import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -22,7 +21,6 @@ import java.util.concurrent.ConcurrentMap;
 import io.mokshjn.cosmo.R;
 import io.mokshjn.cosmo.helpers.LogHelper;
 import io.mokshjn.cosmo.helpers.MediaIDHelper;
-import io.mokshjn.cosmo.models.Album;
 import io.mokshjn.cosmo.models.MutableMediaMetadata;
 
 import static io.mokshjn.cosmo.helpers.MediaIDHelper.MEDIA_ID_MUSICS_BY_GENRE;
@@ -42,16 +40,7 @@ public class LibraryProvider {
     private ConcurrentMap<String, List<MediaMetadataCompat>> mMusicListbyArtist;
     private ConcurrentMap<String, MutableMediaMetadata> mMusicListById;
     private ConcurrentMap<String, List<MediaMetadataCompat>> mMusicListByGenre;
-
-    enum State {
-        NON_INITIALIZED, INITIALIZING, INITIALIZED
-    }
-
     private volatile State mCurrentState = State.NON_INITIALIZED;
-
-    public interface Callback {
-        void onMusicLoaded(boolean success);
-    }
 
     public LibraryProvider(ContentResolver resolver) {this(new LibrarySource(resolver)); }
 
@@ -253,7 +242,9 @@ public class LibraryProvider {
         }
 
         if (MEDIA_ID_ROOT.equals(mediaId)) {
-            mediaItems.add(createBrowsableMediaItemForRoot(resources));
+            for (MediaMetadataCompat metadata : getMusicsByGenre("Songs")) {
+                mediaItems.add(createMediaItem(metadata));
+            }
 
         } else if (MEDIA_ID_MUSICS_BY_GENRE.equals(mediaId)) {
             for (String genre : getGenres()) {
@@ -310,6 +301,14 @@ public class LibraryProvider {
         return new MediaBrowserCompat.MediaItem(copy.getDescription(),
                 MediaBrowserCompat.MediaItem.FLAG_PLAYABLE);
 
+    }
+
+    enum State {
+        NON_INITIALIZED, INITIALIZING, INITIALIZED
+    }
+
+    public interface Callback {
+        void onMusicLoaded(boolean success);
     }
 
 }
