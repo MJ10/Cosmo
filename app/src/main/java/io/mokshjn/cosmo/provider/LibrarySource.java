@@ -1,7 +1,6 @@
 package io.mokshjn.cosmo.provider;
 
 import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
@@ -9,6 +8,8 @@ import android.support.v4.media.MediaMetadataCompat;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+
+import io.mokshjn.cosmo.utils.LibUtils;
 
 /**
  * Created by moksh on 19/3/17.
@@ -40,8 +41,7 @@ public class LibrarySource implements MusicProviderSource {
                         .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.AudioColumns.DURATION)))
                         .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.AudioColumns.TRACK)))
                         .putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.AudioColumns.DURATION)))
-                        .putString(MediaMetadataCompat.METADATA_KEY_GENRE, "Songs")
-                        .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, ContentUris.withAppendedId(sArtworkUri, cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.AudioColumns.ALBUM_ID))).toString())
+                        .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, LibUtils.getMediaStoreAlbumCoverUri(cursor.getColumnIndex(MediaStore.Audio.AudioColumns.ALBUM_ID)).toString())
                         .build();
                 tracks.add(metadata);
             } while (cursor.moveToNext());

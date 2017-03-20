@@ -15,6 +15,7 @@ import io.mokshjn.cosmo.provider.LibraryProvider;
 
 import static io.mokshjn.cosmo.helpers.MediaIDHelper.MEDIA_ID_MUSICS_BY_GENRE;
 import static io.mokshjn.cosmo.helpers.MediaIDHelper.MEDIA_ID_MUSICS_BY_SEARCH;
+import static io.mokshjn.cosmo.helpers.MediaIDHelper.MEDIA_ID_ROOT;
 
 /**
  * Created by moksh on 19/3/17.
@@ -31,13 +32,16 @@ public class QueueHelper {
         // extract the browsing hierarchy from the media ID:
         String[] hierarchy = MediaIDHelper.getHierarchy(mediaId);
 
-        if (hierarchy.length != 2) {
+        if (hierarchy.length > 2) {
             LogHelper.e(TAG, "Could not build a playing queue for this mediaId: ", mediaId);
             return null;
         }
 
+        String categoryValue = "";
         String categoryType = hierarchy[0];
-        String categoryValue = hierarchy[1];
+        if (hierarchy.length == 2) {
+            categoryValue = hierarchy[1];
+        }
         LogHelper.d(TAG, "Creating playing queue for ", categoryType, ",  ", categoryValue);
 
         Iterable<MediaMetadataCompat> tracks = null;
@@ -46,14 +50,19 @@ public class QueueHelper {
             tracks = musicProvider.getMusicsByGenre(categoryValue);
         } else if (categoryType.equals(MEDIA_ID_MUSICS_BY_SEARCH)) {
             tracks = musicProvider.searchMusicBySongTitle(categoryValue);
+        } else if (categoryType.equals(MEDIA_ID_ROOT)) {
+            tracks = musicProvider.getTracks();
         }
 
         if (tracks == null) {
             LogHelper.e(TAG, "Unrecognized category type: ", categoryType, " for media ", mediaId, "hahahah");
             return null;
         }
-
-        return convertToQueue(tracks, hierarchy[0], hierarchy[1]);
+        if (hierarchy.length == 2) {
+            return convertToQueue(tracks, hierarchy[0], hierarchy[1]);
+        } else {
+            return convertToQueue(tracks, hierarchy[0]);
+        }
     }
 
     public static List<MediaSessionCompat.QueueItem> getPlayingQueueFromSearch(String query,

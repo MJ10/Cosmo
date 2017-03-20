@@ -102,6 +102,8 @@ public class MediaIDHelper {
         String[] hierarchy = getHierarchy(mediaID);
         if (hierarchy.length == 2) {
             return hierarchy[1];
+        } else if (hierarchy.length == 1) {
+            return hierarchy[0];
         }
         return null;
     }

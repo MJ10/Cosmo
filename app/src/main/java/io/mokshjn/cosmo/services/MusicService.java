@@ -17,7 +17,6 @@ import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.media.MediaRouter;
-import android.util.Log;
 
 import com.google.android.gms.cast.framework.CastContext;
 import com.google.android.gms.cast.framework.CastSession;
@@ -53,8 +52,6 @@ import static io.mokshjn.cosmo.helpers.MediaIDHelper.MEDIA_ID_ROOT;
 public class MusicService extends MediaBrowserServiceCompat implements
         PlaybackManager.PlaybackServiceCallback {
 
-    private static final String TAG = LogHelper.makeLogTag(MusicService.class);
-
     // Extra on MediaSession that contains the Cast device name currently connected to
     public static final String EXTRA_CONNECTED_CAST = "com.example.android.uamp.CAST_NAME";
     // The action of the incoming Intent indicating that it contains a command
@@ -69,16 +66,15 @@ public class MusicService extends MediaBrowserServiceCompat implements
     // A value of a CMD_NAME key that indicates that the music playback should switch
     // to local playback from cast playback.
     public static final String CMD_STOP_CASTING = "CMD_STOP_CASTING";
+    private static final String TAG = LogHelper.makeLogTag(MusicService.class);
     // Delay stopSelf by using a handler.
     private static final int STOP_DELAY = 30000;
-
+    private final DelayedStopHandler mDelayedStopHandler = new DelayedStopHandler(this);
     private LibraryProvider mMusicProvider;
     private PlaybackManager mPlaybackManager;
-
     private MediaSessionCompat mSession;
     private MediaNotificationManager mMediaNotificationManager;
     private Bundle mSessionExtras;
-    private final DelayedStopHandler mDelayedStopHandler = new DelayedStopHandler(this);
     private MediaRouter mMediaRouter;
     private PackageValidator mPackageValidator;
     private SessionManager mCastSessionManager;
@@ -101,7 +97,6 @@ public class MusicService extends MediaBrowserServiceCompat implements
         // To make the app more responsive, fetch and cache catalog information now.
         // This can help improve the response time in the method
         // {@link #onLoadChildren(String, Result<List<MediaItem>>) onLoadChildren()}.
-        Log.d(TAG, "reter");
         mMusicProvider.retrieveMediaAsync(null /* Callback */);
 
         mPackageValidator = new PackageValidator(this);
@@ -269,7 +264,6 @@ public class MusicService extends MediaBrowserServiceCompat implements
         } else {
             // otherwise, only return results when the music library is retrieved
             result.detach();
-            Log.d(TAG, "Reteriever");
             mMusicProvider.retrieveMediaAsync(new LibraryProvider.Callback() {
                 @Override
                 public void onMusicLoaded(boolean success) {

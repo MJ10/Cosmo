@@ -125,6 +125,7 @@ public class QueueManager {
         if (!canReuseQueue) {
             String queueTitle = mResources.getString(R.string.browse_musics_by_genre_subtitle,
                     MediaIDHelper.extractBrowseCategoryValueFromMediaID(mediaId));
+            LogHelper.d("queue title : ", queueTitle, " media id : ", mediaId);
             setCurrentQueue(queueTitle,
                     QueueHelper.getPlayingQueue(mediaId, mMusicProvider), mediaId);
         }
