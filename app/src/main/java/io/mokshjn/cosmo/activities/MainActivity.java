@@ -2,49 +2,59 @@ package io.mokshjn.cosmo.activities;
 
 import android.Manifest;
 import android.app.ActivityOptions;
+import android.app.SearchManager;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.os.PersistableBundle;
+import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.media.MediaBrowserCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import io.mokshjn.cosmo.R;
 import io.mokshjn.cosmo.fragments.AlbumListFragment;
 import io.mokshjn.cosmo.fragments.ArtistListFragment;
-import io.mokshjn.cosmo.fragments.SongListFragment;
+import io.mokshjn.cosmo.fragments.SongsFragment;
+import io.mokshjn.cosmo.helpers.LogHelper;
 
-public class MainActivity extends AppCompatActivity {
-    private ViewPager mViewPager;
-    private PagerAdapter mPagerAdapter;
-    private boolean serviceBound;
-    private Toolbar toolbar;
+public class MainActivity extends BaseActivity implements SongsFragment.MediaFragmentListener {
 
+    public static final String EXTRA_START_FULLSCREEN =
+            "io.mokshjn.cosmo.EXTRA_START_FULLSCREEN";
+    /**
+     * Optionally used with {@link #EXTRA_START_FULLSCREEN} to carry a MediaDescription to
+     * while the {@link android.support.v4.media.session.MediaControllerCompat} is connecting.
+     */
+    public static final String EXTRA_CURRENT_MEDIA_DESCRIPTION =
+            "io.mokshjn.cosmo.CURRENT_MEDIA_DESCRIPTION";
+    private static final String TAG = LogHelper.makeLogTag(CosmoActivity.class);
+    private static final String SAVED_MEDIA_ID = "io.mokshjn.cosmo.MEDIA_ID";
+    private static final String FRAGMENT_TAG = "uamp_list_container";
     private static final int RC_SEARCH = 0;
     private static final int PERMISSION_REQUEST_CODE = 1;
+    private Bundle mVoiceSearchParams;
+    private ViewPager mViewPager;
+    private PagerAdapter mPagerAdapter;
+    private Toolbar toolbar;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ButterKnife.bind(this);
         setContentView(R.layout.activity_main);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
+        intializePager();
         if(Build.VERSION.SDK_INT >= 23){
             if(checkPermission()){
 
@@ -54,14 +64,66 @@ public class MainActivity extends AppCompatActivity {
         }
 
         setSupportActionBar(toolbar);
+        initializeToolbar();
+        initializeFromParams(savedInstanceState, getIntent());
+        if (savedInstanceState == null) {
+            startFullScreenActivityIfNeeded(getIntent());
+        }
+    }
 
-        intializePager();
+    protected void initializeFromParams(Bundle savedInstanceState, Intent intent) {
+        String mediaId = null;
+        // check if we were started from a "Play XYZ" voice search. If so, we save the extras
+        // (which contain the query details) in a parameter, so we can reuse it later, when the
+        // MediaSession is connected.
+        if (intent.getAction() != null
+                && intent.getAction().equals(MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH)) {
+            mVoiceSearchParams = intent.getExtras();
+            LogHelper.d(TAG, "Starting from voice search query=",
+                    mVoiceSearchParams.getString(SearchManager.QUERY));
+        } else {
+            if (savedInstanceState != null) {
+                // If there is a saved media ID, use it
+                mediaId = savedInstanceState.getString(SAVED_MEDIA_ID);
+            }
+        }
+    }
+
+    private void startFullScreenActivityIfNeeded(Intent intent) {
+        if (intent != null && intent.getBooleanExtra(EXTRA_START_FULLSCREEN, false)) {
+            Intent fullScreenIntent = new Intent(this, FullScreenPlayerActivity.class)
+                    .setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP |
+                            Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                    .putExtra(EXTRA_CURRENT_MEDIA_DESCRIPTION,
+                            intent.getParcelableExtra(EXTRA_CURRENT_MEDIA_DESCRIPTION));
+            startActivity(fullScreenIntent);
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        String mediaId = getMediaId();
+        if (mediaId != null) {
+            outState.putString(SAVED_MEDIA_ID, mediaId);
+        }
+        super.onSaveInstanceState(outState);
+    }
+
+    public String getMediaId() {
+        return ((SongsFragment) mPagerAdapter.getItem(mViewPager.getCurrentItem())).getMediaId();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.search_menu, menu);
         return true;
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        LogHelper.d(TAG, "onNewIntent, intent=" + intent);
+        initializeFromParams(null, intent);
+        startFullScreenActivityIfNeeded(intent);
     }
 
     @Override
@@ -113,18 +175,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
-        super.onSaveInstanceState(outState, outPersistentState);
-        outState.putBoolean("serviceStatus", serviceBound);
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        serviceBound = savedInstanceState.getBoolean("serviceStatus");
-    }
-
     private void intializePager() {
         mPagerAdapter = new PagerAdapter(getSupportFragmentManager());
 
@@ -133,6 +183,30 @@ public class MainActivity extends AppCompatActivity {
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
+    }
+
+    @Override
+    public void onMediaItemSelected(MediaBrowserCompat.MediaItem item) {
+
+    }
+
+    @Override
+    public void setToolbarTitle(CharSequence title) {
+
+    }
+
+    @Override
+    protected void onMediaControllerConnected() {
+        if (mVoiceSearchParams != null) {
+            // If there is a bootstrap parameter to start from a search query, we
+            // send it to the media session and set it to null, so it won't play again
+            // when the activity is stopped/started or recreated:
+            String query = mVoiceSearchParams.getString(SearchManager.QUERY);
+            getSupportMediaController().getTransportControls()
+                    .playFromSearch(query, mVoiceSearchParams);
+            mVoiceSearchParams = null;
+        }
+        ((SongsFragment) getSupportFragmentManager().findFragmentByTag("android:switcher:" + R.id.main_content + ":" + mViewPager.getCurrentItem())).onConnected();
     }
 
     public class PagerAdapter extends FragmentPagerAdapter {
@@ -145,7 +219,7 @@ public class MainActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             switch (position) {
                 case 0:
-                    return SongListFragment.newInstance();
+                    return new SongsFragment();
                 case 1:
                     return AlbumListFragment.newInstance();
                 case 2:

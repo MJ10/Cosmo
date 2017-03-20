@@ -1,6 +1,5 @@
 package io.mokshjn.cosmo.activities;
 
-import android.app.FragmentTransaction;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.os.Bundle;
@@ -120,11 +119,7 @@ public class CosmoActivity extends BaseActivity implements MediaBrowserFragment.
 
         if (fragment == null || !TextUtils.equals(fragment.getMediaId(), mediaId)) {
             fragment = new SongsFragment();
-            fragment.setMediaId(mediaId);
-            FragmentTransaction transaction = getFragmentManager().beginTransaction();
-            transaction.setCustomAnimations(
-                    R.animator.slide_in_from_right, R.animator.slide_out_to_left,
-                    R.animator.slide_in_from_left, R.animator.slide_out_to_right);
+            android.support.v4.app.FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.container, fragment, FRAGMENT_TAG);
             // If this is not the top level media (root), we add it to the fragment back stack,
             // so that actionbar toggle and Back will work appropriately:
@@ -144,7 +139,7 @@ public class CosmoActivity extends BaseActivity implements MediaBrowserFragment.
     }
 
     private SongsFragment getBrowseFragment() {
-        return (SongsFragment) getFragmentManager().findFragmentByTag(FRAGMENT_TAG);
+        return (SongsFragment) getSupportFragmentManager().findFragmentByTag(FRAGMENT_TAG);
     }
 
     @Override

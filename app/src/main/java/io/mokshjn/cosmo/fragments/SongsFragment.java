@@ -1,18 +1,17 @@
 package io.mokshjn.cosmo.fragments;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.widget.LinearLayoutManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,7 +32,7 @@ import io.mokshjn.cosmo.interfaces.MediaBrowserProvider;
  * Created by moksh on 19/3/17.
  */
 
-public class SongsFragment extends Fragment implements SongAdapter.ClickListener {
+public class SongsFragment extends android.support.v4.app.Fragment implements SongAdapter.ClickListener {
 
     private static final String TAG = LogHelper.makeLogTag(MediaBrowserFragment.class);
 
@@ -93,9 +92,17 @@ public class SongsFragment extends Fragment implements SongAdapter.ClickListener
     private String mMediaId;
     private MediaFragmentListener mMediaFragmentlistener;
 
+    public static SongsFragment newInstance() {
+        SongsFragment fragment = new SongsFragment();
+        Bundle args = new Bundle();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     @Override
     public void onAttach(Activity context) {
         super.onAttach(context);
+        Log.d(TAG, "Initialised fragment listener");
         mMediaFragmentlistener = (MediaFragmentListener) context;
     }
 
@@ -130,7 +137,7 @@ public class SongsFragment extends Fragment implements SongAdapter.ClickListener
         if (mediaBrowser != null && mediaBrowser.isConnected() && mMediaId != null) {
             mediaBrowser.unsubscribe(mMediaId);
         }
-        MediaControllerCompat controller = ((FragmentActivity) getActivity())
+        MediaControllerCompat controller = getActivity()
                 .getSupportMediaController();
         if (controller != null) {
             controller.unregisterCallback(mMediaControllerCallback);
@@ -172,7 +179,7 @@ public class SongsFragment extends Fragment implements SongAdapter.ClickListener
         mMediaFragmentlistener.getMediaBrowser().subscribe(mMediaId, mSubscriptionCallback);
 
         // Add MediaController callback so we can redraw the list when metadata changes:
-        MediaControllerCompat controller = ((FragmentActivity) getActivity())
+        MediaControllerCompat controller = getActivity()
                 .getSupportMediaController();
         if (controller != null) {
             controller.registerCallback(mMediaControllerCallback);
@@ -197,7 +204,12 @@ public class SongsFragment extends Fragment implements SongAdapter.ClickListener
 
     @Override
     public void onSongClick(View v, int position) {
-        mMediaFragmentlistener.onMediaItemSelected(tracks.get(position));
+//        mMediaFragmentlistener.onMediaItemSelected(tracks.get(position));
+        MediaBrowserCompat.MediaItem item = tracks.get(position);
+        if (item.isPlayable()) {
+            getActivity().getSupportMediaController().getTransportControls()
+                    .playFromMediaId(item.getMediaId(), null);
+        }
     }
 
     public interface MediaFragmentListener extends MediaBrowserProvider {
