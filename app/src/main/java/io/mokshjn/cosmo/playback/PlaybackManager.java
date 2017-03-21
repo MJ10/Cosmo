@@ -1,7 +1,6 @@
 package io.mokshjn.cosmo.playback;
 
 import android.content.res.Resources;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
@@ -9,10 +8,8 @@ import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 
-import io.mokshjn.cosmo.R;
 import io.mokshjn.cosmo.helpers.LogHelper;
 import io.mokshjn.cosmo.helpers.MediaIDHelper;
-import io.mokshjn.cosmo.helpers.WearHelper;
 import io.mokshjn.cosmo.provider.LibraryProvider;
 
 /**
@@ -56,7 +53,7 @@ public class PlaybackManager implements Playback.Callback {
      * Handle a request to play music
      */
     public void handlePlayRequest() {
-        LogHelper.d(TAG, "handlePlayRequest: mState=" + mPlayback.getState());
+        Log.d(TAG, "handlePlayRequest: mState=" + mPlayback.getState());
         MediaSessionCompat.QueueItem currentMusic = mQueueManager.getCurrentMusic();
         if (currentMusic != null) {
             mServiceCallback.onPlaybackStart();
@@ -169,6 +166,7 @@ public class PlaybackManager implements Playback.Callback {
         // The media player finished playing the current song, so we go ahead
         // and start the next.
         if (mQueueManager.skipQueuePosition(1)) {
+            Log.d(TAG, "onCompletion: handlerCall");
             handlePlayRequest();
             mQueueManager.updateMetadata();
         } else {
@@ -238,6 +236,16 @@ public class PlaybackManager implements Playback.Callback {
     }
 
 
+    public interface PlaybackServiceCallback {
+        void onPlaybackStart();
+
+        void onNotificationRequired();
+
+        void onPlaybackStop();
+
+        void onPlaybackStateUpdated(PlaybackStateCompat newState);
+    }
+
     private class MediaSessionCallback extends MediaSessionCompat.Callback {
         @Override
         public void onPlay() {
@@ -245,6 +253,7 @@ public class PlaybackManager implements Playback.Callback {
             if (mQueueManager.getCurrentMusic() == null) {
                 mQueueManager.setRandomQueue();
             }
+            Log.d(TAG, "onPlay: handler");
             handlePlayRequest();
         }
 
@@ -265,6 +274,7 @@ public class PlaybackManager implements Playback.Callback {
         public void onPlayFromMediaId(String mediaId, Bundle extras) {
             Log.d(TAG, "playFromMediaId mediaId:" + mediaId+ "  extras="+ extras);
             mQueueManager.setQueueFromMusic(mediaId);
+            Log.d(TAG, "onPlayFromMediaId: hander");
             handlePlayRequest();
         }
 
@@ -284,6 +294,7 @@ public class PlaybackManager implements Playback.Callback {
         public void onSkipToNext() {
             LogHelper.d(TAG, "skipToNext");
             if (mQueueManager.skipQueuePosition(1)) {
+                Log.d(TAG, "onSkipToNext: ");
                 handlePlayRequest();
             } else {
                 handleStopRequest("Cannot skip");
@@ -334,15 +345,5 @@ public class PlaybackManager implements Playback.Callback {
             }
         }
 
-    }
-
-    public interface PlaybackServiceCallback {
-            void onPlaybackStart();
-
-            void onNotificationRequired();
-
-            void onPlaybackStop();
-
-            void onPlaybackStateUpdated(PlaybackStateCompat newState);
     }
 }
