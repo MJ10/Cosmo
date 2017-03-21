@@ -25,7 +25,6 @@ import java.util.List;
 import io.mokshjn.cosmo.R;
 import io.mokshjn.cosmo.adapters.SongAdapter;
 import io.mokshjn.cosmo.helpers.LogHelper;
-import io.mokshjn.cosmo.helpers.MediaIDHelper;
 import io.mokshjn.cosmo.interfaces.MediaBrowserProvider;
 
 /**
@@ -91,13 +90,6 @@ public class SongsFragment extends android.support.v4.app.Fragment implements So
             };
     private String mMediaId;
     private MediaFragmentListener mMediaFragmentlistener;
-
-    public static SongsFragment newInstance() {
-        SongsFragment fragment = new SongsFragment();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @Override
     public void onAttach(Activity context) {
@@ -172,7 +164,6 @@ public class SongsFragment extends android.support.v4.app.Fragment implements So
         if (mMediaId == null) {
             mMediaId = mMediaFragmentlistener.getMediaBrowser().getRoot();
         }
-        updateTitle();
 
         mMediaFragmentlistener.getMediaBrowser().unsubscribe(mMediaId);
 
@@ -186,25 +177,8 @@ public class SongsFragment extends android.support.v4.app.Fragment implements So
         }
     }
 
-    private void updateTitle() {
-        if (MediaIDHelper.MEDIA_ID_ROOT.equals(mMediaId)) {
-            mMediaFragmentlistener.setToolbarTitle(null);
-            return;
-        }
-
-        MediaBrowserCompat mediaBrowser = mMediaFragmentlistener.getMediaBrowser();
-        mediaBrowser.getItem(mMediaId, new MediaBrowserCompat.ItemCallback() {
-            @Override
-            public void onItemLoaded(MediaBrowserCompat.MediaItem item) {
-                mMediaFragmentlistener.setToolbarTitle(
-                        item.getDescription().getTitle());
-            }
-        });
-    }
-
     @Override
     public void onSongClick(View v, int position) {
-//        mMediaFragmentlistener.onMediaItemSelected(tracks.get(position));
         MediaBrowserCompat.MediaItem item = tracks.get(position);
         if (item.isPlayable()) {
             getActivity().getSupportMediaController().getTransportControls()
@@ -213,7 +187,5 @@ public class SongsFragment extends android.support.v4.app.Fragment implements So
     }
 
     public interface MediaFragmentListener extends MediaBrowserProvider {
-        void onMediaItemSelected(MediaBrowserCompat.MediaItem item);
-        void setToolbarTitle(CharSequence title);
     }
 }

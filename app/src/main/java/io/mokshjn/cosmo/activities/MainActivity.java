@@ -15,7 +15,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -41,7 +40,6 @@ public class MainActivity extends BaseActivity implements SongsFragment.MediaFra
             "io.mokshjn.cosmo.CURRENT_MEDIA_DESCRIPTION";
     private static final String TAG = LogHelper.makeLogTag(CosmoActivity.class);
     private static final String SAVED_MEDIA_ID = "io.mokshjn.cosmo.MEDIA_ID";
-    private static final String FRAGMENT_TAG = "uamp_list_container";
     private static final int RC_SEARCH = 0;
     private static final int PERMISSION_REQUEST_CODE = 1;
     private Bundle mVoiceSearchParams;
@@ -183,16 +181,6 @@ public class MainActivity extends BaseActivity implements SongsFragment.MediaFra
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
-    }
-
-    @Override
-    public void onMediaItemSelected(MediaBrowserCompat.MediaItem item) {
-
-    }
-
-    @Override
-    public void setToolbarTitle(CharSequence title) {
-
     }
 
     @Override
