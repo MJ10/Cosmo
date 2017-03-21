@@ -33,7 +33,7 @@ import io.mokshjn.cosmo.interfaces.MediaBrowserProvider;
 
 public class SongsFragment extends android.support.v4.app.Fragment implements SongAdapter.ClickListener {
 
-    private static final String TAG = LogHelper.makeLogTag(MediaBrowserFragment.class);
+    private static final String TAG = LogHelper.makeLogTag(SongsFragment.class);
 
     private static final String ARG_MEDIA_ID = "media_id";
 
