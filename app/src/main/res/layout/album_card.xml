@@ -1,47 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:layout_weight="0.3"
     android:paddingLeft="5dp"
-    android:paddingRight="5dp"
-    android:layout_weight="0.3">
+    android:paddingRight="5dp">
     <android.support.v7.widget.CardView
         xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/cvAlbum"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:clickable="true"
         android:foreground="?android:attr/selectableItemBackground"
-        android:id="@+id/cvAlbum"
-        card_view:cardUseCompatPadding="true"
+        android:transitionName="@string/transition_album_bg"
+        card_view:cardCornerRadius="1dp"
         card_view:cardElevation="3dp"
-        card_view:cardCornerRadius="1dp">
+        card_view:cardUseCompatPadding="true">
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:padding="5dp">
             <ImageView
+                android:id="@+id/ivAlbumArt"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/ivAlbumArt"
-                android:transitionName="albumArt"
+                android:contentDescription="@string/albumart"
                 android:src="@drawable/nav_bg"
-                android:contentDescription="@string/albumart"/>
+                android:transitionName="@string/transition_album_art" />
             <TextView
-                android:text="@string/album_name"
-                android:textStyle="bold"
-                android:layout_width="match_parent"
-                android:textSize="19sp"
-                android:lines="1"
-                android:ellipsize="end"
-                android:layout_height="25dp"
                 android:id="@+id/tvAlbumCardTitle"
-                android:layout_below="@+id/ivAlbumArt"/>
+                android:layout_width="match_parent"
+                android:layout_height="25dp"
+                android:layout_below="@+id/ivAlbumArt"
+                android:ellipsize="end"
+                android:lines="1"
+                android:text="@string/album_name"
+                android:textSize="19sp"
+                android:textStyle="bold" />
 
             <TextView
-                android:text="@string/tvSongArtistNullTag"
+                android:id="@+id/tvAlbumCardArtist"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/tvAlbumCardArtist"
-                android:layout_below="@id/tvAlbumCardTitle"/>
+                android:layout_below="@id/tvAlbumCardTitle"
+                android:text="@string/tvSongArtistNullTag" />
         </RelativeLayout>
     </android.support.v7.widget.CardView>
 

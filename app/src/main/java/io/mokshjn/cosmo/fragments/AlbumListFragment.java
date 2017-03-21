@@ -4,11 +4,9 @@ import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,14 +15,12 @@ import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import java.util.ArrayList;
 
-import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.mokshjn.cosmo.R;
 import io.mokshjn.cosmo.activities.AlbumViewActivity;
 import io.mokshjn.cosmo.adapters.AlbumListAdapter;
 import io.mokshjn.cosmo.interfaces.LibraryInterface;
 import io.mokshjn.cosmo.loader.AlbumListLoader;
-import io.mokshjn.cosmo.loader.LibraryLoader;
 import io.mokshjn.cosmo.models.Album;
 
 /**
@@ -72,7 +68,10 @@ public class AlbumListFragment extends Fragment implements AlbumListAdapter.albC
     public void onAlbumClick(View v, int pos) {
         Intent intent = new Intent(getActivity(), AlbumViewActivity.class);
         intent.putExtra("albumId", albumList.get(pos).getAlbumId());
-        startActivity(intent, ActivityOptions.makeSceneTransitionAnimation(getActivity(), v.findViewById(R.id.ivAlbumArt), "albumArt").toBundle());
+        startActivity(intent,
+                ActivityOptions.makeSceneTransitionAnimation(getActivity(),
+                        Pair.create(v, getString(R.string.transition_album_art)),
+                        Pair.create(v, getString(R.string.transition_album_bg))).toBundle());
     }
 
     @Override
