@@ -13,7 +13,7 @@ import android.text.TextUtils;
 public class LibUtils {
     public static final String TAG = LibUtils.class.getSimpleName();
 
-    public static Uri getMediaStoreAlbumCoverUri(int albumId) {
+    public static Uri getMediaStoreAlbumCoverUri(long albumId) {
         final Uri sArtworkUri = Uri
                 .parse("content://media/external/audio/albumart");
 
@@ -35,6 +35,4 @@ public class LibUtils {
         artistName = artistName.trim().toLowerCase();
         return artistName.equals("unknown") || artistName.equals("<unknown>");
     }
-
-
 }

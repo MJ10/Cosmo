@@ -150,12 +150,6 @@ public class SongsFragment extends android.support.v4.app.Fragment implements So
         return null;
     }
 
-    public void setMediaId(String mediaId) {
-        Bundle args = new Bundle(1);
-        args.putString(SongsFragment.ARG_MEDIA_ID, mediaId);
-        setArguments(args);
-    }
-
     public void onConnected() {
         if (isDetached()) {
             return;

@@ -3,8 +3,10 @@ package io.mokshjn.cosmo.fragments;
 import android.app.Fragment;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.media.MediaMetadataCompat;
@@ -72,6 +74,7 @@ public class PlaybackControlsFragment extends Fragment {
             PlaybackControlsFragment.this.onPlaybackStateChanged(state);
         }
 
+        @RequiresApi(api = Build.VERSION_CODES.M)
         @Override
         public void onMetadataChanged(MediaMetadataCompat metadata) {
             if (metadata == null) {
@@ -137,6 +140,7 @@ public class PlaybackControlsFragment extends Fragment {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     public void onConnected() {
         MediaControllerCompat controller = ((FragmentActivity) getActivity())
                 .getSupportMediaController();
@@ -148,6 +152,7 @@ public class PlaybackControlsFragment extends Fragment {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     private void onMetadataChanged(MediaMetadataCompat metadata) {
         LogHelper.d(TAG, "onMetadataChanged ", metadata);
         if (getActivity() == null) {
@@ -175,7 +180,7 @@ public class PlaybackControlsFragment extends Fragment {
             if (art != null) {
                 mAlbumArt.setImageBitmap(art);
             } else {
-                cache.fetch(artUrl, new AlbumArtCache.FetchListener() {
+                cache.fetch(getContext(), artUrl, new AlbumArtCache.FetchListener() {
                             @Override
                             public void onFetched(String artUrl, Bitmap bitmap, Bitmap icon) {
                                 if (icon != null) {

@@ -1,5 +1,6 @@
 package io.mokshjn.cosmo.playback;
 
+import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -29,18 +30,20 @@ public class QueueManager {
     private LibraryProvider mMusicProvider;
     private MetadataUpdateListener mListener;
     private Resources mResources;
+    private Context mContext;
 
     // "Now playing" queue:
     private List<MediaSessionCompat.QueueItem> mPlayingQueue;
     private int mCurrentIndex;
 
-    public QueueManager(@NonNull LibraryProvider musicProvider,
+    public QueueManager(@NonNull Context context,
+                        @NonNull LibraryProvider musicProvider,
                         @NonNull Resources resources,
                         @NonNull MetadataUpdateListener listener) {
         this.mMusicProvider = musicProvider;
         this.mListener = listener;
         this.mResources = resources;
-
+        this.mContext = context;
         mPlayingQueue = Collections.synchronizedList(new ArrayList<MediaSessionCompat.QueueItem>());
         mCurrentIndex = 0;
     }
@@ -181,7 +184,7 @@ public class QueueManager {
         if (metadata.getDescription().getIconBitmap() == null &&
                 metadata.getDescription().getIconUri() != null) {
             String albumUri = metadata.getDescription().getIconUri().toString();
-            AlbumArtCache.getInstance().fetch(albumUri, new AlbumArtCache.FetchListener() {
+            AlbumArtCache.getInstance().fetch(mContext, albumUri, new AlbumArtCache.FetchListener() {
                 @Override
                 public void onFetched(String artUrl, Bitmap bitmap, Bitmap icon) {
                     mMusicProvider.updateMusicArt(musicId, bitmap, icon);

@@ -1,5 +1,6 @@
 package io.mokshjn.cosmo.helpers;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.util.LruCache;
@@ -26,14 +27,8 @@ public class AlbumArtCache {
 
     private static final int BIG_BITMAP_INDEX = 0;
     private static final int ICON_BITMAP_INDEX = 1;
-
-    private final LruCache<String, Bitmap[]> mCache;
-
     private static final AlbumArtCache sInstance = new AlbumArtCache();
-
-    public static AlbumArtCache getInstance() {
-        return sInstance;
-    }
+    private final LruCache<String, Bitmap[]> mCache;
 
     private AlbumArtCache() {
         // Holds no more than MAX_ALBUM_ART_CACHE_SIZE bytes, bounded by maxmemory/4 and
@@ -49,6 +44,10 @@ public class AlbumArtCache {
         };
     }
 
+    public static AlbumArtCache getInstance() {
+        return sInstance;
+    }
+
     public Bitmap getBigImage(String artUrl) {
         Bitmap[] result = mCache.get(artUrl);
         return result == null ? null : result[BIG_BITMAP_INDEX];
@@ -59,18 +58,18 @@ public class AlbumArtCache {
         return result == null ? null : result[ICON_BITMAP_INDEX];
     }
 
-    public void fetch(final String artUrl, final FetchListener listener) {
+    public void fetch(final Context context, final String artUrl, final FetchListener listener) {
         // WARNING: for the sake of simplicity, simultaneous multi-thread fetch requests
         // are not handled properly: they may cause redundant costly operations, like HTTP
         // requests and bitmap rescales. For production-level apps, we recommend you use
         // a proper image loading library, like Glide.
+        LogHelper.d(TAG, "fetch  :", artUrl);
         Bitmap[] bitmap = mCache.get(artUrl);
         if (bitmap != null) {
             LogHelper.d(TAG, "getOrFetch: album art is in cache, using it", artUrl);
             listener.onFetched(artUrl, bitmap[BIG_BITMAP_INDEX], bitmap[ICON_BITMAP_INDEX]);
             return;
         }
-        LogHelper.d(TAG, "getOrFetch: starting asynctask to fetch ", artUrl);
 
         new AsyncTask<Void, Void, Bitmap[]>() {
             @Override
@@ -78,6 +77,7 @@ public class AlbumArtCache {
                 Bitmap[] bitmaps;
                 try {
                     Bitmap bitmap = BitmapHelper.fetchAndRescaleBitmap(artUrl,
+                            context,
                             MAX_ART_WIDTH, MAX_ART_HEIGHT);
                     Bitmap icon = BitmapHelper.scaleBitmap(bitmap,
                             MAX_ART_WIDTH_ICON, MAX_ART_HEIGHT_ICON);
