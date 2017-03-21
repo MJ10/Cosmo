@@ -32,7 +32,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import io.mokshjn.cosmo.R;
-import io.mokshjn.cosmo.fragments.SongListFragment;
 import io.mokshjn.cosmo.models.Song;
 import io.mokshjn.cosmo.utils.StorageUtils;
 
@@ -519,8 +518,6 @@ public class MusicServiceOld extends Service implements MediaPlayer.OnPreparedLi
     }
 
     private void register_playNewAudio() {
-        IntentFilter intentFilter = new IntentFilter(SongListFragment.Broadcast_PLAY_NEW_AUDIO);
-        registerReceiver(playNewAudio, intentFilter);
     }
 
     public enum PlaybackStatus{
