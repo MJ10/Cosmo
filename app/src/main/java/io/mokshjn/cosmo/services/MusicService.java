@@ -1,551 +1,418 @@
 package io.mokshjn.cosmo.services;
 
-import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.Service;
 import android.content.BroadcastReceiver;
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
-import android.media.session.MediaSessionManager;
-import android.net.Uri;
-import android.os.Binder;
-import android.os.IBinder;
-import android.os.PowerManager;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.os.RemoteException;
-import android.provider.MediaStore;
-import android.support.annotation.Nullable;
+import android.support.annotation.NonNull;
+import android.support.v4.media.MediaBrowserCompat;
+import android.support.v4.media.MediaBrowserServiceCompat;
 import android.support.v4.media.MediaMetadataCompat;
-import android.support.v4.media.session.MediaControllerCompat;
+import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaSessionCompat;
-import android.telephony.PhoneStateListener;
-import android.telephony.TelephonyManager;
-import android.support.v7.app.NotificationCompat;
-import android.util.Log;
+import android.support.v4.media.session.PlaybackStateCompat;
+import android.support.v7.media.MediaRouter;
 
-import java.io.IOException;
+import com.google.android.gms.cast.framework.CastContext;
+import com.google.android.gms.cast.framework.CastSession;
+import com.google.android.gms.cast.framework.SessionManager;
+import com.google.android.gms.cast.framework.SessionManagerListener;
+
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.List;
 
 import io.mokshjn.cosmo.R;
-import io.mokshjn.cosmo.fragments.SongListFragment;
-import io.mokshjn.cosmo.models.Song;
-import io.mokshjn.cosmo.utils.StorageUtils;
+import io.mokshjn.cosmo.activities.NowPlayingActivity;
+import io.mokshjn.cosmo.helpers.CarHelper;
+import io.mokshjn.cosmo.helpers.LogHelper;
+import io.mokshjn.cosmo.helpers.MediaNotificationManager;
+import io.mokshjn.cosmo.helpers.PackageValidator;
+import io.mokshjn.cosmo.helpers.TvHelper;
+import io.mokshjn.cosmo.helpers.WearHelper;
+import io.mokshjn.cosmo.playback.CastPlayback;
+import io.mokshjn.cosmo.playback.LocalPlayback;
+import io.mokshjn.cosmo.playback.Playback;
+import io.mokshjn.cosmo.playback.PlaybackManager;
+import io.mokshjn.cosmo.playback.QueueManager;
+import io.mokshjn.cosmo.provider.LibraryProvider;
 
-public class MusicService extends Service implements MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener,
-        MediaPlayer.OnCompletionListener, MediaPlayer.OnSeekCompleteListener, MediaPlayer.OnInfoListener,
-        MediaPlayer.OnBufferingUpdateListener, AudioManager.OnAudioFocusChangeListener {
+import static io.mokshjn.cosmo.helpers.MediaIDHelper.MEDIA_ID_EMPTY_ROOT;
+import static io.mokshjn.cosmo.helpers.MediaIDHelper.MEDIA_ID_ROOT;
 
-    public static final String ACTION_PLAY = "io.moshjn.cosmo.ACTION_PLAY";
-    public static final String ACTION_PAUSE = "io.moshjn.cosmo.ACTION_PAUSE";
-    public static final String ACTION_PREVIOUS = "io.moshjn.cosmo.ACTION_PREVIOUS";
-    public static final String ACTION_NEXT = "io.moshjn.cosmo.ACTION_NEXT";
-    public static final String ACTION_STOP = "io.moshjn.cosmo.ACTION_STOP";
+/**
+ * Created by moksh on 19/3/17.
+ */
 
-    final public static Uri sArtworkUri = Uri
-            .parse("content://media/external/audio/albumart");
+public class MusicService extends MediaBrowserServiceCompat implements
+        PlaybackManager.PlaybackServiceCallback {
 
-    private MediaPlayer player;
+    // Extra on MediaSession that contains the Cast device name currently connected to
+    public static final String EXTRA_CONNECTED_CAST = "com.example.android.uamp.CAST_NAME";
+    // The action of the incoming Intent indicating that it contains a command
+    // to be executed (see {@link #onStartCommand})
+    public static final String ACTION_CMD = "com.example.android.uamp.ACTION_CMD";
+    // The key in the extras of the incoming Intent indicating the command that
+    // should be executed (see {@link #onStartCommand})
+    public static final String CMD_NAME = "CMD_NAME";
+    // A value of a CMD_NAME key in the extras of the incoming Intent that
+    // indicates that the music playback should be paused (see {@link #onStartCommand})
+    public static final String CMD_PAUSE = "CMD_PAUSE";
+    // A value of a CMD_NAME key that indicates that the music playback should switch
+    // to local playback from cast playback.
+    public static final String CMD_STOP_CASTING = "CMD_STOP_CASTING";
+    private static final String TAG = LogHelper.makeLogTag(MusicService.class);
+    // Delay stopSelf by using a handler.
+    private static final int STOP_DELAY = 30000;
+    private final DelayedStopHandler mDelayedStopHandler = new DelayedStopHandler(this);
+    private LibraryProvider mMusicProvider;
+    private PlaybackManager mPlaybackManager;
+    private MediaSessionCompat mSession;
+    private MediaNotificationManager mMediaNotificationManager;
+    private Bundle mSessionExtras;
+    private MediaRouter mMediaRouter;
+    private PackageValidator mPackageValidator;
+    private SessionManager mCastSessionManager;
+    private SessionManagerListener<CastSession> mCastSessionManagerListener;
 
-    private MediaSessionManager mediaSessionManager;
-    private MediaSessionCompat mediaSession;
-    private MediaControllerCompat.TransportControls transportControls;
+    private boolean mIsConnectedToCar;
+    private BroadcastReceiver mCarConnectionReceiver;
 
-    private boolean ongoingCall = false;
-    private PhoneStateListener phoneStateListener;
-    private TelephonyManager telephonyManager;
-
-    private static final int NOTIFICATION_ID = 659;
-
-    private int resumeSongPosition;
-
-    private AudioManager audioManager;
-
-
-    private final IBinder musicBind = new MusicBinder();
-
-    private ArrayList<Song> songList;
-    private int songPosition = -1;
-    private Song currentSong;
-
-
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return musicBind;
-    }
-
-    @Override
-    public boolean onUnbind(Intent intent) {
-        player.stop();
-        player.reset();
-        player.release();
-        mediaSession.release();
-        removeNotification();
-        return super.onUnbind(intent);
-    }
-
+    /*
+     * (non-Javadoc)
+     * @see android.app.Service#onCreate()
+     */
     @Override
     public void onCreate() {
         super.onCreate();
+        LogHelper.d(TAG, "onCreate");
 
-        callStateListener();
-        registerBecomingNoisyReciever();
-        register_playNewAudio();
-    }
+        mMusicProvider = new LibraryProvider(getContentResolver());
 
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
+        // To make the app more responsive, fetch and cache catalog information now.
+        // This can help improve the response time in the method
+        // {@link #onLoadChildren(String, Result<List<MediaItem>>) onLoadChildren()}.
+        mMusicProvider.retrieveMediaAsync(null /* Callback */);
+
+        mPackageValidator = new PackageValidator(this);
+
+        QueueManager queueManager = new QueueManager(mMusicProvider, getResources(),
+                new QueueManager.MetadataUpdateListener() {
+                    @Override
+                    public void onMetadataChanged(MediaMetadataCompat metadata) {
+                        mSession.setMetadata(metadata);
+                    }
+
+                    @Override
+                    public void onMetadataRetrieveError() {
+                        mPlaybackManager.updatePlaybackState(
+                                getString(R.string.error_no_metadata));
+                    }
+
+                    @Override
+                    public void onCurrentQueueIndexUpdated(int queueIndex) {
+                        mPlaybackManager.handlePlayRequest();
+                    }
+
+                    @Override
+                    public void onQueueUpdated(String title,
+                                               List<MediaSessionCompat.QueueItem> newQueue) {
+                        mSession.setQueue(newQueue);
+                        mSession.setQueueTitle(title);
+                    }
+                });
+
+        LocalPlayback playback = new LocalPlayback(this, mMusicProvider);
+        mPlaybackManager = new PlaybackManager(this, getResources(), mMusicProvider, queueManager,
+                playback);
+
+        // Start a new MediaSession
+        mSession = new MediaSessionCompat(this, "MusicService");
+        setSessionToken(mSession.getSessionToken());
+        mSession.setCallback(mPlaybackManager.getMediaSessionCallback());
+        mSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
+                MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
+
+        Context context = getApplicationContext();
+        Intent intent = new Intent(context, NowPlayingActivity.class);
+        PendingIntent pi = PendingIntent.getActivity(context, 99 /*request code*/,
+                intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        mSession.setSessionActivity(pi);
+
+        mSessionExtras = new Bundle();
+        CarHelper.setSlotReservationFlags(mSessionExtras, true, true, true);
+        WearHelper.setSlotReservationFlags(mSessionExtras, true, true);
+        WearHelper.setUseBackgroundFromTheme(mSessionExtras, true);
+        mSession.setExtras(mSessionExtras);
+
+        mPlaybackManager.updatePlaybackState(null);
 
         try {
-            StorageUtils storage = new StorageUtils(getApplicationContext());
-            songList = storage.loadSongs();
-
-            songPosition = storage.loadSongPosition();
-
-            if (songPosition != -1 && songPosition < songList.size()) {
-                currentSong = songList.get(songPosition);
-            } else {
-                stopSelf();
-            }
-        } catch (NullPointerException e) {
-            stopSelf();
+            mMediaNotificationManager = new MediaNotificationManager(this);
+        } catch (RemoteException e) {
+            throw new IllegalStateException("Could not create a MediaNotificationManager", e);
         }
 
-        if(requestAudioFocus() == false) {
-            stopSelf();
+        if (!TvHelper.isTvUiMode(this)) {
+            mCastSessionManager = CastContext.getSharedInstance(this).getSessionManager();
+            mCastSessionManagerListener = new CastSessionManagerListener();
+            mCastSessionManager.addSessionManagerListener(mCastSessionManagerListener,
+                    CastSession.class);
         }
 
-        if(mediaSession == null) {
-            try {
-                initMediaSession();
-                initMediaPlayer();
-            } catch (RemoteException e) {
-                e.printStackTrace();
-                stopSelf();
-            }
-            buildNotification(PlaybackStatus.PLAYING);
-        }
+        mMediaRouter = MediaRouter.getInstance(getApplicationContext());
 
-        handleIncomingActions(intent);
-        return super.onStartCommand(intent, flags, startId);
+        registerCarConnectionReceiver();
     }
 
+    /**
+     * (non-Javadoc)
+     * @see android.app.Service#onStartCommand(android.content.Intent, int, int)
+     */
+    @Override
+    public int onStartCommand(Intent startIntent, int flags, int startId) {
+        if (startIntent != null) {
+            String action = startIntent.getAction();
+            String command = startIntent.getStringExtra(CMD_NAME);
+            if (ACTION_CMD.equals(action)) {
+                if (CMD_PAUSE.equals(command)) {
+                    mPlaybackManager.handlePauseRequest();
+                } else if (CMD_STOP_CASTING.equals(command)) {
+                    CastContext.getSharedInstance(this).getSessionManager().endCurrentSession(true);
+                }
+            } else {
+                // Try to handle the intent as a media button event wrapped by MediaButtonReceiver
+                MediaButtonReceiver.handleIntent(mSession, startIntent);
+            }
+        }
+        // Reset the delay handler to enqueue a message to stop the service if
+        // nothing is playing.
+        mDelayedStopHandler.removeCallbacksAndMessages(null);
+        mDelayedStopHandler.sendEmptyMessageDelayed(0, STOP_DELAY);
+        return START_STICKY;
+    }
+
+    /**
+     * (non-Javadoc)
+     * @see android.app.Service#onDestroy()
+     */
     @Override
     public void onDestroy() {
-        super.onDestroy();
-        if(player != null) {
-            player.release();
+        LogHelper.d(TAG, "onDestroy");
+        unregisterCarConnectionReceiver();
+        // Service is being killed, so make sure we release our resources
+        mPlaybackManager.handleStopRequest(null);
+        mMediaNotificationManager.stopNotification();
+
+        if (mCastSessionManager != null) {
+            mCastSessionManager.removeSessionManagerListener(mCastSessionManagerListener,
+                    CastSession.class);
         }
 
-        removeAudioFocus();
-
-        if(phoneStateListener != null) {
-            telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_NONE);
-        }
-
-        removeNotification();
-
-        unregisterReceiver(becomingNoisyReceiver);
-        unregisterReceiver(playNewAudio);
-
-        new StorageUtils(getApplicationContext()).clearCachedAudioPlaylist();
-    }
-
-    public class MusicBinder extends Binder {
-        public MusicService getService() {
-            return MusicService.this;
-        }
+        mDelayedStopHandler.removeCallbacksAndMessages(null);
+        mSession.release();
     }
 
     @Override
-    public void onPrepared(MediaPlayer mediaPlayer) {
-        playSong();
+    public BrowserRoot onGetRoot(@NonNull String clientPackageName, int clientUid,
+                                 Bundle rootHints) {
+        LogHelper.d(TAG, "OnGetRoot: clientPackageName=" + clientPackageName,
+                "; clientUid=" + clientUid + " ; rootHints=", rootHints);
+        // To ensure you are not allowing any arbitrary app to browse your app's contents, you
+        // need to check the origin:
+        if (!mPackageValidator.isCallerAllowed(this, clientPackageName, clientUid)) {
+            // If the request comes from an untrusted package, return an empty browser root.
+            // If you return null, then the media browser will not be able to connect and
+            // no further calls will be made to other media browsing methods.
+            LogHelper.i(TAG, "OnGetRoot: Browsing NOT ALLOWED for unknown caller. "
+                    + "Returning empty browser root so all apps can use MediaController."
+                    + clientPackageName);
+            return new MediaBrowserServiceCompat.BrowserRoot(MEDIA_ID_EMPTY_ROOT, null);
+        }
+        //noinspection StatementWithEmptyBody
+        if (CarHelper.isValidCarPackage(clientPackageName)) {
+            // Optional: if your app needs to adapt the music library to show a different subset
+            // when connected to the car, this is where you should handle it.
+            // If you want to adapt other runtime behaviors, like tweak ads or change some behavior
+            // that should be different on cars, you should instead use the boolean flag
+            // set by the BroadcastReceiver mCarConnectionReceiver (mIsConnectedToCar).
+        }
+        //noinspection StatementWithEmptyBody
+        if (WearHelper.isValidWearCompanionPackage(clientPackageName)) {
+            // Optional: if your app needs to adapt the music library for when browsing from a
+            // Wear device, you should return a different MEDIA ROOT here, and then,
+            // on onLoadChildren, handle it accordingly.
+        }
+
+        return new BrowserRoot(MEDIA_ID_ROOT, null);
     }
 
     @Override
-    public void onCompletion(MediaPlayer mediaPlayer) {
-        skipToNext();
-        updateMetaData();
-        buildNotification(PlaybackStatus.PLAYING);
-    }
-
-    @Override
-    public void onBufferingUpdate(MediaPlayer mediaPlayer, int i) {
-
-    }
-
-    @Override
-    public boolean onInfo(MediaPlayer mediaPlayer, int i, int i1) {
-        return false;
-    }
-
-    @Override
-    public void onSeekComplete(MediaPlayer mediaPlayer) {
-
-    }
-
-    @Override
-    public boolean onError(MediaPlayer mediaPlayer, int i, int i1) {
-        return false;
-    }
-
-    @Override
-    public void onAudioFocusChange(int i) {
-        switch (i) {
-            case AudioManager.AUDIOFOCUS_GAIN:
-                initMediaPlayer();
-                break;
-            case AudioManager.AUDIOFOCUS_LOSS:
-                if(player.isPlaying()){
-                    player.stop();
-                }
-                player.reset();
-                player.release();
-                break;
-            case AudioManager.AUDIOFOCUS_GAIN_TRANSIENT:
-                if(player.isPlaying()) {
-                    player.pause();
-                }
-                break;
-            case AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK:
-                if (player.isPlaying()) {
-                    player.setVolume(0.1f, 0.1f);
-                }
-                break;
-        }
-    }
-
-    private boolean requestAudioFocus() {
-        audioManager= (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        int result = audioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
-        if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-            return true;
-        }
-        return false;
-    }
-
-    private boolean removeAudioFocus() {
-        return AudioManager.AUDIOFOCUS_REQUEST_GRANTED == audioManager.abandonAudioFocus(this);
-    }
-
-    private void initMediaPlayer() {
-        player = new MediaPlayer();
-
-        player.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
-        player.setOnPreparedListener(this);
-        player.setOnErrorListener(this);
-        player.setOnCompletionListener(this);
-        player.setOnSeekCompleteListener(this);
-        player.setOnInfoListener(this);
-        player.setOnBufferingUpdateListener(this);
-
-        player.reset();
-
-        player.setAudioStreamType(AudioManager.STREAM_MUSIC);
-
-        try {
-            player.setDataSource(getApplicationContext(), ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, currentSong.getId()));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        player.prepareAsync();
-    }
-
-    public void playSong() {
-        if(!player.isPlaying()){
-            player.start();
-        }
-    }
-
-    public void stopSong() {
-        if(player == null) return;
-        if(player.isPlaying()) {
-            player.stop();
-        }
-    }
-
-    public void pauseSong() {
-        if(player.isPlaying()) {
-            player.pause();
-            resumeSongPosition = player.getCurrentPosition();
-        }
-    }
-
-    public void resumeSong() {
-        if(!player.isPlaying()) {
-            player.seekTo(resumeSongPosition);
-            player.start();
-        }
-    }
-
-    private void skipToNext() {
-        if(songPosition == songList.size() -1 ){
-            songPosition = 0;
-            currentSong = songList.get(songPosition);
+    public void onLoadChildren(@NonNull final String parentMediaId,
+                               @NonNull final Result<List<MediaBrowserCompat.MediaItem>> result) {
+        LogHelper.d(TAG, "OnLoadChildren: parentMediaId=", parentMediaId);
+        if (MEDIA_ID_EMPTY_ROOT.equals(parentMediaId)) {
+            result.sendResult(new ArrayList<MediaBrowserCompat.MediaItem>());
+        } else if (mMusicProvider.isInitialized()) {
+            // if music library is ready, return immediately
+            result.sendResult(mMusicProvider.getChildren(parentMediaId, getResources()));
         } else {
-            currentSong = songList.get(++songPosition);
+            // otherwise, only return results when the music library is retrieved
+            result.detach();
+            mMusicProvider.retrieveMediaAsync(new LibraryProvider.Callback() {
+                @Override
+                public void onMusicLoaded(boolean success) {
+                    result.sendResult(mMusicProvider.getChildren(parentMediaId, getResources()));
+                }
+            });
         }
-
-        new StorageUtils(getApplicationContext()).storeAudioIndex(songPosition);
-
-        stopSong();
-        player.reset();
-        initMediaPlayer();
     }
 
-    private void skipToPrevious() {
-        if(songPosition == 0) {
-            songPosition = songList.size() -1;
-            currentSong = songList.get(songPosition);
-        } else {
-            currentSong = songList.get(--songPosition);
-        }
+    /**
+     * Callback method called from PlaybackManager whenever the music is about to play.
+     */
+    @Override
+    public void onPlaybackStart() {
+        mSession.setActive(true);
 
-        new StorageUtils(getApplicationContext()).storeAudioIndex(songPosition);
+        mDelayedStopHandler.removeCallbacksAndMessages(null);
 
-        stopSong();
-        player.reset();
-        initMediaPlayer();
+        // The service needs to continue running even after the bound client (usually a
+        // MediaController) disconnects, otherwise the music playback will stop.
+        // Calling startService(Intent) will keep the service running until it is explicitly killed.
+        startService(new Intent(getApplicationContext(), MusicService.class));
     }
 
-    private BroadcastReceiver becomingNoisyReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            pauseSong();
-            buildNotification(PlaybackStatus.PAUSED);
-        }
-    };
 
-    private void registerBecomingNoisyReciever() {
-        IntentFilter intentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
-        registerReceiver(becomingNoisyReceiver, intentFilter);
+    /**
+     * Callback method called from PlaybackManager whenever the music stops playing.
+     */
+    @Override
+    public void onPlaybackStop() {
+        mSession.setActive(false);
+        // Reset the delayed stop handler, so after STOP_DELAY it will be executed again,
+        // potentially stopping the service.
+        mDelayedStopHandler.removeCallbacksAndMessages(null);
+        mDelayedStopHandler.sendEmptyMessageDelayed(0, STOP_DELAY);
+        stopForeground(true);
     }
 
-    private void callStateListener() {
-        telephonyManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+    @Override
+    public void onNotificationRequired() {
+        mMediaNotificationManager.startNotification();
+    }
 
-        phoneStateListener = new PhoneStateListener() {
+    @Override
+    public void onPlaybackStateUpdated(PlaybackStateCompat newState) {
+        mSession.setPlaybackState(newState);
+    }
+
+    private void registerCarConnectionReceiver() {
+        IntentFilter filter = new IntentFilter(CarHelper.ACTION_MEDIA_STATUS);
+        mCarConnectionReceiver = new BroadcastReceiver() {
             @Override
-            public void onCallStateChanged(int state, String incomingNumber) {
-                switch (state) {
-                    case TelephonyManager.CALL_STATE_RINGING:
-                    case TelephonyManager.CALL_STATE_OFFHOOK:
-                        if(player != null) {
-                            pauseSong();
-                            ongoingCall = true;
-                        }
-                        break;
-                    case TelephonyManager.CALL_STATE_IDLE:
-                        if(player != null) {
-                            ongoingCall = false;
-                            resumeSong();
-                        }
-                }
+            public void onReceive(Context context, Intent intent) {
+                String connectionEvent = intent.getStringExtra(CarHelper.MEDIA_CONNECTION_STATUS);
+                mIsConnectedToCar = CarHelper.MEDIA_CONNECTED.equals(connectionEvent);
+                LogHelper.i(TAG, "Connection event to Android Auto: ", connectionEvent,
+                        " isConnectedToCar=", mIsConnectedToCar);
             }
         };
-
-        telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
+        registerReceiver(mCarConnectionReceiver, filter);
     }
 
-    private void initMediaSession() throws RemoteException {
-        if (mediaSession != null) return;
-
-        mediaSessionManager = (MediaSessionManager) getSystemService(Context.MEDIA_SESSION_SERVICE);
-        mediaSession = new MediaSessionCompat(getApplicationContext(), "Cosmo");
-        transportControls = mediaSession.getController().getTransportControls();
-        mediaSession.setActive(true);
-        mediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
-
-        updateMetaData();
-
-        mediaSession.setCallback(new MediaSessionCompat.Callback() {
-            @Override
-            public void onPlay() {
-                super.onPlay();
-
-                resumeSong();
-                buildNotification(PlaybackStatus.PLAYING);
-            }
-
-            @Override
-            public void onPause() {
-                super.onPause();
-
-                pauseSong();
-                buildNotification(PlaybackStatus.PAUSED);
-            }
-
-            @Override
-            public void onSkipToNext() {
-                super.onSkipToNext();
-
-                skipToNext();
-                updateMetaData();
-                buildNotification(PlaybackStatus.PLAYING);
-            }
-
-            @Override
-            public void onSkipToPrevious() {
-                super.onSkipToPrevious();
-
-                skipToPrevious();
-                updateMetaData();
-                buildNotification(PlaybackStatus.PLAYING);
-            }
-
-            @Override
-            public void onStop() {
-                super.onStop();
-
-                removeNotification();
-                stopSelf();
-            }
-
-            @Override
-            public void onSeekTo(long pos) {
-                super.onSeekTo(pos);
-            }
-        });
+    private void unregisterCarConnectionReceiver() {
+        unregisterReceiver(mCarConnectionReceiver);
     }
 
-    private void updateMetaData() {
-        Bitmap albumArt;
-        if(currentSong == null) {
-            albumArt = BitmapFactory.decodeResource(getResources(), R.drawable.nav_bg);
-        } else {
-            Uri uri = ContentUris.withAppendedId(sArtworkUri,
-                    currentSong.getAlbumId());
-            try {
-                albumArt = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
-            } catch (IOException e) {
-                e.printStackTrace();
-                albumArt = BitmapFactory.decodeResource(getResources(), R.drawable.nav_bg);
-            }
-        }
-        mediaSession.setMetadata(new MediaMetadataCompat.Builder()
-        .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART , albumArt)
-        .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, currentSong.getArtist())
-        .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, currentSong.getAlbum())
-        .putString(MediaMetadataCompat.METADATA_KEY_TITLE, currentSong.getTitle())
-        .build());
-    }
+    /**
+     * A simple handler that stops the service if playback is not active (playing)
+     */
+    private static class DelayedStopHandler extends Handler {
+        private final WeakReference<MusicService> mWeakReference;
 
-    private void buildNotification(PlaybackStatus playbackStatus) {
-
-        int notificationAction = android.R.drawable.ic_media_pause;
-        PendingIntent play_pauseAction = null;
-
-        if(playbackStatus == PlaybackStatus.PLAYING) {
-            notificationAction = android.R.drawable.ic_media_pause;
-            play_pauseAction = playbackAction(1);
-        } else {
-            notificationAction = android.R.drawable.ic_media_play;
-            play_pauseAction = playbackAction(0);
+        private DelayedStopHandler(MusicService service) {
+            mWeakReference = new WeakReference<>(service);
         }
 
-        Bitmap largeIcon;
-
-        try {
-            largeIcon = MediaStore.Images.Media.getBitmap(getContentResolver(), ContentUris.withAppendedId(sArtworkUri, currentSong.getAlbumId()));
-        } catch (IOException e) {
-            e.printStackTrace();
-            largeIcon = BitmapFactory.decodeResource(getResources(), R.drawable.nav_bg);
-        }
-
-        NotificationCompat.Builder builder = (NotificationCompat.Builder) new NotificationCompat.Builder(getApplicationContext())
-                .setShowWhen(false)
-                .setStyle(new NotificationCompat.MediaStyle()
-                    .setMediaSession(mediaSession.getSessionToken())
-                    .setShowActionsInCompactView(0, 1, 2))
-                .setColor(getResources().getColor(R.color.colorAccent))
-                .setLargeIcon(largeIcon)
-                .setSmallIcon(android.R.drawable.stat_sys_headset)
-                .setContentText(currentSong.getArtist())
-                .setContentTitle(currentSong.getTitle())
-                .setContentInfo(currentSong.getAlbum())
-                .addAction(android.R.drawable.ic_media_previous, "previous", playbackAction(3))
-                .addAction(notificationAction, "pause", play_pauseAction)
-                .addAction(android.R.drawable.ic_media_next, "next", playbackAction(2));
-
-        ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE)).notify(NOTIFICATION_ID, builder.build());
-    }
-
-    private PendingIntent playbackAction(int actionNumber) {
-        Intent playbackAction = new Intent(this, MusicService.class);
-        switch (actionNumber) {
-            case 0:
-                playbackAction.setAction(ACTION_PLAY);
-                return PendingIntent.getService(this, actionNumber, playbackAction, 0);
-            case 1:
-                playbackAction.setAction(ACTION_PAUSE);
-                return PendingIntent.getService(this, actionNumber, playbackAction, 0);
-            case 2:
-                playbackAction.setAction(ACTION_NEXT);
-                return PendingIntent.getService(this, actionNumber, playbackAction, 0);
-            case 3:
-                playbackAction.setAction(ACTION_PREVIOUS);
-                return PendingIntent.getService(this, actionNumber, playbackAction, 0);
-            default:
-                break;
-        }
-        return null;
-    }
-
-    private void removeNotification(){
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.cancel(NOTIFICATION_ID);
-    }
-
-    private void handleIncomingActions(Intent playbackAction) {
-        if (playbackAction == null || playbackAction.getAction() == null) return;
-
-        String actionString = playbackAction.getAction();
-        if (actionString.equalsIgnoreCase(ACTION_PLAY)) {
-            transportControls.play();
-        } else if (actionString.equalsIgnoreCase(ACTION_PAUSE)) {
-            transportControls.pause();
-        } else if (actionString.equalsIgnoreCase(ACTION_NEXT)) {
-            transportControls.skipToNext();
-        } else if (actionString.equalsIgnoreCase(ACTION_PREVIOUS)) {
-            transportControls.skipToPrevious();
-        } else if (actionString.equalsIgnoreCase(ACTION_STOP)) {
-            transportControls.stop();
-        }
-    }
-
-    private BroadcastReceiver playNewAudio = new BroadcastReceiver() {
         @Override
-        public void onReceive(Context context, Intent intent) {
-            songPosition = new StorageUtils(getApplicationContext()).loadSongPosition();
-            Log.d("songNo", "onReceive: "+songPosition);
-            if(songPosition != -1 && songPosition < songList.size()){
-                currentSong = songList.get(songPosition);
-            } else {
-                stopSelf();
+        public void handleMessage(Message msg) {
+            MusicService service = mWeakReference.get();
+            if (service != null && service.mPlaybackManager.getPlayback() != null) {
+                if (service.mPlaybackManager.getPlayback().isPlaying()) {
+                    LogHelper.d(TAG, "Ignoring delayed stop since the media player is in use.");
+                    return;
+                }
+                LogHelper.d(TAG, "Stopping service with delay handler.");
+                service.stopSelf();
             }
-
-            stopSong();
-            player.reset();
-            initMediaPlayer();
-            updateMetaData();
-            buildNotification(PlaybackStatus.PLAYING);
         }
-    };
-
-    private void register_playNewAudio() {
-        IntentFilter intentFilter = new IntentFilter(SongListFragment.Broadcast_PLAY_NEW_AUDIO);
-        registerReceiver(playNewAudio, intentFilter);
     }
 
+    /**
+     * Session Manager Listener responsible for switching the Playback instances
+     * depending on whether it is connected to a remote player.
+     */
+    private class CastSessionManagerListener implements SessionManagerListener<CastSession> {
 
-    public enum PlaybackStatus{
-        PLAYING,
-        PAUSED
+        @Override
+        public void onSessionEnded(CastSession session, int error) {
+            LogHelper.d(TAG, "onSessionEnded");
+            mSessionExtras.remove(EXTRA_CONNECTED_CAST);
+            mSession.setExtras(mSessionExtras);
+            Playback playback = new LocalPlayback(MusicService.this, mMusicProvider);
+            mMediaRouter.setMediaSessionCompat(null);
+            mPlaybackManager.switchToPlayback(playback, false);
+        }
+
+        @Override
+        public void onSessionResumed(CastSession session, boolean wasSuspended) {
+        }
+
+        @Override
+        public void onSessionStarted(CastSession session, String sessionId) {
+            // In case we are casting, send the device name as an extra on MediaSession metadata.
+            mSessionExtras.putString(EXTRA_CONNECTED_CAST,
+                    session.getCastDevice().getFriendlyName());
+            mSession.setExtras(mSessionExtras);
+            // Now we can switch to CastPlayback
+            Playback playback = new CastPlayback(mMusicProvider, MusicService.this);
+            mMediaRouter.setMediaSessionCompat(mSession);
+            mPlaybackManager.switchToPlayback(playback, true);
+        }
+
+        @Override
+        public void onSessionStarting(CastSession session) {
+        }
+
+        @Override
+        public void onSessionStartFailed(CastSession session, int error) {
+        }
+
+        @Override
+        public void onSessionEnding(CastSession session) {
+            // This is our final chance to update the underlying stream position
+            // In onSessionEnded(), the underlying CastPlayback#mRemoteMediaClient
+            // is disconnected and hence we update our local value of stream position
+            // to the latest position.
+            mPlaybackManager.getPlayback().updateLastKnownStreamPosition();
+        }
+
+        @Override
+        public void onSessionResuming(CastSession session, String sessionId) {
+        }
+
+        @Override
+        public void onSessionResumeFailed(CastSession session, int error) {
+        }
+
+        @Override
+        public void onSessionSuspended(CastSession session, int reason) {
+        }
     }
 }

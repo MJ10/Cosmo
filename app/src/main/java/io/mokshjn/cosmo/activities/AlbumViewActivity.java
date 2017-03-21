@@ -25,10 +25,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.mokshjn.cosmo.R;
 import io.mokshjn.cosmo.adapters.SongListAdapter;
-import io.mokshjn.cosmo.fragments.SongListFragment;
 import io.mokshjn.cosmo.loader.LibraryLoader;
 import io.mokshjn.cosmo.models.Song;
-import io.mokshjn.cosmo.services.MusicService;
+import io.mokshjn.cosmo.services.MusicServiceOld;
 import io.mokshjn.cosmo.utils.StorageUtils;
 
 public class AlbumViewActivity extends AppCompatActivity implements SongListAdapter.ClickListener {
@@ -38,13 +37,13 @@ public class AlbumViewActivity extends AppCompatActivity implements SongListAdap
     @BindView(R.id.ivAlbumArt) ImageView ivAlbumArt;
     private ArrayList<Song> albumSongs;
     private long albumId;
-    private MusicService service;
+    private MusicServiceOld service;
     private boolean musicBound = false;
 
     private ServiceConnection musicServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            MusicService.MusicBinder binder = (MusicService.MusicBinder) iBinder;
+            MusicServiceOld.MusicBinder binder = (MusicServiceOld.MusicBinder) iBinder;
             service = binder.getService();
             musicBound = true;
         }
@@ -110,7 +109,7 @@ public class AlbumViewActivity extends AppCompatActivity implements SongListAdap
             storage.storeSong(albumSongs);
             storage.storeAudioIndex(id);
 
-            Intent playerIntent = new Intent(this, io.mokshjn.cosmo.services.MusicService.class);
+            Intent playerIntent = new Intent(this, MusicServiceOld.class);
             startService(playerIntent);
             bindService(playerIntent, musicServiceConnection, Context.BIND_AUTO_CREATE);
         } else {
