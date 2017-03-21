@@ -20,7 +20,7 @@ import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.app.NotificationCompat;
 
 import io.mokshjn.cosmo.R;
-import io.mokshjn.cosmo.activities.CosmoActivity;
+import io.mokshjn.cosmo.activities.MainActivity;
 import io.mokshjn.cosmo.services.MusicService;
 
 /**
@@ -28,37 +28,65 @@ import io.mokshjn.cosmo.services.MusicService;
  */
 
 public class MediaNotificationManager extends BroadcastReceiver {
-    private static final String TAG = LogHelper.makeLogTag(MediaNotificationManager.class);
-
-    private static final int NOTIFICATION_ID = 412;
-    private static final int REQUEST_CODE = 100;
-
     public static final String ACTION_PAUSE = "com.example.android.uamp.pause";
     public static final String ACTION_PLAY = "com.example.android.uamp.play";
     public static final String ACTION_PREV = "com.example.android.uamp.prev";
     public static final String ACTION_NEXT = "com.example.android.uamp.next";
     public static final String ACTION_STOP_CASTING = "com.example.android.uamp.stop_cast";
-
+    private static final String TAG = LogHelper.makeLogTag(MediaNotificationManager.class);
+    private static final int NOTIFICATION_ID = 412;
+    private static final int REQUEST_CODE = 100;
     private final MusicService mService;
-    private MediaSessionCompat.Token mSessionToken;
-    private MediaControllerCompat mController;
-    private MediaControllerCompat.TransportControls mTransportControls;
-
-    private PlaybackStateCompat mPlaybackState;
-    private MediaMetadataCompat mMetadata;
-
     private final NotificationManagerCompat mNotificationManager;
-
     private final PendingIntent mPauseIntent;
     private final PendingIntent mPlayIntent;
     private final PendingIntent mPreviousIntent;
     private final PendingIntent mNextIntent;
-
     private final PendingIntent mStopCastIntent;
-
     private final int mNotificationColor;
-
+    private MediaSessionCompat.Token mSessionToken;
+    private MediaControllerCompat mController;
+    private MediaControllerCompat.TransportControls mTransportControls;
+    private PlaybackStateCompat mPlaybackState;
+    private MediaMetadataCompat mMetadata;
     private boolean mStarted = false;
+    private final MediaControllerCompat.Callback mCb = new MediaControllerCompat.Callback() {
+        @Override
+        public void onPlaybackStateChanged(@NonNull PlaybackStateCompat state) {
+            mPlaybackState = state;
+            LogHelper.d(TAG, "Received new playback state", state);
+            if (state.getState() == PlaybackStateCompat.STATE_STOPPED ||
+                    state.getState() == PlaybackStateCompat.STATE_NONE) {
+                stopNotification();
+            } else {
+                Notification notification = createNotification();
+                if (notification != null) {
+                    mNotificationManager.notify(NOTIFICATION_ID, notification);
+                }
+            }
+        }
+
+        @Override
+        public void onMetadataChanged(MediaMetadataCompat metadata) {
+            mMetadata = metadata;
+            LogHelper.d(TAG, "Received new metadata ", metadata);
+            Notification notification = createNotification();
+            if (notification != null) {
+                mNotificationManager.notify(NOTIFICATION_ID, notification);
+            }
+        }
+
+        @Override
+        public void onSessionDestroyed() {
+            super.onSessionDestroyed();
+            LogHelper.d(TAG, "Session was destroyed, resetting to the new session token");
+            try {
+                updateSessionToken();
+            } catch (RemoteException e) {
+                LogHelper.e(TAG, e, "could not connect media controller");
+            }
+        }
+    };
 
     public MediaNotificationManager(MusicService service) throws RemoteException {
         mService = service;
@@ -185,53 +213,15 @@ public class MediaNotificationManager extends BroadcastReceiver {
     }
 
     private PendingIntent createContentIntent(MediaDescriptionCompat description) {
-        Intent openUI = new Intent(mService, CosmoActivity.class);
+        Intent openUI = new Intent(mService, MainActivity.class);
         openUI.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        openUI.putExtra(CosmoActivity.EXTRA_START_FULLSCREEN, true);
+        openUI.putExtra(MainActivity.EXTRA_START_FULLSCREEN, true);
         if (description != null) {
-            openUI.putExtra(CosmoActivity.EXTRA_CURRENT_MEDIA_DESCRIPTION, description);
+            openUI.putExtra(MainActivity.EXTRA_CURRENT_MEDIA_DESCRIPTION, description);
         }
         return PendingIntent.getActivity(mService, REQUEST_CODE, openUI,
                 PendingIntent.FLAG_CANCEL_CURRENT);
     }
-
-    private final MediaControllerCompat.Callback mCb = new MediaControllerCompat.Callback() {
-        @Override
-        public void onPlaybackStateChanged(@NonNull PlaybackStateCompat state) {
-            mPlaybackState = state;
-            LogHelper.d(TAG, "Received new playback state", state);
-            if (state.getState() == PlaybackStateCompat.STATE_STOPPED ||
-                    state.getState() == PlaybackStateCompat.STATE_NONE) {
-                stopNotification();
-            } else {
-                Notification notification = createNotification();
-                if (notification != null) {
-                    mNotificationManager.notify(NOTIFICATION_ID, notification);
-                }
-            }
-        }
-
-        @Override
-        public void onMetadataChanged(MediaMetadataCompat metadata) {
-            mMetadata = metadata;
-            LogHelper.d(TAG, "Received new metadata ", metadata);
-            Notification notification = createNotification();
-            if (notification != null) {
-                mNotificationManager.notify(NOTIFICATION_ID, notification);
-            }
-        }
-
-        @Override
-        public void onSessionDestroyed() {
-            super.onSessionDestroyed();
-            LogHelper.d(TAG, "Session was destroyed, resetting to the new session token");
-            try {
-                updateSessionToken();
-            } catch (RemoteException e) {
-                LogHelper.e(TAG, e, "could not connect media controller");
-            }
-        }
-    };
 
     private Notification createNotification() {
         LogHelper.d(TAG, "updateNotificationMetadata. mMetadata=" + mMetadata);

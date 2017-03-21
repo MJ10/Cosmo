@@ -5,9 +5,9 @@ import android.app.SharedElementCallback;
 import android.content.Intent;
 import android.graphics.Point;
 import android.graphics.Typeface;
+import android.os.Bundle;
 import android.support.annotation.TransitionRes;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -35,7 +35,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.mokshjn.cosmo.R;
-import io.mokshjn.cosmo.adapters.SongListAdapter;
 import io.mokshjn.cosmo.transitions.CircularReveal;
 import io.mokshjn.cosmo.utils.ImeUtils;
 import io.mokshjn.cosmo.utils.TransitionUtils;
@@ -67,7 +66,6 @@ public class SearchActivity extends AppCompatActivity {
     @BindInt(R.integer.num_columns) int columns;
     @BindDimen(R.dimen.z_app_bar) float appBarElevation;
 
-    SongListAdapter adapter;
     private TextView noResults;
     private SparseArray<Transition> transitions = new SparseArray<>();
 
