@@ -23,9 +23,9 @@ import android.support.annotation.Nullable;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
+import android.support.v7.app.NotificationCompat;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
-import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
 import java.io.IOException;
@@ -48,30 +48,45 @@ public class MusicServiceOld extends Service implements MediaPlayer.OnPreparedLi
 
     final public static Uri sArtworkUri = Uri
             .parse("content://media/external/audio/albumart");
-
+    private static final int NOTIFICATION_ID = 659;
+    private final IBinder musicBind = new MusicBinder();
     private MediaPlayer player;
-
     private MediaSessionManager mediaSessionManager;
     private MediaSessionCompat mediaSession;
     private MediaControllerCompat.TransportControls transportControls;
-
     private boolean ongoingCall = false;
     private PhoneStateListener phoneStateListener;
     private TelephonyManager telephonyManager;
-
-    private static final int NOTIFICATION_ID = 659;
-
     private int resumeSongPosition;
-
     private AudioManager audioManager;
-
-
-    private final IBinder musicBind = new MusicBinder();
-
     private ArrayList<Song> songList;
     private int songPosition = -1;
     private Song currentSong;
+    private BroadcastReceiver becomingNoisyReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            pauseSong();
+            buildNotification(PlaybackStatus.PAUSED);
+        }
+    };
+    private BroadcastReceiver playNewAudio = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            songPosition = new StorageUtils(getApplicationContext()).loadSongPosition();
+            Log.d("songNo", "onReceive: " + songPosition);
+            if (songPosition != -1 && songPosition < songList.size()) {
+                currentSong = songList.get(songPosition);
+            } else {
+                stopSelf();
+            }
 
+            stopSong();
+            player.reset();
+            initMediaPlayer();
+            updateMetaData();
+            buildNotification(PlaybackStatus.PLAYING);
+        }
+    };
 
     @Nullable
     @Override
@@ -156,12 +171,6 @@ public class MusicServiceOld extends Service implements MediaPlayer.OnPreparedLi
         new StorageUtils(getApplicationContext()).clearCachedAudioPlaylist();
     }
 
-    public class MusicBinder extends Binder {
-        public MusicServiceOld getService() {
-            return MusicServiceOld.this;
-        }
-    }
-
     @Override
     public void onPrepared(MediaPlayer mediaPlayer) {
         playSong();
@@ -223,10 +232,7 @@ public class MusicServiceOld extends Service implements MediaPlayer.OnPreparedLi
     private boolean requestAudioFocus() {
         audioManager= (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         int result = audioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
-        if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-            return true;
-        }
-        return false;
+        return result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
     }
 
     private boolean removeAudioFocus() {
@@ -313,14 +319,6 @@ public class MusicServiceOld extends Service implements MediaPlayer.OnPreparedLi
         player.reset();
         initMediaPlayer();
     }
-
-    private BroadcastReceiver becomingNoisyReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            pauseSong();
-            buildNotification(PlaybackStatus.PAUSED);
-        }
-    };
 
     private void registerBecomingNoisyReciever() {
         IntentFilter intentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
@@ -520,33 +518,19 @@ public class MusicServiceOld extends Service implements MediaPlayer.OnPreparedLi
         }
     }
 
-    private BroadcastReceiver playNewAudio = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            songPosition = new StorageUtils(getApplicationContext()).loadSongPosition();
-            Log.d("songNo", "onReceive: "+songPosition);
-            if(songPosition != -1 && songPosition < songList.size()){
-                currentSong = songList.get(songPosition);
-            } else {
-                stopSelf();
-            }
-
-            stopSong();
-            player.reset();
-            initMediaPlayer();
-            updateMetaData();
-            buildNotification(PlaybackStatus.PLAYING);
-        }
-    };
-
     private void register_playNewAudio() {
         IntentFilter intentFilter = new IntentFilter(SongListFragment.Broadcast_PLAY_NEW_AUDIO);
         registerReceiver(playNewAudio, intentFilter);
     }
 
-
     public enum PlaybackStatus{
         PLAYING,
         PAUSED
+    }
+
+    public class MusicBinder extends Binder {
+        public MusicServiceOld getService() {
+            return MusicServiceOld.this;
+        }
     }
 }

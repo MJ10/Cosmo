@@ -41,8 +41,6 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".services.MusicServiceOld" />
-
         <activity android:name=".activities.AlbumViewActivity">
 
         </activity>
