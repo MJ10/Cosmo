@@ -40,8 +40,7 @@ public class LibrarySource implements MusicProviderSource {
                         .putString(MediaMetadataCompat.METADATA_KEY_TITLE, cursor.getString(cursor.getColumnIndex(MediaStore.Audio.AudioColumns.TITLE)))
                         .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.AudioColumns.DURATION)))
                         .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.AudioColumns.TRACK)))
-                        .putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.AudioColumns.DURATION)))
-                        .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, LibUtils.getMediaStoreAlbumCoverUri(cursor.getColumnIndex(MediaStore.Audio.AudioColumns.ALBUM_ID)).toString())
+                        .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, LibUtils.getMediaStoreAlbumCoverUri(cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID))).toString())
                         .build();
                 tracks.add(metadata);
             } while (cursor.moveToNext());

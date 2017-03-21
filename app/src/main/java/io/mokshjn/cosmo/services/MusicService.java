@@ -101,7 +101,7 @@ public class MusicService extends MediaBrowserServiceCompat implements
 
         mPackageValidator = new PackageValidator(this);
 
-        QueueManager queueManager = new QueueManager(mMusicProvider, getResources(),
+        QueueManager queueManager = new QueueManager(getApplicationContext(), mMusicProvider, getResources(),
                 new QueueManager.MetadataUpdateListener() {
                     @Override
                     public void onMetadataChanged(MediaMetadataCompat metadata) {
