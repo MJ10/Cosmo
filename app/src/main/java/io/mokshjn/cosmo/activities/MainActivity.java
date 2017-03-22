@@ -108,7 +108,7 @@ public class MainActivity extends BaseActivity implements SongsFragment.MediaFra
     }
 
     public String getMediaId() {
-        return ((SongsFragment) mPagerAdapter.getItem(mViewPager.getCurrentItem())).getMediaId();
+        return ((SongsFragment) getSupportFragmentManager().findFragmentByTag("android:switcher:" + R.id.main_content + ":" + 0)).getMediaId();
     }
 
     @Override
@@ -194,7 +194,7 @@ public class MainActivity extends BaseActivity implements SongsFragment.MediaFra
                     .playFromSearch(query, mVoiceSearchParams);
             mVoiceSearchParams = null;
         }
-        ((SongsFragment) getSupportFragmentManager().findFragmentByTag("android:switcher:" + R.id.main_content + ":" + mViewPager.getCurrentItem())).onConnected();
+        ((SongsFragment) getSupportFragmentManager().findFragmentByTag("android:switcher:" + R.id.main_content + ":" + 0)).onConnected();
     }
 
     public class PagerAdapter extends FragmentPagerAdapter {

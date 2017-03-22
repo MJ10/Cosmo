@@ -17,12 +17,26 @@ import io.mokshjn.cosmo.models.Song;
 
 public class StorageUtils {
 
-    private final String STORAGE = " io.mokshjn.cosmo.STORAGE";
+    private final static String STORAGE = " io.mokshjn.cosmo.STORAGE";
     private SharedPreferences preferences;
     private Context context;
 
     public StorageUtils(Context context) {
         this.context = context;
+    }
+
+    public static void storeMediaID(Context context, String mediaID) {
+        SharedPreferences preferences = context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("mediaID", mediaID);
+        editor.apply();
+    }
+
+    public static String getStoredMediaID(Context context) {
+        String mediaID;
+        SharedPreferences preferences = context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
+        mediaID = preferences.getString("mediaID", "null");
+        return mediaID;
     }
 
     public void storeSong(ArrayList<Song> arrayList) {
