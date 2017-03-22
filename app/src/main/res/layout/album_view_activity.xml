@@ -8,7 +8,7 @@
     android:transitionGroup="false"
     app:dragDismissDistance="@dimen/drag_dismiss_distance"
     app:dragDismissScale="0.95"
-    tools:context=".activities.AlbumViewActivity">
+    tools:context="io.mokshjn.cosmo.activities.AlbumActivity">
 
     <View
         android:id="@+id/background"
@@ -32,7 +32,7 @@
         app:scrimColor="@color/scrim" />
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/dribbble_comments"
+        android:id="@+id/rvAlbumSongs"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clipToPadding="false"

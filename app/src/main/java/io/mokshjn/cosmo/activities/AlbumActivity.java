@@ -25,12 +25,15 @@ public class AlbumActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.album_view_activity);
         ButterKnife.bind(this);
+
         chromeFader = new ElasticDragDismissFrameLayout.SystemChromeFader(this) {
             @Override
             public void onDragDismissed() {
                 finishAfterTransition();
             }
         };
+
+        draggableFrame.addListener(chromeFader);
     }
 
     @Override
@@ -42,6 +45,5 @@ public class AlbumActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        draggableFrame.removeListener(chromeFader);
     }
 }
