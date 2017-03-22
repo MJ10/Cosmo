@@ -1,4 +1,4 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
@@ -74,6 +74,21 @@
         <item name="android:textColor">@color/text_primary_light</item>
     </style>
 
+    <style name="AppTheme.Translucent.Album">
+        <item name="android:colorPrimary">@color/colorPrimary</item>
+        <item name="android:colorAccent">@color/colorAccent</item>
+        <item name="android:statusBarColor">@color/colorText</item>
+        <item name="android:navigationBarColor">@color/colorText</item>
+        <item name="android:colorControlActivated">?android:colorAccent</item>
+        <item name="android:windowAllowReturnTransitionOverlap">false</item>
+    </style>
 
-
+    <style name="AppTheme.Translucent.Album.View">
+        <item name="android:windowSharedElementEnterTransition">@transition/album_shared_enter
+        </item>
+        <item name="android:windowSharedElementReturnTransition">@transition/album_shared_return
+        </item>
+        <item name="android:windowEnterTransition">@transition/album_enter</item>
+        <item name="android:windowReturnTransition">@transition/album_return</item>
+    </style>
 </resources>

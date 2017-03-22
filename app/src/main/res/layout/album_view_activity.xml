@@ -18,7 +18,7 @@
         android:transitionName="@string/transition_album_bg" />
 
     <io.mokshjn.cosmo.widgets.ParallaxScrimageView
-        android:id="@+id/shot"
+        android:id="@+id/ivAlbumArt"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/light_grey"

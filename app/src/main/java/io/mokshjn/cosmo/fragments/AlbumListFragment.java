@@ -17,7 +17,7 @@ import java.util.ArrayList;
 
 import butterknife.ButterKnife;
 import io.mokshjn.cosmo.R;
-import io.mokshjn.cosmo.activities.AlbumViewActivity;
+import io.mokshjn.cosmo.activities.AlbumActivity;
 import io.mokshjn.cosmo.adapters.AlbumListAdapter;
 import io.mokshjn.cosmo.interfaces.LibraryInterface;
 import io.mokshjn.cosmo.loader.AlbumListLoader;
@@ -66,8 +66,7 @@ public class AlbumListFragment extends Fragment implements AlbumListAdapter.albC
 
     @Override
     public void onAlbumClick(View v, int pos) {
-        Intent intent = new Intent(getActivity(), AlbumViewActivity.class);
-        intent.putExtra("albumId", albumList.get(pos).getAlbumId());
+        Intent intent = new Intent(getActivity(), AlbumActivity.class);
         startActivity(intent,
                 ActivityOptions.makeSceneTransitionAnimation(getActivity(),
                         Pair.create(v, getString(R.string.transition_album_art)),
