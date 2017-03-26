@@ -15,30 +15,10 @@
   limitations under the License.
   -->
 
-<transitionSet
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<transitionSet>
 
-    <transition
-        class="io.mokshjn.cosmo.transitions.CircularReveal"
-        app:startRadius="@dimen/fab_radius"
-        android:duration="250"
-        android:interpolator="@android:interpolator/fast_out_slow_in">
-        <targets>
-            <target android:targetId="@id/confirm_save_container" />
-        </targets>
-    </transition>
 
-    <transitionSet
-        android:interpolator="@android:interpolator/linear_out_slow_in">
-        <targets>
-            <target android:targetId="@id/results_scrim" />
-        </targets>
-        <fade android:duration="500" />
-        <transition
-            class="io.mokshjn.cosmo.transitions.CircularReveal"
-            app:centerOn="@id/fab"
-            android:duration="280" />
-    </transitionSet>
 
 </transitionSet>
+
+

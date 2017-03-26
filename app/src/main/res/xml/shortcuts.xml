@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:enabled="true"
+        android:icon="@drawable/ic_search_24dp"
+        android:shortcutDisabledMessage="@string/searchmenutext"
+        android:shortcutId="search"
+        android:shortcutLongLabel="@string/searchmenutext"
+        android:shortcutShortLabel="@string/searchmenutext">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="io.mokshjn.cosmo.activities.SearchActivity"
+            android:targetPackage="io.mokshjn.cosmo" />
+
+    </shortcut>
+</shortcuts>
