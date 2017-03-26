@@ -2,11 +2,19 @@ package io.mokshjn.cosmo.activities;
 
 import android.app.SearchManager;
 import android.app.SharedElementCallback;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.RemoteException;
+import android.support.annotation.NonNull;
 import android.support.annotation.TransitionRes;
+import android.support.v4.media.MediaBrowserCompat;
+import android.support.v4.media.MediaMetadataCompat;
+import android.support.v4.media.session.MediaControllerCompat;
+import android.support.v4.media.session.MediaSessionCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
@@ -21,7 +29,6 @@ import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
-import android.widget.CheckedTextView;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
@@ -35,12 +42,28 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.mokshjn.cosmo.R;
+import io.mokshjn.cosmo.helpers.LogHelper;
+import io.mokshjn.cosmo.interfaces.MediaBrowserProvider;
+import io.mokshjn.cosmo.services.MusicService;
 import io.mokshjn.cosmo.transitions.CircularReveal;
 import io.mokshjn.cosmo.utils.ImeUtils;
 import io.mokshjn.cosmo.utils.TransitionUtils;
 
-public class SearchActivity extends AppCompatActivity {
+public class SearchActivity extends AppCompatActivity implements MediaBrowserProvider {
 
+    private static final String TAG = LogHelper.makeLogTag(SearchActivity.class);
+    private final MediaControllerCompat.Callback mMediaControllerCallback =
+            new MediaControllerCompat.Callback() {
+                @Override
+                public void onPlaybackStateChanged(@NonNull PlaybackStateCompat state) {
+
+                }
+
+                @Override
+                public void onMetadataChanged(MediaMetadataCompat metadata) {
+
+                }
+            };
     @BindView(R.id.searchback)
     ImageButton searchBack;
     @BindView(R.id.searchback_container)
@@ -56,16 +79,26 @@ public class SearchActivity extends AppCompatActivity {
     @BindView(R.id.container) ViewGroup container;
     @BindView(R.id.search_toolbar) ViewGroup searchToolbar;
     @BindView(R.id.results_container) ViewGroup resultsContainer;
-    @BindView(R.id.fab) ImageButton fab;
-    @BindView(R.id.confirm_save_container) ViewGroup confirmSaveContainer;
-    @BindView(R.id.save_dribbble)
-    CheckedTextView saveDribbble;
-    @BindView(R.id.save_designer_news) CheckedTextView saveDesignerNews;
     @BindView(R.id.scrim) View scrim;
     @BindView(R.id.results_scrim) View resultsScrim;
     @BindInt(R.integer.num_columns) int columns;
     @BindDimen(R.dimen.z_app_bar) float appBarElevation;
-
+    private String mediaID;
+    private MediaBrowserCompat mediaBrowser;
+    private final MediaBrowserCompat.ConnectionCallback mConnectionCallback =
+            new MediaBrowserCompat.ConnectionCallback() {
+                @Override
+                public void onConnected() {
+                    LogHelper.d(TAG, "onConnected");
+                    try {
+                        connectToSession(mediaBrowser.getSessionToken());
+                        if (getMediaID() == null) {
+                        }
+                    } catch (RemoteException e) {
+                        LogHelper.e(TAG, e, "could not connect media controller");
+                    }
+                }
+            };
     private TextView noResults;
     private SparseArray<Transition> transitions = new SparseArray<>();
 
@@ -74,10 +107,25 @@ public class SearchActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
         ButterKnife.bind(this);
+        mediaBrowser = new MediaBrowserCompat(this,
+                new ComponentName(this, MusicService.class), mConnectionCallback, null);
         setupSearch();
 
         onNewIntent(getIntent());
         setupTransitions();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mediaBrowser.connect();
+        if (mediaBrowser.isConnected()) {
+            onConnected();
+        }
+    }
+
+    private void onConnected() {
+
     }
 
     private void setupSearch() {
@@ -120,8 +168,6 @@ public class SearchActivity extends AppCompatActivity {
         TransitionManager.beginDelayedTransition(container, getTransition(R.transition.auto));
         results.setVisibility(View.GONE);
         progress.setVisibility(View.GONE);
-        fab.setVisibility(View.GONE);
-        confirmSaveContainer.setVisibility(View.GONE);
         resultsScrim.setVisibility(View.GONE);
         setNoResultsVisibility(View.GONE);
     }
@@ -163,7 +209,6 @@ public class SearchActivity extends AppCompatActivity {
         }
     }
 
-
     private void searchFor(String query) {
         clearResults();
         progress.setVisibility(View.VISIBLE);
@@ -200,6 +245,21 @@ public class SearchActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void connectToSession(MediaSessionCompat.Token token) throws RemoteException {
+        MediaControllerCompat mediaController = new MediaControllerCompat(this, token);
+        setSupportMediaController(mediaController);
+        mediaController.registerCallback(mMediaControllerCallback);
+    }
+
+    @Override
+    public MediaBrowserCompat getMediaBrowser() {
+        return mediaBrowser;
+    }
+
+    private String getMediaID() {
+        return mediaID;
     }
 
 }
