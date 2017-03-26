@@ -20,6 +20,7 @@ import io.mokshjn.cosmo.helpers.MediaIDHelper;
 import io.mokshjn.cosmo.models.MutableMediaMetadata;
 
 import static io.mokshjn.cosmo.helpers.MediaIDHelper.MEDIA_ID_MUSICS_BY_GENRE;
+import static io.mokshjn.cosmo.helpers.MediaIDHelper.MEDIA_ID_MUSICS_BY_SEARCH;
 import static io.mokshjn.cosmo.helpers.MediaIDHelper.MEDIA_ID_ROOT;
 
 /**
@@ -174,6 +175,7 @@ public class LibraryProvider {
                     mMusicListById.put(musicId, new MutableMediaMetadata(musicId, item));
                     this.tracks.add(item);
                 }
+                buildListsByAlbum();
                 buildListsByGenre();
                 mCurrentState = State.INITIALIZED;
             }
@@ -219,11 +221,11 @@ public class LibraryProvider {
         ConcurrentMap<String, List<MediaMetadataCompat>> newMusicListByAlbum = new ConcurrentHashMap<>();
 
         for (MutableMediaMetadata m : mMusicListById.values()) {
-            String genre = m.metadata.getString(MediaMetadataCompat.METADATA_KEY_ALBUM);
-            List<MediaMetadataCompat> list = newMusicListByAlbum.get(genre);
+            String album = m.metadata.getString(MediaMetadataCompat.METADATA_KEY_ALBUM);
+            List<MediaMetadataCompat> list = newMusicListByAlbum.get(album);
             if (list == null) {
                 list = new ArrayList<>();
-                newMusicListByAlbum.put(genre, list);
+                newMusicListByAlbum.put(album, list);
             }
             list.add(m.metadata);
         }
@@ -239,21 +241,21 @@ public class LibraryProvider {
 
         if (MEDIA_ID_ROOT.equals(mediaId)) {
             for (MediaMetadataCompat item : tracks) {
-                mediaItems.add(createMediaItem(item));
+                mediaItems.add(createMediaItem(item, MEDIA_ID_ROOT));
             }
         } else if (mediaId.startsWith(MEDIA_ID_MUSICS_BY_GENRE)) {
             String genre = MediaIDHelper.getHierarchy(mediaId)[1];
             for (MediaMetadataCompat metadata : getMusicsByGenre(genre)) {
-                mediaItems.add(createMediaItem(metadata));
+                mediaItems.add(createMediaItem(metadata, MEDIA_ID_MUSICS_BY_GENRE));
             }
-
+        } else if (mediaId.startsWith(MEDIA_ID_MUSICS_BY_SEARCH)) {
         } else {
             LogHelper.w(TAG, "Skipping unmatched mediaId: ", mediaId);
         }
         return mediaItems;
     }
 
-    public MediaBrowserCompat.MediaItem createMediaItem(MediaMetadataCompat metadata) {
+    public MediaBrowserCompat.MediaItem createMediaItem(MediaMetadataCompat metadata, String fromWhere) {
         // Since mediaMetadata fields are immutable, we need to create a copy, so we
         // can set a hierarchy-aware mediaID. We will need to know the media hierarchy
         // when we get a onPlayFromMusicID call, so we can create the proper queue based

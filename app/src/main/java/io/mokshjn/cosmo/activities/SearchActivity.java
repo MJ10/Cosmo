@@ -136,7 +136,8 @@ public class SearchActivity extends AppCompatActivity implements MediaBrowserPro
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {
-                return false;
+                getSupportMediaController().getTransportControls().playFromSearch(s, null);
+                return true;
             }
 
             @Override

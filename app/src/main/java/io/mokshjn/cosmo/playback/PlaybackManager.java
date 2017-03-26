@@ -354,7 +354,7 @@ public class PlaybackManager implements Playback.Callback {
             List<MediaBrowserCompat.MediaItem> songs = new ArrayList<>();
             Iterable<MediaMetadataCompat> iterable = mMusicProvider.searchMusicByAlbum(album);
             for (MediaMetadataCompat compat : iterable) {
-                songs.add(mMusicProvider.createMediaItem(compat));
+                songs.add(mMusicProvider.createMediaItem(compat, MediaIDHelper.MEDIA_ID_MUSICS_BY_ALBUM));
             }
             return songs;
         }
