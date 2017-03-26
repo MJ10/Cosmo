@@ -20,10 +20,13 @@ import io.mokshjn.cosmo.R;
 public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
 
     private ClickListener clickListener;
-    private ArrayList<MediaBrowserCompat.MediaItem> tracks;
+    private ArrayList<MediaBrowserCompat.MediaItem> tracks = new ArrayList<>();
 
     public SongAdapter(ArrayList<MediaBrowserCompat.MediaItem> tracks) {
         this.tracks = tracks;
+    }
+
+    public SongAdapter() {
     }
 
     @Override
@@ -48,6 +51,10 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> {
 
     public void setClickListener(ClickListener clickListener) {
         this.clickListener = clickListener;
+    }
+
+    public void setTracks(ArrayList<MediaBrowserCompat.MediaItem> tracks) {
+        this.tracks = tracks;
     }
 
     public interface ClickListener {

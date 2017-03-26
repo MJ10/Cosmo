@@ -4,9 +4,14 @@ import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
+import android.support.v4.media.MediaBrowserCompat;
+import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import io.mokshjn.cosmo.helpers.LogHelper;
 import io.mokshjn.cosmo.helpers.MediaIDHelper;
@@ -343,6 +348,15 @@ public class PlaybackManager implements Playback.Callback {
             } else {
                 updatePlaybackState("Could not find music");
             }
+        }
+
+        public List<MediaBrowserCompat.MediaItem> getSongsFromAlbum(String album) {
+            List<MediaBrowserCompat.MediaItem> songs = new ArrayList<>();
+            Iterable<MediaMetadataCompat> iterable = mMusicProvider.searchMusicByAlbum(album);
+            for (MediaMetadataCompat compat : iterable) {
+                songs.add(mMusicProvider.createMediaItem(compat));
+            }
+            return songs;
         }
 
     }

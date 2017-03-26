@@ -73,9 +73,7 @@ public class SongsFragment extends android.support.v4.app.Fragment implements So
                         for (MediaBrowserCompat.MediaItem item : children) {
                             tracks.add(item);
                         }
-                        adapter = new SongAdapter(tracks);
-                        rvSongList.setAdapter(adapter);
-                        adapter.setClickListener(SongsFragment.this);
+                        adapter.setTracks(tracks);
                         adapter.notifyDataSetChanged();
                     } catch (Throwable t) {
                         LogHelper.e(TAG, "Error on childrenloaded", t);
@@ -107,6 +105,9 @@ public class SongsFragment extends android.support.v4.app.Fragment implements So
         View rootView = inflater.inflate(R.layout.fragment_song_list, container, false);
         rvSongList = (FastScrollRecyclerView) rootView.findViewById(R.id.rvSongList);
         rvSongList.setLayoutManager(new LinearLayoutManager(getContext()));
+        adapter = new SongAdapter();
+        rvSongList.setAdapter(adapter);
+        adapter.setClickListener(this);
         return rootView;
     }
 

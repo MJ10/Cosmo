@@ -253,7 +253,7 @@ public class LibraryProvider {
         return mediaItems;
     }
 
-    private MediaBrowserCompat.MediaItem createMediaItem(MediaMetadataCompat metadata) {
+    public MediaBrowserCompat.MediaItem createMediaItem(MediaMetadataCompat metadata) {
         // Since mediaMetadata fields are immutable, we need to create a copy, so we
         // can set a hierarchy-aware mediaID. We will need to know the media hierarchy
         // when we get a onPlayFromMusicID call, so we can create the proper queue based
