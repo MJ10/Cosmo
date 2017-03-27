@@ -16,6 +16,7 @@ import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -25,6 +26,7 @@ import android.transition.Transition;
 import android.transition.TransitionInflater;
 import android.transition.TransitionManager;
 import android.transition.TransitionSet;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +36,7 @@ import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindDimen;
@@ -42,14 +45,17 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.mokshjn.cosmo.R;
+import io.mokshjn.cosmo.adapters.SongAdapter;
 import io.mokshjn.cosmo.helpers.LogHelper;
+import io.mokshjn.cosmo.helpers.QueueHelper;
 import io.mokshjn.cosmo.interfaces.MediaBrowserProvider;
+import io.mokshjn.cosmo.provider.LibraryProvider;
 import io.mokshjn.cosmo.services.MusicService;
 import io.mokshjn.cosmo.transitions.CircularReveal;
 import io.mokshjn.cosmo.utils.ImeUtils;
 import io.mokshjn.cosmo.utils.TransitionUtils;
 
-public class SearchActivity extends AppCompatActivity implements MediaBrowserProvider {
+public class SearchActivity extends AppCompatActivity implements MediaBrowserProvider, SongAdapter.ClickListener {
 
     private static final String TAG = LogHelper.makeLogTag(SearchActivity.class);
     private final MediaControllerCompat.Callback mMediaControllerCallback =
@@ -83,7 +89,9 @@ public class SearchActivity extends AppCompatActivity implements MediaBrowserPro
     @BindView(R.id.results_scrim) View resultsScrim;
     @BindInt(R.integer.num_columns) int columns;
     @BindDimen(R.dimen.z_app_bar) float appBarElevation;
-    private String mediaID;
+    private SongAdapter adapter;
+    private LibraryProvider libraryProvider;
+    private String searchQuery;
     private MediaBrowserCompat mediaBrowser;
     private final MediaBrowserCompat.ConnectionCallback mConnectionCallback =
             new MediaBrowserCompat.ConnectionCallback() {
@@ -92,13 +100,12 @@ public class SearchActivity extends AppCompatActivity implements MediaBrowserPro
                     LogHelper.d(TAG, "onConnected");
                     try {
                         connectToSession(mediaBrowser.getSessionToken());
-                        if (getMediaID() == null) {
-                        }
                     } catch (RemoteException e) {
                         LogHelper.e(TAG, e, "could not connect media controller");
                     }
                 }
             };
+    private ArrayList<MediaBrowserCompat.MediaItem> tracks = new ArrayList<>();
     private TextView noResults;
     private SparseArray<Transition> transitions = new SparseArray<>();
 
@@ -110,7 +117,12 @@ public class SearchActivity extends AppCompatActivity implements MediaBrowserPro
         mediaBrowser = new MediaBrowserCompat(this,
                 new ComponentName(this, MusicService.class), mConnectionCallback, null);
         setupSearch();
-
+        adapter = new SongAdapter();
+        results.setLayoutManager(new LinearLayoutManager(this));
+        results.setAdapter(adapter);
+        adapter.setClickListener(this);
+        libraryProvider = new LibraryProvider(getContentResolver());
+        libraryProvider.retrieveMediaAsync(null);
         onNewIntent(getIntent());
         setupTransitions();
     }
@@ -136,7 +148,7 @@ public class SearchActivity extends AppCompatActivity implements MediaBrowserPro
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {
-                getSupportMediaController().getTransportControls().playFromSearch(s, null);
+                searchFor(s);
                 return true;
             }
 
@@ -171,6 +183,8 @@ public class SearchActivity extends AppCompatActivity implements MediaBrowserPro
         progress.setVisibility(View.GONE);
         resultsScrim.setVisibility(View.GONE);
         setNoResultsVisibility(View.GONE);
+        tracks.clear();
+        adapter.notifyDataSetChanged();
     }
 
     Transition getTransition(@TransitionRes int transitionId) {
@@ -210,11 +224,41 @@ public class SearchActivity extends AppCompatActivity implements MediaBrowserPro
         }
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (getSupportMediaController() != null) {
+            getSupportMediaController().unregisterCallback(mMediaControllerCallback);
+        }
+        mediaBrowser.disconnect();
+    }
+
     private void searchFor(String query) {
         clearResults();
         progress.setVisibility(View.VISIBLE);
         ImeUtils.hideIme(searchView);
         searchView.clearFocus();
+//        getSupportMediaController().getTransportControls().playFromSearch(query, null);
+        for (MediaSessionCompat.QueueItem item : QueueHelper.getPlayingQueueFromSearch(query, null, libraryProvider)) {
+            tracks.add(new MediaBrowserCompat.MediaItem(item.getDescription(), MediaBrowserCompat.MediaItem.FLAG_PLAYABLE));
+            Log.d(TAG, "searchFor: " + item.getDescription().getMediaId());
+        }
+        adapter.setTracks(tracks);
+        if (tracks != null && tracks.size() > 0) {
+            if (results.getVisibility() != View.VISIBLE) {
+                TransitionManager.beginDelayedTransition(container,
+                        getTransition(R.transition.search_show_results));
+                progress.setVisibility(View.GONE);
+                results.setVisibility(View.VISIBLE);
+            }
+            adapter.notifyDataSetChanged();
+        } else {
+            TransitionManager.beginDelayedTransition(
+                    container, getTransition(R.transition.auto));
+            progress.setVisibility(View.GONE);
+//            setNoResultsVisibility(View.VISIBLE);
+        }
+        searchQuery = query;
     }
 
     @OnClick({ R.id.scrim, R.id.searchback })
@@ -259,8 +303,9 @@ public class SearchActivity extends AppCompatActivity implements MediaBrowserPro
         return mediaBrowser;
     }
 
-    private String getMediaID() {
-        return mediaID;
-    }
 
+    @Override
+    public void onSongClick(View v, int position) {
+        getSupportMediaController().getTransportControls().playFromMediaId(tracks.get(position).getMediaId(), null);
+    }
 }
