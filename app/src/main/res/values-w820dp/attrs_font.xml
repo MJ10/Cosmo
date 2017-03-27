@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   Copyright 2015 Google Inc.
 
   Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,14 +14,15 @@
   limitations under the License.
   -->
 
-<io.mokshjn.cosmo.widgets.BaselineGridTextView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/no_search_results"
-    style="@style/Widget.AppTheme.EmptyText"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:drawablePadding="@dimen/spacing_micro"
-    android:drawableTop="@drawable/ic_search_24dp"
-    android:padding="@dimen/spacing_huge"
-    android:paddingTop="@dimen/spacing_huge"
-    android:textAlignment="center" />
+<resources>
+
+    <attr name="font" format="string" />
+
+    <declare-styleable name="FontTextAppearance">
+        <attr name="android:textSize" />
+        <attr name="android:textColor" />
+        <attr name="android:fontFamily" />
+        <attr name="font" />
+    </declare-styleable>
+
+</resources>

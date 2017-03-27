@@ -256,7 +256,7 @@ public class SearchActivity extends AppCompatActivity implements MediaBrowserPro
             TransitionManager.beginDelayedTransition(
                     container, getTransition(R.transition.auto));
             progress.setVisibility(View.GONE);
-//            setNoResultsVisibility(View.VISIBLE);
+            setNoResultsVisibility(View.VISIBLE);
         }
         searchQuery = query;
     }
