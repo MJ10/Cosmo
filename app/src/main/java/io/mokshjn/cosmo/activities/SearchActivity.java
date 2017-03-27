@@ -238,7 +238,7 @@ public class SearchActivity extends AppCompatActivity implements MediaBrowserPro
         progress.setVisibility(View.VISIBLE);
         ImeUtils.hideIme(searchView);
         searchView.clearFocus();
-//        getSupportMediaController().getTransportControls().playFromSearch(query, null);
+//       getSupportMediaController().getTransportControls().playFromSearch(query, null);
         for (MediaSessionCompat.QueueItem item : QueueHelper.getPlayingQueueFromSearch(query, null, libraryProvider)) {
             tracks.add(new MediaBrowserCompat.MediaItem(item.getDescription(), MediaBrowserCompat.MediaItem.FLAG_PLAYABLE));
             Log.d(TAG, "searchFor: " + item.getDescription().getMediaId());
