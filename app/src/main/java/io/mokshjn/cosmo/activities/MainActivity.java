@@ -54,9 +54,7 @@ public class MainActivity extends BaseActivity implements SongsFragment.MediaFra
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         intializePager();
         if(Build.VERSION.SDK_INT >= 23){
-            if(checkPermission()){
-
-            } else {
+            if (!checkPermission()) {
                 askPermission();
             }
         }
