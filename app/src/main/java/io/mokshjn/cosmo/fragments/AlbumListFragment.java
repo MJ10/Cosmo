@@ -71,8 +71,7 @@ public class AlbumListFragment extends Fragment implements AlbumListAdapter.albC
         intent.putExtra("albumID", albumList.get(pos).getAlbumId());
         startActivity(intent,
                 ActivityOptions.makeSceneTransitionAnimation(getActivity(),
-                        Pair.create(v.findViewById(R.id.ivAlbumArt), getString(R.string.transition_album_art)),
-                        Pair.create(v, getString(R.string.transition_album_bg))).toBundle());
+                        Pair.create(v.findViewById(R.id.ivAlbumArt), getString(R.string.transition_album_art))).toBundle());
     }
 
     @Override

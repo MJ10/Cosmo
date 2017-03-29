@@ -14,16 +14,12 @@
     <string name="discog_template">x Songs | y Albums</string>
     <string name="artist_name_null">artist_name</string>
     <string name="transition_search_back" translatable="false">transition_search_back</string>
-    <string name="confirm_save_dribbble_search">Save Dribbble</string>
-    <string name="confirm_save_designer_news_search">Save Designer News</string>
-    <string name="confirm_save_search">Save</string>
     <string name="path_search">M13.3843083,13.3956843 C11.233862,15.5399983 7.7581039,15.5381046 5.61000013,13.3900003 C3.46000004,11.2399998 3.46000004,7.76000023 5.61000013,5.61000013 C7.76000023,3.46000004 11.2400007,3.46000004 13.3900003,5.61000013 C15.54,7.76000023 15.5400009,11.2400007 13.3900003,13.3900003 C13.388104,13.3918967 13.3862067,13.3937913 13.3843083,13.3956843 C15.1427975,15.1834093 19.6826174,19.798706 19.6826172,19.7987061 L13.3843085,13.3956846 L13.3843083,13.3956843 Z</string>
     <string name="no_search_results">No results for\n“%1$s”</string>
 
     <string name="favorite">Favorite</string>
     <string name="error_no_metadata">Unable to retrieve metadata.</string>
     <string name="browse_genres">Genres</string>
-    <string name="browse_genre_subtitle">Songs by genre</string>
     <string name="browse_musics_by_genre_subtitle">%1$s songs</string>
     <string name="random_queue_title">Random music</string>
     <string name="error_no_connection">Cannot connect to server. Please, check your Internet connectivity.</string>
@@ -43,11 +39,6 @@
     <string name="home_title">Home</string>
     <string name="related_content_header">You may also like</string>
     <string name="action_listen">Listen</string>
-    <string name="open_content_drawer">Open the main menu</string>
-    <string name="close_content_drawer">Close the main menu</string>
-    <string name="placeholder_message">This is a placeholder for your application code.</string>
-    <string name="drawer_allmusic_title">All Music</string>
-    <string name="drawer_playlists_title">Playlists</string>
     <string name="now_playing">Now Playing</string>
     <string name="background_image_str">Background image for album art</string>
     <string name="search_queue_title">Search results</string>
@@ -56,4 +47,5 @@
     <string name="media_route_menu_title">Play on…</string>
     <string name="transition_album_bg">transition_album_bg</string>
     <string name="transition_album_art">transition_album_art</string>
+    <string name="appbar_scrolling_view_behavior" translatable="false">android.support.design.widget.AppBarLayout$ScrollingViewBehavior</string>
 </resources>

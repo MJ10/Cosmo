@@ -17,8 +17,6 @@ import io.mokshjn.cosmo.utils.LibUtils;
 
 public class LibrarySource implements MusicProviderSource {
 
-    final public static Uri sArtworkUri = Uri
-            .parse("content://media/external/audio/albumart");
     private ContentResolver resolver;
 
     public LibrarySource(ContentResolver resolver) {
