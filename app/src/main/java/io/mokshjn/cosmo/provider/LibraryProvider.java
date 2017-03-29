@@ -6,7 +6,6 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaMetadataCompat;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -64,7 +63,6 @@ public class LibraryProvider {
     }
 
     public Iterable<MediaMetadataCompat> searchMusicByAlbum(String query) {
-        Log.d(TAG, "searchMusicByAlbum: " + query);
         return searchMusic(MediaMetadataCompat.METADATA_KEY_ALBUM, query);
     }
 
@@ -84,7 +82,6 @@ public class LibraryProvider {
                 result.add(track.metadata);
             }
         }
-        Log.d(TAG, "searchMusic: " + result.size());
         return result;
     }
 

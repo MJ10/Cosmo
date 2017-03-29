@@ -132,6 +132,11 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
     }
 
     @Override
+    public void onBackPressed() {
+        finishAfterTransition();
+    }
+
+    @Override
     protected void onStart() {
         super.onStart();
         mediaBrowser.connect();
@@ -143,13 +148,14 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
     @Override
     protected void onStop() {
         super.onStop();
+        mediaBrowser.disconnect();
         if (getSupportMediaController() != null) {
             getSupportMediaController().unregisterCallback(mMediaControllerCallback);
         }
-        mediaBrowser.disconnect();
     }
 
     private void onConnected() {
+
     }
 
     @Override

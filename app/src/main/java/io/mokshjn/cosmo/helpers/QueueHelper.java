@@ -7,7 +7,6 @@ import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.text.TextUtils;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,13 +69,8 @@ public class QueueHelper {
 
         LogHelper.d(TAG, "Creating playing queue for musics from album: ", album);
 
-        Log.d(TAG, "getPlayingQueueFromAlbum: ");
         Iterable<MediaMetadataCompat> result;
         result = musicProvider.searchMusicByAlbum(album);
-        int i = 0;
-        for (MediaMetadataCompat m : result) {
-            Log.d(TAG, "getPlayingQueueFromAlbum: " + ++i);
-        }
         return convertToQueue(result, MEDIA_ID_MUSICS_BY_ALBUM, album);
     }
 
@@ -149,7 +143,6 @@ public class QueueHelper {
         List<MediaSessionCompat.QueueItem> queue = new ArrayList<>();
         int count = 0;
         for (MediaMetadataCompat track : tracks) {
-            Log.d(TAG, "convertToQueue: " + "here");
             // We create a hierarchy-aware mediaID, so we know what the queue is about by looking
             // at the QueueItem media IDs.
             String hierarchyAwareMediaID = MediaIDHelper.createMediaID(
@@ -165,7 +158,6 @@ public class QueueHelper {
                     trackCopy.getDescription(), count++);
             queue.add(item);
         }
-        Log.d(TAG, "convertToQueue: " + queue.size());
         return queue;
 
     }

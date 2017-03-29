@@ -53,7 +53,7 @@ public class MainActivity extends BaseActivity implements SongsFragment.MediaFra
         setContentView(R.layout.activity_main);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         intializePager();
-        if(Build.VERSION.SDK_INT >= 23){
+        if (Build.VERSION.SDK_INT >= 23) {
             if (!checkPermission()) {
                 askPermission();
             }
@@ -149,9 +149,8 @@ public class MainActivity extends BaseActivity implements SongsFragment.MediaFra
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
             case PERMISSION_REQUEST_CODE: {
-                if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                }
-                else {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                } else {
                     Toast.makeText(this, "Permsission not granted shutting down app", Toast.LENGTH_SHORT).show();
                     finish();
                 }
@@ -161,7 +160,7 @@ public class MainActivity extends BaseActivity implements SongsFragment.MediaFra
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode){
+        switch (requestCode) {
             case RC_SEARCH:
                 View searchMenuView = toolbar.findViewById(R.id.action_search);
                 if (searchMenuView != null) {
