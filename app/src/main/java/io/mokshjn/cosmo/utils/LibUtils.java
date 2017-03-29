@@ -1,6 +1,8 @@
 package io.mokshjn.cosmo.utils;
 
+import android.content.ContentResolver;
 import android.content.ContentUris;
+import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
@@ -22,6 +24,18 @@ public class LibUtils {
 
     public static Uri getSongFileUri(long songId) {
         return ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, songId);
+    }
+
+    public static String getAlbumByAlbumId(long albumId, ContentResolver resolver) {
+        String album = "";
+        String selection = "_id = " + albumId;
+        Uri uri = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI;
+        Cursor cursor = resolver.query(uri, null, selection, null, null);
+        if (cursor != null && cursor.moveToFirst()) {
+            album = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM));
+            cursor.close();
+        }
+        return album;
     }
 
     public static String getReadableDurationString(long songDurationMillis) {
