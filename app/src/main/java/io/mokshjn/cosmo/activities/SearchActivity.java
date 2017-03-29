@@ -91,7 +91,6 @@ public class SearchActivity extends AppCompatActivity implements MediaBrowserPro
     @BindDimen(R.dimen.z_app_bar) float appBarElevation;
     private SongAdapter adapter;
     private LibraryProvider libraryProvider;
-    private String searchQuery;
     private MediaBrowserCompat mediaBrowser;
     private final MediaBrowserCompat.ConnectionCallback mConnectionCallback =
             new MediaBrowserCompat.ConnectionCallback() {
@@ -137,7 +136,6 @@ public class SearchActivity extends AppCompatActivity implements MediaBrowserPro
     }
 
     private void onConnected() {
-
     }
 
     private void setupSearch() {
@@ -238,7 +236,6 @@ public class SearchActivity extends AppCompatActivity implements MediaBrowserPro
         progress.setVisibility(View.VISIBLE);
         ImeUtils.hideIme(searchView);
         searchView.clearFocus();
-//       getSupportMediaController().getTransportControls().playFromSearch(query, null);
         for (MediaSessionCompat.QueueItem item : QueueHelper.getPlayingQueueFromSearch(query, null, libraryProvider)) {
             tracks.add(new MediaBrowserCompat.MediaItem(item.getDescription(), MediaBrowserCompat.MediaItem.FLAG_PLAYABLE));
             Log.d(TAG, "searchFor: " + item.getDescription().getMediaId());
@@ -258,7 +255,6 @@ public class SearchActivity extends AppCompatActivity implements MediaBrowserPro
             progress.setVisibility(View.GONE);
             setNoResultsVisibility(View.VISIBLE);
         }
-        searchQuery = query;
     }
 
     @OnClick({ R.id.scrim, R.id.searchback })
