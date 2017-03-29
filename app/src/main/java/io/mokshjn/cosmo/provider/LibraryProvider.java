@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaMetadataCompat;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,8 +20,6 @@ import io.mokshjn.cosmo.helpers.LogHelper;
 import io.mokshjn.cosmo.helpers.MediaIDHelper;
 import io.mokshjn.cosmo.models.MutableMediaMetadata;
 
-import static io.mokshjn.cosmo.helpers.MediaIDHelper.MEDIA_ID_MUSICS_BY_GENRE;
-import static io.mokshjn.cosmo.helpers.MediaIDHelper.MEDIA_ID_MUSICS_BY_SEARCH;
 import static io.mokshjn.cosmo.helpers.MediaIDHelper.MEDIA_ID_ROOT;
 
 /**
@@ -36,7 +35,6 @@ public class LibraryProvider {
     private ConcurrentMap<String, List<MediaMetadataCompat>> mMusicListByArtist;
     private ConcurrentMap<String, MutableMediaMetadata> mMusicListById;
     private List<MediaMetadataCompat> tracks;
-    private ConcurrentMap<String, List<MediaMetadataCompat>> mMusicListByGenre;
     private volatile State mCurrentState = State.NON_INITIALIZED;
 
     public LibraryProvider(ContentResolver resolver) {this(new LibrarySource(resolver)); }
@@ -46,15 +44,7 @@ public class LibraryProvider {
         mMusicListById = new ConcurrentHashMap<>();
         mMusicListByAlbum = new ConcurrentHashMap<>();
         mMusicListByArtist = new ConcurrentHashMap<>();
-        mMusicListByGenre = new ConcurrentHashMap<>();
         tracks = new ArrayList<>();
-    }
-
-    public Iterable<String> getAlbums(){
-        if(mCurrentState != State.INITIALIZED){
-            return Collections.emptyList();
-        }
-        return mMusicListByAlbum.keySet();
     }
 
     public Iterable<MediaMetadataCompat> getShuffledMusic() {
@@ -69,18 +59,12 @@ public class LibraryProvider {
         return shuffled;
     }
 
-    public Iterable<MediaMetadataCompat> getMusicsByAlbum(String genre) {
-        if (mCurrentState != State.INITIALIZED || !mMusicListByAlbum.containsKey(genre)) {
-            return Collections.emptyList();
-        }
-        return mMusicListByAlbum.get(genre);
-    }
-
     public Iterable<MediaMetadataCompat> searchMusicBySongTitle(String query) {
         return searchMusic(MediaMetadataCompat.METADATA_KEY_TITLE, query);
     }
 
     public Iterable<MediaMetadataCompat> searchMusicByAlbum(String query) {
+        Log.d(TAG, "searchMusicByAlbum: " + query);
         return searchMusic(MediaMetadataCompat.METADATA_KEY_ALBUM, query);
     }
 
@@ -100,6 +84,7 @@ public class LibraryProvider {
                 result.add(track.metadata);
             }
         }
+        Log.d(TAG, "searchMusic: " + result.size());
         return result;
     }
 
@@ -176,7 +161,6 @@ public class LibraryProvider {
                     this.tracks.add(item);
                 }
                 buildListsByAlbum();
-                buildListsByGenre();
                 mCurrentState = State.INITIALIZED;
             }
         } finally {
@@ -186,35 +170,6 @@ public class LibraryProvider {
                 mCurrentState = State.NON_INITIALIZED;
             }
         }
-    }
-
-    private synchronized void buildListsByGenre() {
-        ConcurrentMap<String, List<MediaMetadataCompat>> newMusicListByGenre = new ConcurrentHashMap<>();
-
-        for (MutableMediaMetadata m : mMusicListById.values()) {
-            String genre = m.metadata.getString(MediaMetadataCompat.METADATA_KEY_ALBUM);
-            List<MediaMetadataCompat> list = newMusicListByGenre.get(genre);
-            if (list == null) {
-                list = new ArrayList<>();
-                newMusicListByGenre.put(genre, list);
-            }
-            list.add(m.metadata);
-        }
-        mMusicListByGenre = newMusicListByGenre;
-    }
-
-    public Iterable<MediaMetadataCompat> getMusicsByGenre(String genre) {
-        if (mCurrentState != State.INITIALIZED || !mMusicListByGenre.containsKey(genre)) {
-            return Collections.emptyList();
-        }
-        return mMusicListByGenre.get(genre);
-    }
-
-    public Iterable<String> getGenres() {
-        if (mCurrentState != State.INITIALIZED) {
-            return Collections.emptyList();
-        }
-        return mMusicListByGenre.keySet();
     }
 
     private synchronized void buildListsByAlbum() {
@@ -227,7 +182,7 @@ public class LibraryProvider {
                 list = new ArrayList<>();
                 newMusicListByAlbum.put(album, list);
             }
-            list.add(m.metadata);
+            newMusicListByAlbum.get(album).add(m.metadata);
         }
         mMusicListByAlbum = newMusicListByAlbum;
     }
@@ -241,21 +196,15 @@ public class LibraryProvider {
 
         if (MEDIA_ID_ROOT.equals(mediaId)) {
             for (MediaMetadataCompat item : tracks) {
-                mediaItems.add(createMediaItem(item, MEDIA_ID_ROOT));
+                mediaItems.add(createMediaItem(item));
             }
-        } else if (mediaId.startsWith(MEDIA_ID_MUSICS_BY_GENRE)) {
-            String genre = MediaIDHelper.getHierarchy(mediaId)[1];
-            for (MediaMetadataCompat metadata : getMusicsByGenre(genre)) {
-                mediaItems.add(createMediaItem(metadata, MEDIA_ID_MUSICS_BY_GENRE));
-            }
-        } else if (mediaId.startsWith(MEDIA_ID_MUSICS_BY_SEARCH)) {
         } else {
             LogHelper.w(TAG, "Skipping unmatched mediaId: ", mediaId);
         }
         return mediaItems;
     }
 
-    public MediaBrowserCompat.MediaItem createMediaItem(MediaMetadataCompat metadata, String fromWhere) {
+    public MediaBrowserCompat.MediaItem createMediaItem(MediaMetadataCompat metadata) {
         // Since mediaMetadata fields are immutable, we need to create a copy, so we
         // can set a hierarchy-aware mediaID. We will need to know the media hierarchy
         // when we get a onPlayFromMusicID call, so we can create the proper queue based
