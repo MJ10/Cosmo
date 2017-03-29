@@ -7,13 +7,14 @@ import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.text.TextUtils;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import io.mokshjn.cosmo.provider.LibraryProvider;
 
-import static io.mokshjn.cosmo.helpers.MediaIDHelper.MEDIA_ID_MUSICS_BY_GENRE;
+import static io.mokshjn.cosmo.helpers.MediaIDHelper.MEDIA_ID_MUSICS_BY_ALBUM;
 import static io.mokshjn.cosmo.helpers.MediaIDHelper.MEDIA_ID_MUSICS_BY_SEARCH;
 import static io.mokshjn.cosmo.helpers.MediaIDHelper.MEDIA_ID_ROOT;
 
@@ -46,12 +47,12 @@ public class QueueHelper {
 
         Iterable<MediaMetadataCompat> tracks = null;
         // This sample only supports genre and by_search category types.
-        if (categoryType.equals(MEDIA_ID_MUSICS_BY_GENRE)) {
-            tracks = musicProvider.getMusicsByGenre(categoryValue);
-        } else if (categoryType.equals(MEDIA_ID_MUSICS_BY_SEARCH)) {
+        if (categoryType.equals(MEDIA_ID_MUSICS_BY_SEARCH)) {
             tracks = musicProvider.searchMusicBySongTitle(categoryValue);
         } else if (categoryType.equals(MEDIA_ID_ROOT)) {
             tracks = musicProvider.getTracks();
+        } else if (categoryType.equals(MEDIA_ID_MUSICS_BY_ALBUM)) {
+            tracks = musicProvider.searchMusicByAlbum(categoryValue);
         }
 
         if (tracks == null) {
@@ -63,6 +64,20 @@ public class QueueHelper {
         } else {
             return convertToQueue(tracks, hierarchy[0]);
         }
+    }
+
+    public static List<MediaSessionCompat.QueueItem> getPlayingQueueFromAlbum(String album, LibraryProvider musicProvider) {
+
+        LogHelper.d(TAG, "Creating playing queue for musics from album: ", album);
+
+        Log.d(TAG, "getPlayingQueueFromAlbum: ");
+        Iterable<MediaMetadataCompat> result;
+        result = musicProvider.searchMusicByAlbum(album);
+        int i = 0;
+        for (MediaMetadataCompat m : result) {
+            Log.d(TAG, "getPlayingQueueFromAlbum: " + ++i);
+        }
+        return convertToQueue(result, MEDIA_ID_MUSICS_BY_ALBUM, album);
     }
 
     public static List<MediaSessionCompat.QueueItem> getPlayingQueueFromSearch(String query,
@@ -134,7 +149,7 @@ public class QueueHelper {
         List<MediaSessionCompat.QueueItem> queue = new ArrayList<>();
         int count = 0;
         for (MediaMetadataCompat track : tracks) {
-
+            Log.d(TAG, "convertToQueue: " + "here");
             // We create a hierarchy-aware mediaID, so we know what the queue is about by looking
             // at the QueueItem media IDs.
             String hierarchyAwareMediaID = MediaIDHelper.createMediaID(
@@ -150,6 +165,7 @@ public class QueueHelper {
                     trackCopy.getDescription(), count++);
             queue.add(item);
         }
+        Log.d(TAG, "convertToQueue: " + queue.size());
         return queue;
 
     }
