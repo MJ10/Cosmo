@@ -6,7 +6,7 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <!--<item name="android:windowTranslucentStatus">true</item>-->
+        <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowActivityTransitions">true</item>
         <item name="android:windowSharedElementsUseOverlay">false</item>
     </style>
@@ -14,9 +14,6 @@
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
-    <style name="TextApperance.Album.Title" parent="@style/TextAppearance.AppCompat.Large">
-        <item name="android:textSize">29sp</item>
-    </style>
     <style name="AppTheme.Translucent">
         <!-- using a semi-transparent window background for the drag-back gesture -->
         <item name="android:windowBackground">@color/scrim</item>
@@ -60,12 +57,6 @@
         <item name="android:submitBackground">@android:color/transparent</item>
     </style>
 
-    <style name="ExpandedFabTheme" parent="@android:style/ThemeOverlay.Material.Light">
-        <item name="android:textColorPrimary">@color/dark_icon</item>
-        <item name="android:textColorPrimaryDisableOnly">@color/dark_icon</item>
-        <item name="android:colorControlActivated">@color/dark_icon</item>
-    </style>
-
     <style name="Widget.AppTheme" parent="android:Widget" />
 
     <style name="TextAppearance.DialogContent" parent="@android:style/TextAppearance.Material.Subhead">
@@ -79,12 +70,9 @@
         <item name="android:textColor">@color/text_primary_light</item>
     </style>
 
-    <style name="AppTheme.Album" parent="Theme.AppCompat.NoActionBar">
-        <item name="android:colorPrimary">@color/colorPrimary</item>
-        <item name="android:colorAccent">@color/colorAccent</item>
-        <item name="android:statusBarColor">@color/colorText</item>
-        <item name="android:navigationBarColor">@color/colorText</item>
-        <item name="android:colorControlActivated">?android:colorAccent</item>
-        <item name="android:windowAllowReturnTransitionOverlap">true</item>
+    <style name="AppTheme.Album">
+        <item name="android:windowActivityTransitions">true</item>
+        <item name="android:windowActionBar">false</item>
     </style>
+
 </resources>

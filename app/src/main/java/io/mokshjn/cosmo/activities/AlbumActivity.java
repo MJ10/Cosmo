@@ -16,6 +16,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 
@@ -55,6 +56,10 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
     ImageView ivAlbumArt;
     @BindView(R.id.rvAlbumSongs)
     RecyclerView rvAlbumSongs;
+    @BindView(R.id.line_one)
+    TextView tvAlbumName;
+    @BindView(R.id.line_two)
+    TextView tvAlbumArtist;
     private long albumID;
     private SongAdapter adapter;
     private LibraryProvider libraryProvider;
@@ -77,7 +82,7 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.album_view_activity);
+        setContentView(R.layout.activity_album_details);
         ButterKnife.bind(this);
         mediaBrowser = new MediaBrowserCompat(this,
                 new ComponentName(this, MusicService.class), mConnectionCallback, null);
@@ -108,12 +113,13 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
             adapter.setTracks(tracks);
             adapter.notifyDataSetChanged();
         }
+        tvAlbumArtist.setText(tracks.get(0).getDescription().getSubtitle());
     }
 
     private void setupToolbar() {
-        android.support.v7.widget.Toolbar toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.avToolbar);
-        setSupportActionBar(toolbar);
-
+//        android.support.v7.widget.Toolbar toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.avToolbar);
+//        setSupportActionBar(toolbar);
+        tvAlbumName.setText(album);
         Glide.with(this)
                 .load(LibUtils.getMediaStoreAlbumCoverUri(albumID))
                 .crossFade()
