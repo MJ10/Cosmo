@@ -17,7 +17,7 @@
         <ImageView
             android:id="@+id/ivAlbumArt"
             android:layout_width="match_parent"
-            android:layout_height="320dp"
+            android:layout_height="240dp"
             android:layout_marginBottom="90dp"
             android:scaleType="centerCrop"
             android:transitionName="@string/transition_album_art"
@@ -31,6 +31,7 @@
             android:background="@drawable/text_protection_scrim" />
 
         <LinearLayout
+            android:id="@+id/albumText"
             android:layout_width="match_parent"
             android:layout_height="90dp"
             android:layout_below="@id/ivAlbumArt"
@@ -72,6 +73,8 @@
                         android:lines="1"
                         android:textSize="16sp"
                         tools:text="Lateralus" />
+
+
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>
@@ -82,9 +85,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/headerView"
-        android:layout_gravity="bottom"
-        android:clipToPadding="false"
-        android:paddingTop="10dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:listitem="@layout/song_card" />
+
 </RelativeLayout>
