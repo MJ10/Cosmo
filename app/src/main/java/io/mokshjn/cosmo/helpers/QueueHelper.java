@@ -9,6 +9,7 @@ import android.support.v4.media.session.MediaSessionCompat;
 import android.text.TextUtils;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import io.mokshjn.cosmo.provider.LibraryProvider;
@@ -68,10 +69,19 @@ public class QueueHelper {
     public static List<MediaSessionCompat.QueueItem> getPlayingQueueFromAlbum(String album, LibraryProvider musicProvider) {
 
         LogHelper.d(TAG, "Creating playing queue for musics from album: ", album);
-
+        ArrayList<MediaMetadataCompat> tracks = new ArrayList<>();
         Iterable<MediaMetadataCompat> result;
         result = musicProvider.searchMusicByAlbum(album);
-        return convertToQueue(result, MEDIA_ID_MUSICS_BY_ALBUM, album);
+        for (MediaMetadataCompat m : result) {
+            tracks.add(m);
+        }
+        tracks.sort(new Comparator<MediaMetadataCompat>() {
+            @Override
+            public int compare(MediaMetadataCompat o1, MediaMetadataCompat o2) {
+                return (int) (o1.getLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER) - o2.getLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER));
+            }
+        });
+        return convertToQueue(tracks, MEDIA_ID_MUSICS_BY_ALBUM, album);
     }
 
     public static List<MediaSessionCompat.QueueItem> getPlayingQueueFromSearch(String query,
