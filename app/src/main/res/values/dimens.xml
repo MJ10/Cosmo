@@ -24,53 +24,10 @@
     <dimen name="padding_normal_til">12dp</dimen>
     <dimen name="til_margin_fix">-4dp</dimen>
 
-
-    <!-- dialogs -->
-    <dimen name="padding_dialog">24dp</dimen>
-    <dimen name="dialog_title_spacing">20dp</dimen>
-
-    <!-- drawer -->
-    <dimen name="drawer_width">@dimen/match_parent</dimen>
-
     <!-- grid -->
     <integer name="num_columns">2</integer>
     <dimen name="grid_icon_with_padding">40dp</dimen> <!-- 24dp icon + 2 * @dimen/spacing_normal -->
 
-    <!-- designer news story -->
-    <dimen name="extended_height_toolbar">128dp</dimen>
-    <dimen name="comment_thread_width">4dp</dimen>
-    <dimen name="comment_thread_gap">4dp</dimen>
-    <dimen name="comment_separation">16dp</dimen>
-    <dimen name="designer_news_story_comment_elevation">0dp</dimen>
-    <dimen name="designer_news_story_comment_action_elevation">2dp</dimen>
-    <dimen name="designer_news_story_comment_horizontal_padding">0dp</dimen>
-    <dimen name="designer_news_story_comment_actions_padding_start">@dimen/spacing_normal</dimen>
-    <dimen name="designer_news_story_comment_actions_padding_end">@dimen/padding_normal</dimen>
-    <dimen name="designer_news_story_enter_comment_padding_start">@dimen/padding_normal_til</dimen>
-    <dimen name="designer_news_story_enter_comment_padding_end">@dimen/padding_normal</dimen>
-    <dimen name="designer_news_story_comments_vertical_padding">0dp</dimen>
-
-    <!-- dribbble shot -->
-    <dimen name="shot_collapsed_app_bar_height">168dp</dimen> <!-- 3 * ?android:actionBarSize -->
-    <!-- avatar should be a 40dp asset in a 48dp touch target & optically aligned with standard padding -->
-    <dimen name="avatar_size">40dp</dimen>
-    <dimen name="avatar_bounds">48dp</dimen>
-    <dimen name="avatar_padding">4dp</dimen> <!-- (avatar_bounds - avatar_size) / 2 -->
-    <dimen name="avatar_margin">12dp</dimen> <!-- padding_normal - avatar_padding -->
-    <dimen name="avatar_ripple_radius">20dp</dimen> <!-- avatar_size / 2 -->
-    <dimen name="comment_actions_height">40dp</dimen>
-    <dimen name="comment_like_margin_adjustment">-8dp</dimen>
-
-    <!-- dribbble player -->
-    <dimen name="large_avatar_size">120dp</dimen> <!-- 2 * actionBarSize - 2 * avatar_padding -->
-    <dimen name="large_avatar_height">160dp</dimen> <!-- large_avatar_margin + large_avatar_size + avatar_margin -->
-
-    <!-- bottom sheet -->
-    <dimen name="bottom_sheet_width">@dimen/match_parent</dimen>
-
-    <!-- about screen -->
-    <dimen name="about_header_height">224dp</dimen>
-    <dimen name="about_icon_padding">24dp</dimen>
 
     <!-- Z-axis elevations -->
     <dimen name="z_app_bar">4dp</dimen>
@@ -85,25 +42,10 @@
     <!-- per https://developer.android.com/reference/android/view/ViewGroup.LayoutParams.html#MATCH_PARENT -->
     <item name="match_parent" format="integer" type="dimen">-1</item>
 
-    <dimen name="error_horizontal_padding">4dp</dimen>
-    <dimen name="error_vertical_padding">16dp</dimen>
-
     <!-- playback controls -->
     <dimen name="playback_controls_albumart_horizontal_margin">8dp</dimen>
     <dimen name="playback_controls_albumart_size">64dp</dimen>
     <dimen name="playback_controls_padding">8dp</dimen>
-
-    <!-- navigation drawer -->
-    <dimen name="drawer_item_icon_margin_end">32dp</dimen>
-    <dimen name="drawer_item_height">48dp</dimen>
-    <dimen name="drawer_item_horizontal_padding">16dp</dimen>
-
-    <!-- media browser listview -->
-    <dimen name="media_item_height">72dp</dimen>
-    <dimen name="media_item_icon_margin_start">12dp</dimen>
-    <dimen name="media_item_text_margin_start">60dp</dimen>
-    <!-- Margins for the ShowcaseView button -->
-    <dimen name="button_margin">50dp</dimen>
 
     <!-- Margins for full screen activity-->
     <dimen name="text_view_margin">16dp</dimen>
