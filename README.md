@@ -1,7 +1,7 @@
 # Cosmo
 
 ## Introduction
-Cosmo is an Android Music player aimed at providing the user with a simple clean Music player with minimal essential features. The application is currently in the initial stages of development and  a lot of things are broken. I am constantly working on fixing the issue.
+Cosmo is an Android Music player aimed at providing the user with a simple clean Music player with minimal essential features. The application is currently in a very early stage of development and  a lot of things are broken. I am constantly working on fixing these issues.
 
 ## Developing
 ### Requirements
