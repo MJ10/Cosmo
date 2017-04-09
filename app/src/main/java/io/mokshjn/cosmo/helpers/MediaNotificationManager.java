@@ -28,11 +28,11 @@ import io.mokshjn.cosmo.services.MusicService;
  */
 
 public class MediaNotificationManager extends BroadcastReceiver {
-    public static final String ACTION_PAUSE = "com.example.android.uamp.pause";
-    public static final String ACTION_PLAY = "com.example.android.uamp.play";
-    public static final String ACTION_PREV = "com.example.android.uamp.prev";
-    public static final String ACTION_NEXT = "com.example.android.uamp.next";
-    public static final String ACTION_STOP_CASTING = "com.example.android.uamp.stop_cast";
+    public static final String ACTION_PAUSE = "io.mokshjn.cosmo.pause";
+    public static final String ACTION_PLAY = "io.mokshjn.cosmo.play";
+    public static final String ACTION_PREV = "io.mokshjn.cosmo.prev";
+    public static final String ACTION_NEXT = "io.mokshjn.cosmo.next";
+    public static final String ACTION_STOP_CASTING = "io.mokshjn.cosmo.stop_cast";
     private static final String TAG = LogHelper.makeLogTag(MediaNotificationManager.class);
     private static final int NOTIFICATION_ID = 412;
     private static final int REQUEST_CODE = 100;
@@ -280,6 +280,7 @@ public class MediaNotificationManager extends BroadcastReceiver {
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setUsesChronometer(true)
                 .setContentIntent(createContentIntent(description))
+                .setSubText(mMetadata.getString(MediaMetadataCompat.METADATA_KEY_ALBUM))
                 .setContentTitle(description.getTitle())
                 .setContentText(description.getSubtitle())
                 .setLargeIcon(art);
