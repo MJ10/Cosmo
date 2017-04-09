@@ -11,12 +11,12 @@ import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -57,10 +57,12 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
     ImageView ivAlbumArt;
     @BindView(R.id.rvAlbumSongs)
     RecyclerView rvAlbumSongs;
-    @BindView(R.id.line_one)
-    TextView tvAlbumName;
-    @BindView(R.id.line_two)
-    TextView tvAlbumArtist;
+    @BindView(R.id.scrollView)
+    NestedScrollView scrollView;
+//    @BindView(R.id.line_one)
+//    TextView tvAlbumName;
+//    @BindView(R.id.line_two)
+//    TextView tvAlbumArtist;
 
     private long albumID;
     private AlbumSongsAdapter adapter;
@@ -84,7 +86,7 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_album_details);
+        setContentView(R.layout.activity_album);
         ButterKnife.bind(this);
         mediaBrowser = new MediaBrowserCompat(this,
                 new ComponentName(this, MusicService.class), mConnectionCallback, null);
@@ -98,13 +100,19 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
         rvAlbumSongs.setLayoutManager(new LinearLayoutManager(this));
         rvAlbumSongs.setAdapter(adapter);
         adapter.setClickListener(this);
+        rvAlbumSongs.setNestedScrollingEnabled(true);
         libraryProvider = new LibraryProvider(getContentResolver());
         libraryProvider.retrieveMediaAsync(new LibraryProvider.Callback() {
             @Override
             public void onMusicLoaded(boolean success) {
                 setupSongs();
+//                setTranslations();
             }
         });
+    }
+
+    private void setTranslations() {
+        scrollView.smoothScrollBy(0, ivAlbumArt.getMaxHeight());
     }
 
 
@@ -116,11 +124,11 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
             adapter.setTracks(tracks);
             adapter.notifyDataSetChanged();
         }
-        tvAlbumArtist.setText(tracks.get(0).getDescription().getSubtitle());
+//        tvAlbumArtist.setText(tracks.get(0).getDescription().getSubtitle());
     }
 
     private void setupToolbar() {
-        tvAlbumName.setText(album);
+//        tvAlbumName.setText(album);
         setupAlbumArt();
     }
 

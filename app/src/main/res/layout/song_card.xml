@@ -10,7 +10,7 @@
     android:foreground="?android:attr/selectableItemBackground"
     android:stateListAnimator="@animator/card_raise"
     card_view:cardCornerRadius="1dp"
-    card_view:cardElevation="2dp">
+    card_view:cardElevation="4dp">
 
     <LinearLayout
         android:layout_width="match_parent"
