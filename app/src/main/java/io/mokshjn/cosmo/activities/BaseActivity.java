@@ -30,6 +30,44 @@ public abstract class BaseActivity extends ActionBarCastActivity implements Medi
 
     private MediaBrowserCompat mMediaBrowser;
     private PlaybackControlsFragment mControlsFragment;
+    // Callback that ensures that we are showing the controls
+    private final MediaControllerCompat.Callback mMediaControllerCallback =
+            new MediaControllerCompat.Callback() {
+                @Override
+                public void onPlaybackStateChanged(@NonNull PlaybackStateCompat state) {
+                    if (shouldShowControls()) {
+                        showPlaybackControls();
+                    } else {
+                        LogHelper.d(TAG, "mediaControllerCallback.onPlaybackStateChanged: " +
+                                "hiding controls because state is ", state.getState());
+                        hidePlaybackControls();
+                    }
+                }
+
+                @Override
+                public void onMetadataChanged(MediaMetadataCompat metadata) {
+                    if (shouldShowControls()) {
+                        showPlaybackControls();
+                    } else {
+                        LogHelper.d(TAG, "mediaControllerCallback.onMetadataChanged: " +
+                                "hiding controls because metadata is null");
+                        hidePlaybackControls();
+                    }
+                }
+            };
+    private final MediaBrowserCompat.ConnectionCallback mConnectionCallback =
+            new MediaBrowserCompat.ConnectionCallback() {
+                @Override
+                public void onConnected() {
+                    LogHelper.d(TAG, "onConnected");
+                    try {
+                        connectToSession(mMediaBrowser.getSessionToken());
+                    } catch (RemoteException e) {
+                        LogHelper.e(TAG, e, "could not connect media controller");
+                        hidePlaybackControls();
+                    }
+                }
+            };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -93,9 +131,6 @@ public abstract class BaseActivity extends ActionBarCastActivity implements Medi
     protected void showPlaybackControls() {
         LogHelper.d(TAG, "showPlaybackControls");
         getFragmentManager().beginTransaction()
-                .setCustomAnimations(
-                        R.animator.slide_in_from_bottom, R.animator.slide_out_to_bottom,
-                        R.animator.slide_in_from_bottom, R.animator.slide_out_to_bottom)
                 .show(mControlsFragment)
                 .commit();
 
@@ -150,45 +185,5 @@ public abstract class BaseActivity extends ActionBarCastActivity implements Medi
 
         onMediaControllerConnected();
     }
-
-    // Callback that ensures that we are showing the controls
-    private final MediaControllerCompat.Callback mMediaControllerCallback =
-            new MediaControllerCompat.Callback() {
-                @Override
-                public void onPlaybackStateChanged(@NonNull PlaybackStateCompat state) {
-                    if (shouldShowControls()) {
-                        showPlaybackControls();
-                    } else {
-                        LogHelper.d(TAG, "mediaControllerCallback.onPlaybackStateChanged: " +
-                                "hiding controls because state is ", state.getState());
-                        hidePlaybackControls();
-                    }
-                }
-
-                @Override
-                public void onMetadataChanged(MediaMetadataCompat metadata) {
-                    if (shouldShowControls()) {
-                        showPlaybackControls();
-                    } else {
-                        LogHelper.d(TAG, "mediaControllerCallback.onMetadataChanged: " +
-                                "hiding controls because metadata is null");
-                        hidePlaybackControls();
-                    }
-                }
-            };
-
-    private final MediaBrowserCompat.ConnectionCallback mConnectionCallback =
-            new MediaBrowserCompat.ConnectionCallback() {
-                @Override
-                public void onConnected() {
-                    LogHelper.d(TAG, "onConnected");
-                    try {
-                        connectToSession(mMediaBrowser.getSessionToken());
-                    } catch (RemoteException e) {
-                        LogHelper.e(TAG, e, "could not connect media controller");
-                        hidePlaybackControls();
-                    }
-                }
-            };
 
 }

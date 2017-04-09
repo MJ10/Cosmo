@@ -15,7 +15,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -61,11 +60,7 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
     TextView tvAlbumName;
     @BindView(R.id.line_two)
     TextView tvAlbumArtist;
-    @BindView(R.id.headerView)
-    View headerView;
 
-    float headerTranslation;
-    float headerImageTranslation;
     private long albumID;
     private SongAdapter adapter;
     private LibraryProvider libraryProvider;
@@ -109,37 +104,6 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
                 setupSongs();
             }
         });
-
-        headerView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                headerView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                AlbumActivity.this.headerView.setMinimumHeight(headerView.getHeight());
-            }
-        });
-
-        rvAlbumSongs.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                headerTranslation = headerView.getTranslationY() - dy;
-                headerImageTranslation = ivAlbumArt.getTranslationY() + dy / 2;
-
-                //Fixes an issue where the image translation gets a little out of sync with
-                //the header translation.
-                if (headerTranslation == 0) {
-                    headerImageTranslation = 0;
-                }
-
-                float ratio = Math.min(1, -headerTranslation / headerView.getHeight());
-
-                headerView.setTranslationY(headerTranslation);
-                ivAlbumArt.setTranslationY(headerImageTranslation);
-            }
-        });
-
-        headerView.setTranslationY(headerTranslation);
-        ivAlbumArt.setTranslationY(headerImageTranslation);
     }
 
 
@@ -155,8 +119,6 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
     }
 
     private void setupToolbar() {
-//        android.support.v7.widget.Toolbar toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.avToolbar);
-//        setSupportActionBar(toolbar);
         tvAlbumName.setText(album);
         Glide.with(this)
                 .load(LibUtils.getMediaStoreAlbumCoverUri(albumID))
