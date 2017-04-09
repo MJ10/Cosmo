@@ -105,7 +105,7 @@ public class SongsFragment extends android.support.v4.app.Fragment implements So
         View rootView = inflater.inflate(R.layout.fragment_song_list, container, false);
         rvSongList = (FastScrollRecyclerView) rootView.findViewById(R.id.rvSongList);
         rvSongList.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new SongAdapter();
+        adapter = new SongAdapter(getContext());
         rvSongList.setAdapter(adapter);
         adapter.setClickListener(this);
         return rootView;

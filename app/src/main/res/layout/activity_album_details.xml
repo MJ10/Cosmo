@@ -73,6 +73,6 @@
         android:layout_height="match_parent"
         android:layout_marginTop="356dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:listitem="@layout/song_card" />
+        tools:listitem="@layout/album_song_card" />
 
 </FrameLayout>

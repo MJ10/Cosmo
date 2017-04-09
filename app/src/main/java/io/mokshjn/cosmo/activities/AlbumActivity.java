@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.mokshjn.cosmo.R;
-import io.mokshjn.cosmo.adapters.SongAdapter;
+import io.mokshjn.cosmo.adapters.AlbumSongsAdapter;
 import io.mokshjn.cosmo.helpers.LogHelper;
 import io.mokshjn.cosmo.helpers.QueueHelper;
 import io.mokshjn.cosmo.interfaces.MediaBrowserProvider;
@@ -38,7 +38,7 @@ import io.mokshjn.cosmo.utils.LibUtils;
  * Created by moksh on 22/3/17.
  */
 
-public class AlbumActivity extends AppCompatActivity implements MediaBrowserProvider, SongAdapter.ClickListener {
+public class AlbumActivity extends AppCompatActivity implements MediaBrowserProvider, AlbumSongsAdapter.ClickListener {
 
     private static final String TAG = LogHelper.makeLogTag(AlbumActivity.class);
     private final MediaControllerCompat.Callback mMediaControllerCallback =
@@ -63,7 +63,7 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
     TextView tvAlbumArtist;
 
     private long albumID;
-    private SongAdapter adapter;
+    private AlbumSongsAdapter adapter;
     private LibraryProvider libraryProvider;
     private String album;
     private MediaBrowserCompat mediaBrowser;
@@ -94,7 +94,7 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
             album = LibUtils.getAlbumByAlbumId(albumID, getContentResolver());
         }
         setupToolbar();
-        adapter = new SongAdapter();
+        adapter = new AlbumSongsAdapter();
         rvAlbumSongs.setLayoutManager(new LinearLayoutManager(this));
         rvAlbumSongs.setAdapter(adapter);
         adapter.setClickListener(this);

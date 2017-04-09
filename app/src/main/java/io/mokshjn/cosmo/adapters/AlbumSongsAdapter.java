@@ -1,7 +1,5 @@
 package io.mokshjn.cosmo.adapters;
 
-import android.content.Context;
-import android.support.annotation.NonNull;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaDescriptionCompat;
 import android.support.v7.widget.CardView;
@@ -9,58 +7,41 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import java.util.ArrayList;
 
 import io.mokshjn.cosmo.R;
-import io.mokshjn.cosmo.helpers.CircleTransform;
 
 /**
- * Created by moksh on 19/3/17.
+ * Created by moksh on 9/4/17.
  */
 
-public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> implements FastScrollRecyclerView.SectionedAdapter {
-
-    private ClickListener clickListener;
-    private Context context;
+public class AlbumSongsAdapter extends RecyclerView.Adapter<AlbumSongsAdapter.ViewHolder> {
+    private AlbumSongsAdapter.ClickListener clickListener;
     private ArrayList<MediaBrowserCompat.MediaItem> tracks = new ArrayList<>();
 
-    public SongAdapter(ArrayList<MediaBrowserCompat.MediaItem> tracks) {
+    public AlbumSongsAdapter(ArrayList<MediaBrowserCompat.MediaItem> tracks) {
         this.tracks = tracks;
     }
 
-    public SongAdapter() {
-    }
-
-    public SongAdapter(Context context) {
-        this.context = context;
+    public AlbumSongsAdapter() {
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.song_card, parent, false);
-        return new ViewHolder(view);
+    public AlbumSongsAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.album_song_card, parent, false);
+        return new AlbumSongsAdapter.ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(AlbumSongsAdapter.ViewHolder holder, int position) {
         MediaBrowserCompat.MediaItem item = tracks.get(position);
         MediaDescriptionCompat descriptionCompat = item.getDescription();
 
         holder.tvSongTitle.setText(descriptionCompat.getTitle());
         holder.tvSongArtist.setText(descriptionCompat.getSubtitle());
-        Glide.with(context)
-                .load(descriptionCompat.getIconUri())
-                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
-                .transform(new CircleTransform(context))
-                .crossFade()
-                .into(holder.ivAlbumArt);
+        holder.tvTrackNumber.setText(String.valueOf(position + 1));
     }
 
     @Override
@@ -68,7 +49,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> im
         return tracks.size();
     }
 
-    public void setClickListener(ClickListener clickListener) {
+    public void setClickListener(AlbumSongsAdapter.ClickListener clickListener) {
         this.clickListener = clickListener;
     }
 
@@ -76,19 +57,12 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> im
         this.tracks = tracks;
     }
 
-    @NonNull
-    @Override
-    public String getSectionName(int position) {
-        return tracks.get(position).getDescription().getTitle().toString().substring(0, 1);
-    }
-
     public interface ClickListener {
         void onSongClick(View v, int position);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        private TextView tvSongTitle, tvSongArtist;
-        private ImageView ivAlbumArt;
+        private TextView tvSongTitle, tvSongArtist, tvTrackNumber;
         private CardView cvSong;
 
         public ViewHolder(View itemView) {
@@ -97,7 +71,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> im
 
             tvSongArtist = (TextView) itemView.findViewById(R.id.tvSongArtist);
             tvSongTitle = (TextView) itemView.findViewById(R.id.tvTitle);
-            ivAlbumArt = (ImageView) itemView.findViewById(R.id.ivAlbumArt);
+            tvTrackNumber = (TextView) itemView.findViewById(R.id.tvTrackNumber);
             cvSong.setOnClickListener(this);
 
         }
