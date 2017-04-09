@@ -12,27 +12,43 @@
     card_view:cardCornerRadius="1dp"
     card_view:cardElevation="2dp">
 
-    <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
         android:padding="10dp">
 
-        <TextView
-            android:id="@+id/tvTitle"
+        <ImageView
+            android:id="@+id/ivAlbumArt"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="10dp"
+            android:layout_weight="0.15" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.85"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:lines="1"
-            android:text="@string/tvSongTitleNullTag"
-            android:textSize="20sp"
-            android:textStyle="bold" />
+                android:ellipsize="end"
+                android:lines="1"
+                android:text="@string/tvSongTitleNullTag"
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/tvSongArtist"
+            <TextView
+                android:id="@+id/tvSongArtist"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-            android:layout_below="@id/tvTitle"
-            android:text="@string/tvSongArtistNullTag" />
-    </RelativeLayout>
+                android:layout_below="@id/tvTitle"
+                android:text="@string/tvSongArtistNullTag" />
+        </LinearLayout>
+
+    </LinearLayout>
 </android.support.v7.widget.CardView>
 
