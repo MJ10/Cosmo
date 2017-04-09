@@ -2,7 +2,6 @@ package io.mokshjn.cosmo.activities;
 
 import android.content.ComponentName;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -23,13 +22,15 @@ import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import io.mokshjn.cosmo.R;
-import io.mokshjn.cosmo.helpers.AlbumArtCache;
 import io.mokshjn.cosmo.helpers.LogHelper;
 import io.mokshjn.cosmo.services.MusicService;
 
@@ -274,35 +275,6 @@ public class FullScreenPlayerActivity extends ActionBarCastActivity {
         mExecutorService.shutdown();
     }
 
-    private void fetchImageAsync(@NonNull MediaDescriptionCompat description) {
-        if (description.getIconUri() == null) {
-            return;
-        }
-        String artUrl = description.getIconUri().toString();
-        mCurrentArtUrl = artUrl;
-        AlbumArtCache cache = AlbumArtCache.getInstance();
-        Bitmap art = cache.getBigImage(artUrl);
-        if (art == null) {
-            art = description.getIconBitmap();
-        }
-        if (art != null) {
-            // if we have the art cached or from the MediaDescription, use it:
-            mBackgroundImage.setImageBitmap(art);
-        } else {
-            // otherwise, fetch a high res version and update:
-            cache.fetch(getApplicationContext(), artUrl, new AlbumArtCache.FetchListener() {
-                @Override
-                public void onFetched(String artUrl, Bitmap bitmap, Bitmap icon) {
-                    // sanity check, in case a new fetch request has been done while
-                    // the previous hasn't yet returned:
-                    if (artUrl.equals(mCurrentArtUrl)) {
-                        mBackgroundImage.setImageBitmap(bitmap);
-                    }
-                }
-            });
-        }
-    }
-
     private void updateMediaDescription(MediaDescriptionCompat description) {
         if (description == null) {
             return;
@@ -310,7 +282,11 @@ public class FullScreenPlayerActivity extends ActionBarCastActivity {
         LogHelper.d(TAG, "updateMediaDescription called ");
         mLine1.setText(description.getTitle());
         mLine2.setText(description.getSubtitle());
-        fetchImageAsync(description);
+        Glide.with(this)
+                .loadFromMediaStore(description.getIconUri())
+                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                .crossFade()
+                .into(mBackgroundImage);
     }
 
     private void updateDuration(MediaMetadataCompat metadata) {

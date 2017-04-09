@@ -1,7 +1,6 @@
 package io.mokshjn.cosmo.adapters;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
@@ -11,12 +10,13 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import java.util.ArrayList;
 
 import io.mokshjn.cosmo.R;
-import io.mokshjn.cosmo.helpers.AlbumArtCache;
 import io.mokshjn.cosmo.models.Album;
 import io.mokshjn.cosmo.utils.LibUtils;
 
@@ -51,26 +51,11 @@ public class AlbumListAdapter extends RecyclerView.Adapter<AlbumListAdapter.View
         if(alb != null) {
             holder.tvAlbumTitle.setText(alb.getAlbumTitle());
             holder.tvArtist.setText(alb.getArtist());
-            final String sArtworkUri = LibUtils.getMediaStoreAlbumCoverUri(alb.getAlbumId()).toString();
-//            Glide.with(context)
-//                    .loadFromMediaStore(ContentUris.withAppendedId(sArtworkUri, alb.getAlbumId()))
-//                    .crossFade()
-//                    .into(holder.ivAlbumArt);
-            AlbumArtCache cache = AlbumArtCache.getInstance();
-            final Bitmap art = cache.getBigImage(sArtworkUri);
-            if (art != null) {
-                holder.ivAlbumArt.setImageBitmap(art);
-            } else {
-                cache.fetch(context, sArtworkUri, new AlbumArtCache.FetchListener() {
-                    @Override
-                    public void onFetched(String artUrl, Bitmap bigImage, Bitmap iconImage) {
-                        if (artUrl.equals(sArtworkUri)) {
-                            holder.ivAlbumArt.setImageBitmap(bigImage);
-                        }
-                    }
-                });
-            }
-
+            Glide.with(context)
+                    .load(LibUtils.getMediaStoreAlbumCoverUri(alb.getAlbumId()))
+                    .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                    .crossFade()
+                    .into(holder.ivAlbumArt);
         }
     }
 

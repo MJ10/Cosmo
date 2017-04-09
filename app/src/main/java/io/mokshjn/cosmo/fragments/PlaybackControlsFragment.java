@@ -2,7 +2,6 @@ package io.mokshjn.cosmo.fragments;
 
 import android.app.Fragment;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -12,7 +11,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,10 +19,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+
 import io.mokshjn.cosmo.R;
 import io.mokshjn.cosmo.activities.FullScreenPlayerActivity;
 import io.mokshjn.cosmo.activities.MainActivity;
-import io.mokshjn.cosmo.helpers.AlbumArtCache;
 import io.mokshjn.cosmo.helpers.LogHelper;
 import io.mokshjn.cosmo.services.MusicService;
 
@@ -64,7 +64,6 @@ public class PlaybackControlsFragment extends Fragment {
     private TextView mSubtitle;
     private TextView mExtraInfo;
     private ImageView mAlbumArt;
-    private String mArtUrl;
     // Receive callbacks from the MediaController. Here we update our state such as which queue
     // is being shown, the current title and description and the PlaybackState.
     private final MediaControllerCompat.Callback mCallback = new MediaControllerCompat.Callback() {
@@ -166,35 +165,11 @@ public class PlaybackControlsFragment extends Fragment {
 
         mTitle.setText(metadata.getDescription().getTitle());
         mSubtitle.setText(metadata.getDescription().getSubtitle());
-        String artUrl = null;
-        if (metadata.getDescription().getIconUri() != null) {
-            artUrl = metadata.getDescription().getIconUri().toString();
-        }
-        if (!TextUtils.equals(artUrl, mArtUrl)) {
-            mArtUrl = artUrl;
-            Bitmap art = metadata.getDescription().getIconBitmap();
-            AlbumArtCache cache = AlbumArtCache.getInstance();
-            if (art == null) {
-                art = cache.getIconImage(mArtUrl);
-            }
-            if (art != null) {
-                mAlbumArt.setImageBitmap(art);
-            } else {
-                cache.fetch(getContext(), artUrl, new AlbumArtCache.FetchListener() {
-                            @Override
-                            public void onFetched(String artUrl, Bitmap bitmap, Bitmap icon) {
-                                if (icon != null) {
-                                    LogHelper.d(TAG, "album art icon of w=", icon.getWidth(),
-                                            " h=", icon.getHeight());
-                                    if (isAdded()) {
-                                        mAlbumArt.setImageBitmap(icon);
-                                    }
-                                }
-                            }
-                        }
-                );
-            }
-        }
+        Glide.with(getContext())
+                .load(metadata.getDescription().getIconUri())
+                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                .crossFade()
+                .into(mAlbumArt);
     }
 
     public void setExtraInfo(String extraInfo) {
