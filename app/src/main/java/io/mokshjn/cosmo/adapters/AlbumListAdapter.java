@@ -1,25 +1,24 @@
 package io.mokshjn.cosmo.adapters;
 
-import android.content.ContentUris;
 import android.content.Context;
-import android.net.Uri;
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import java.util.ArrayList;
 
 import io.mokshjn.cosmo.R;
+import io.mokshjn.cosmo.helpers.AlbumArtCache;
 import io.mokshjn.cosmo.models.Album;
+import io.mokshjn.cosmo.utils.LibUtils;
 
 /**
  * Created by moksh on 1/2/17.
@@ -47,17 +46,31 @@ public class AlbumListAdapter extends RecyclerView.Adapter<AlbumListAdapter.View
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(final ViewHolder holder, int position) {
         Album alb = albumList.get(position);
         if(alb != null) {
             holder.tvAlbumTitle.setText(alb.getAlbumTitle());
             holder.tvArtist.setText(alb.getArtist());
-            Uri sArtworkUri = Uri
-                    .parse("content://media/external/audio/albumart");
-            Glide.with(context)
-                    .loadFromMediaStore(ContentUris.withAppendedId(sArtworkUri, alb.getAlbumId()))
-                    .crossFade()
-                    .into(holder.ivAlbumArt);
+            final String sArtworkUri = LibUtils.getMediaStoreAlbumCoverUri(alb.getAlbumId()).toString();
+//            Glide.with(context)
+//                    .loadFromMediaStore(ContentUris.withAppendedId(sArtworkUri, alb.getAlbumId()))
+//                    .crossFade()
+//                    .into(holder.ivAlbumArt);
+            AlbumArtCache cache = AlbumArtCache.getInstance();
+            final Bitmap art = cache.getBigImage(sArtworkUri);
+            if (art != null) {
+                holder.ivAlbumArt.setImageBitmap(art);
+            } else {
+                cache.fetch(context, sArtworkUri, new AlbumArtCache.FetchListener() {
+                    @Override
+                    public void onFetched(String artUrl, Bitmap bigImage, Bitmap iconImage) {
+                        if (artUrl.equals(sArtworkUri)) {
+                            holder.ivAlbumArt.setImageBitmap(bigImage);
+                        }
+                    }
+                });
+            }
+
         }
     }
 
@@ -70,6 +83,10 @@ public class AlbumListAdapter extends RecyclerView.Adapter<AlbumListAdapter.View
     @Override
     public String getSectionName(int position) {
         return albumList.get(position).getAlbumTitle().substring(0, 1);
+    }
+
+    public interface albClickListener {
+        void onAlbumClick(View v, int pos);
     }
 
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -96,9 +113,5 @@ public class AlbumListAdapter extends RecyclerView.Adapter<AlbumListAdapter.View
                 clickListener.onAlbumClick(view, getLayoutPosition());
             }
         }
-    }
-
-    public interface albClickListener{
-        void onAlbumClick(View v, int pos);
     }
 }

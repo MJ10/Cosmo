@@ -2,6 +2,7 @@ package io.mokshjn.cosmo.activities;
 
 import android.content.ComponentName;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
@@ -18,14 +19,13 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-
 import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.mokshjn.cosmo.R;
 import io.mokshjn.cosmo.adapters.SongAdapter;
+import io.mokshjn.cosmo.helpers.AlbumArtCache;
 import io.mokshjn.cosmo.helpers.LogHelper;
 import io.mokshjn.cosmo.helpers.QueueHelper;
 import io.mokshjn.cosmo.interfaces.MediaBrowserProvider;
@@ -120,10 +120,29 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
 
     private void setupToolbar() {
         tvAlbumName.setText(album);
-        Glide.with(this)
-                .load(LibUtils.getMediaStoreAlbumCoverUri(albumID))
-                .crossFade()
-                .into(ivAlbumArt);
+//        Glide.with(this)
+//                .load(LibUtils.getMediaStoreAlbumCoverUri(albumID))
+//                .crossFade()
+//                .into(ivAlbumArt);
+        setupAlbumArt();
+    }
+
+    private void setupAlbumArt() {
+        final String albumArtUri = LibUtils.getMediaStoreAlbumCoverUri(albumID).toString();
+        AlbumArtCache cache = AlbumArtCache.getInstance();
+        Bitmap art = cache.getBigImage(albumArtUri);
+        if (art != null) {
+            ivAlbumArt.setImageBitmap(art);
+        } else {
+            cache.fetch(this, albumArtUri, new AlbumArtCache.FetchListener() {
+                @Override
+                public void onFetched(String artUrl, Bitmap bigImage, Bitmap iconImage) {
+                    if (artUrl == albumArtUri) {
+                        ivAlbumArt.setImageBitmap(bigImage);
+                    }
+                }
+            });
+        }
     }
 
     private void connectToSession(MediaSessionCompat.Token token) throws RemoteException {

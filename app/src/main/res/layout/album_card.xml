@@ -21,7 +21,7 @@
             <ImageView
                 android:id="@+id/ivAlbumArt"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="160dp"
                 android:contentDescription="@string/albumart"
                 android:src="@drawable/nav_bg"
                 android:transitionName="@string/transition_album_art" />
