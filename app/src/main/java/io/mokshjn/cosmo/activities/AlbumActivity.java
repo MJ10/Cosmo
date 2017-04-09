@@ -100,7 +100,7 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
         rvAlbumSongs.setLayoutManager(new LinearLayoutManager(this));
         rvAlbumSongs.setAdapter(adapter);
         adapter.setClickListener(this);
-        rvAlbumSongs.setNestedScrollingEnabled(true);
+        rvAlbumSongs.setNestedScrollingEnabled(false);
         libraryProvider = new LibraryProvider(getContentResolver());
         libraryProvider.retrieveMediaAsync(new LibraryProvider.Callback() {
             @Override
