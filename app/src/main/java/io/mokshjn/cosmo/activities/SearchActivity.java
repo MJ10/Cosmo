@@ -116,7 +116,7 @@ public class SearchActivity extends AppCompatActivity implements MediaBrowserPro
         mediaBrowser = new MediaBrowserCompat(this,
                 new ComponentName(this, MusicService.class), mConnectionCallback, null);
         setupSearch();
-        adapter = new SongAdapter();
+        adapter = new SongAdapter(this);
         results.setLayoutManager(new LinearLayoutManager(this));
         results.setAdapter(adapter);
         adapter.setClickListener(this);

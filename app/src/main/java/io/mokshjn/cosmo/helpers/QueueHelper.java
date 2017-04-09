@@ -52,8 +52,10 @@ public class QueueHelper {
         } else if (categoryType.equals(MEDIA_ID_ROOT)) {
             tracks = musicProvider.getTracks();
         } else if (categoryType.equals(MEDIA_ID_MUSICS_BY_ALBUM)) {
-            tracks = musicProvider.searchMusicByAlbum(categoryValue);
+//            tracks = musicProvider.searchMusicByAlbum(categoryValue);
+            return getPlayingQueueFromAlbum(categoryValue, musicProvider);
         }
+
 
         if (tracks == null) {
             LogHelper.e(TAG, "Unrecognized category type: ", categoryType, " for media ", mediaId, "hahahah");
