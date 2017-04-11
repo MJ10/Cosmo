@@ -2,12 +2,12 @@ package io.mokshjn.cosmo.fragments;
 
 import android.app.Fragment;
 import android.content.Intent;
+import android.graphics.drawable.AnimatedVectorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
@@ -204,11 +204,13 @@ public class PlaybackControlsFragment extends Fragment {
         }
 
         if (enablePlay) {
-            mPlayPause.setImageDrawable(
-                    ContextCompat.getDrawable(getActivity(), R.drawable.ic_play_arrow_black_36dp));
+            AnimatedVectorDrawable pauseToPlay = (AnimatedVectorDrawable) getActivity().getDrawable(R.drawable.avd_pause_to_play);
+            mPlayPause.setImageDrawable(pauseToPlay);
+            pauseToPlay.start();
         } else {
-            mPlayPause.setImageDrawable(
-                    ContextCompat.getDrawable(getActivity(), R.drawable.ic_pause_black_36dp));
+            AnimatedVectorDrawable playToPause = (AnimatedVectorDrawable) getActivity().getDrawable(R.drawable.avd_play_to_pause);
+            mPlayPause.setImageDrawable(playToPause);
+            playToPause.start();
         }
 
         MediaControllerCompat controller = ((FragmentActivity) getActivity())

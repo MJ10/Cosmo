@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="path_play">M0,0 L0,24 20,12 0,0 M0,0 L0,0 0,0 0,0</string>
+    <string name="path_pause">M3,0 L3,24 9,24 9,0 M15,0 L15,24 21,24 21,0</string>
+    <string name="play">play</string>
+    <string name="pause">pause</string>
+    <integer name="stroke_width">2</integer>
+    <color name="stroke_color">#ccc</color>
+    <string name="groupPlayPause">groupPlayPause</string>
+    <integer name="duration">450</integer>
+</resources>

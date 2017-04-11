@@ -2,13 +2,12 @@ package io.mokshjn.cosmo.activities;
 
 import android.content.ComponentName;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
+import android.graphics.drawable.AnimatedVectorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.RemoteException;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaDescriptionCompat;
 import android.support.v4.media.MediaMetadataCompat;
@@ -59,8 +58,8 @@ public class FullScreenPlayerActivity extends ActionBarCastActivity {
     private TextView mLine3;
     private ProgressBar mLoading;
     private View mControllers;
-    private Drawable mPauseDrawable;
-    private Drawable mPlayDrawable;
+    private AnimatedVectorDrawable mPauseDrawable;
+    private AnimatedVectorDrawable mPlayDrawable;
     private ImageView mBackgroundImage;
     private String mCurrentArtUrl;
     private MediaBrowserCompat mMediaBrowser;
@@ -112,8 +111,8 @@ public class FullScreenPlayerActivity extends ActionBarCastActivity {
         }
 
         mBackgroundImage = (ImageView) findViewById(R.id.background_image);
-        mPauseDrawable = ContextCompat.getDrawable(this, R.drawable.uamp_ic_pause_white_48dp);
-        mPlayDrawable = ContextCompat.getDrawable(this, R.drawable.uamp_ic_play_arrow_white_48dp);
+        mPauseDrawable = (AnimatedVectorDrawable) getDrawable(R.drawable.avd_play_to_pause);
+        mPlayDrawable = (AnimatedVectorDrawable) getDrawable(R.drawable.avd_pause_to_play);
         mPlayPause = (ImageView) findViewById(R.id.play_pause);
         mSkipNext = (ImageView) findViewById(R.id.next);
         mSkipPrev = (ImageView) findViewById(R.id.prev);
@@ -317,6 +316,7 @@ public class FullScreenPlayerActivity extends ActionBarCastActivity {
                 mLoading.setVisibility(INVISIBLE);
                 mPlayPause.setVisibility(VISIBLE);
                 mPlayPause.setImageDrawable(mPauseDrawable);
+                mPauseDrawable.start();
                 mControllers.setVisibility(VISIBLE);
                 scheduleSeekbarUpdate();
                 break;
@@ -325,6 +325,7 @@ public class FullScreenPlayerActivity extends ActionBarCastActivity {
                 mLoading.setVisibility(INVISIBLE);
                 mPlayPause.setVisibility(VISIBLE);
                 mPlayPause.setImageDrawable(mPlayDrawable);
+                mPlayDrawable.start();
                 stopSeekbarUpdate();
                 break;
             case PlaybackStateCompat.STATE_NONE:
@@ -332,6 +333,7 @@ public class FullScreenPlayerActivity extends ActionBarCastActivity {
                 mLoading.setVisibility(INVISIBLE);
                 mPlayPause.setVisibility(VISIBLE);
                 mPlayPause.setImageDrawable(mPlayDrawable);
+                mPlayDrawable.start();
                 stopSeekbarUpdate();
                 break;
             case PlaybackStateCompat.STATE_BUFFERING:
