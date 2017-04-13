@@ -15,7 +15,10 @@ import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.transition.Slide;
+import android.view.Gravity;
 import android.view.View;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
@@ -59,10 +62,6 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
     RecyclerView rvAlbumSongs;
     @BindView(R.id.scrollView)
     NestedScrollView scrollView;
-//    @BindView(R.id.line_one)
-//    TextView tvAlbumName;
-//    @BindView(R.id.line_two)
-//    TextView tvAlbumArtist;
 
     private long albumID;
     private AlbumSongsAdapter adapter;
@@ -88,6 +87,7 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_album);
         ButterKnife.bind(this);
+        setEnterTransitions();
         mediaBrowser = new MediaBrowserCompat(this,
                 new ComponentName(this, MusicService.class), mConnectionCallback, null);
         Intent intent = getIntent();
@@ -106,15 +106,25 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
             @Override
             public void onMusicLoaded(boolean success) {
                 setupSongs();
-//                setTranslations();
             }
         });
     }
 
-    private void setTranslations() {
-        scrollView.smoothScrollBy(0, ivAlbumArt.getMaxHeight());
+    private void setEnterTransitions() {
+        Slide slide = new Slide(Gravity.BOTTOM);
+        slide.addTarget(R.id.rvAlbumList);
+        slide.addTarget(R.id.bgView);
+        slide.setInterpolator(AnimationUtils.loadInterpolator(this, android.R.interpolator.linear_out_slow_in));
+        slide.setDuration(450);
+        getWindow().setEnterTransition(slide);
+        getWindow().setExitTransition(slide);
     }
 
+    @Override
+    public void onEnterAnimationComplete() {
+//        super.onEnterAnimationComplete();
+        rvAlbumSongs.setVisibility(View.VISIBLE);
+    }
 
     private void setupSongs() {
         for (MediaSessionCompat.QueueItem item : QueueHelper.getPlayingQueueFromAlbum(album, libraryProvider)) {
@@ -124,11 +134,9 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
             adapter.setTracks(tracks);
             adapter.notifyDataSetChanged();
         }
-//        tvAlbumArtist.setText(tracks.get(0).getDescription().getSubtitle());
     }
 
     private void setupToolbar() {
-//        tvAlbumName.setText(album);
         setupAlbumArt();
     }
 
@@ -152,6 +160,7 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
 
     @Override
     public void onBackPressed() {
+        rvAlbumSongs.setVisibility(View.GONE);
         finishAfterTransition();
     }
 

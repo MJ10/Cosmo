@@ -18,6 +18,7 @@
             android:transitionName="@string/transition_album_art" />
 
         <View
+            android:id="@+id/bgView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/blue" />
@@ -44,6 +45,7 @@
                 android:layout_height="wrap_content"
                 android:paddingEnd="20dp"
                 android:paddingStart="20dp"
+                android:visibility="gone"
                 tools:listitem="@layout/album_song_card" />
 
             <View
