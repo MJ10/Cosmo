@@ -76,10 +76,19 @@ public class LibraryProvider {
         }
         ArrayList<MediaMetadataCompat> result = new ArrayList<>();
         query = query.toLowerCase(Locale.US);
-        for (MutableMediaMetadata track : mMusicListById.values()) {
-            if (track.metadata.getString(metadataField).toLowerCase(Locale.US)
-                    .contains(query)) {
-                result.add(track.metadata);
+        if (metadataField == MediaMetadataCompat.METADATA_KEY_ALBUM) {
+            for (MutableMediaMetadata track : mMusicListById.values()) {
+                if (track.metadata.getString(metadataField).toLowerCase(Locale.US)
+                        .equals(query)) {
+                    result.add(track.metadata);
+                }
+            }
+        } else {
+            for (MutableMediaMetadata track : mMusicListById.values()) {
+                if (track.metadata.getString(metadataField).toLowerCase(Locale.US)
+                        .contains(query)) {
+                    result.add(track.metadata);
+                }
             }
         }
         return result;

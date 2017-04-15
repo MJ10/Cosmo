@@ -174,10 +174,16 @@ public class SongsFragment extends android.support.v4.app.Fragment implements So
 
     @Override
     public void onSongClick(View v, int position) {
-        MediaBrowserCompat.MediaItem item = tracks.get(position);
+        final MediaBrowserCompat.MediaItem item = tracks.get(position);
         if (item.isPlayable()) {
-            getActivity().getSupportMediaController().getTransportControls()
-                    .playFromMediaId(item.getMediaId(), null);
+            android.os.Handler handler = new android.os.Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    getActivity().getSupportMediaController().getTransportControls()
+                            .playFromMediaId(item.getMediaId(), null);
+                }
+            }, 300);
         }
     }
 
