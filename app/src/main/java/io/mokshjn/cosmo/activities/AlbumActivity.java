@@ -3,6 +3,7 @@ package io.mokshjn.cosmo.activities;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -122,8 +123,13 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
 
     @Override
     public void onEnterAnimationComplete() {
-//        super.onEnterAnimationComplete();
-        rvAlbumSongs.setVisibility(View.VISIBLE);
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                rvAlbumSongs.setVisibility(View.VISIBLE);
+            }
+        }, 500);
     }
 
     private void setupSongs() {
