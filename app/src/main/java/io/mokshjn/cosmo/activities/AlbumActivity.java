@@ -2,6 +2,7 @@ package io.mokshjn.cosmo.activities;
 
 import android.content.ComponentName;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.RemoteException;
@@ -14,6 +15,7 @@ import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.transition.Slide;
@@ -24,6 +26,9 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.bitmap.GlideBitmapDrawable;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.target.ImageViewTarget;
 
 import java.util.ArrayList;
 
@@ -63,6 +68,8 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
     RecyclerView rvAlbumSongs;
     @BindView(R.id.scrollView)
     NestedScrollView scrollView;
+    @BindView(R.id.bgView)
+    View bgView;
 
     private long albumID;
     private AlbumSongsAdapter adapter;
@@ -81,6 +88,17 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
                     }
                 }
             };
+    private Palette.PaletteAsyncListener listener = new Palette.PaletteAsyncListener() {
+        @Override
+        public void onGenerated(Palette palette) {
+            int defaultColor = getResources().getColor(R.color.colorPrimary);
+            int lightMutedColor = palette.getLightMutedColor(defaultColor);
+            int darkVibrantColor = palette.getDarkVibrantColor(defaultColor);
+            bgView.setBackgroundColor(lightMutedColor);
+            adapter.setBgColor(darkVibrantColor);
+            adapter.notifyDataSetChanged();
+        }
+    };
     private ArrayList<MediaBrowserCompat.MediaItem> tracks = new ArrayList<>();
 
     @Override
@@ -102,6 +120,7 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
         rvAlbumSongs.setAdapter(adapter);
         adapter.setClickListener(this);
         rvAlbumSongs.setNestedScrollingEnabled(false);
+        setPalette();
         libraryProvider = new LibraryProvider(getContentResolver());
         libraryProvider.retrieveMediaAsync(new LibraryProvider.Callback() {
             @Override
@@ -109,6 +128,9 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
                 setupSongs();
             }
         });
+    }
+
+    private void setPalette() {
     }
 
     private void setEnterTransitions() {
@@ -150,7 +172,19 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
         Glide.with(this)
                 .load(LibUtils.getMediaStoreAlbumCoverUri(albumID))
                 .diskCacheStrategy(DiskCacheStrategy.SOURCE)
-                .into(ivAlbumArt);
+                .into(new ImageViewTarget<GlideDrawable>(ivAlbumArt) {
+                    @Override
+                    protected void setResource(GlideDrawable resource) {
+                        ivAlbumArt.setImageDrawable(resource.getCurrent());
+
+                        extractColors(resource);
+                    }
+                });
+    }
+
+    private void extractColors(GlideDrawable resource) {
+        Bitmap bitmap = ((GlideBitmapDrawable) resource.getCurrent()).getBitmap();
+        Palette.from(bitmap).generate(listener);
     }
 
     private void connectToSession(MediaSessionCompat.Token token) throws RemoteException {

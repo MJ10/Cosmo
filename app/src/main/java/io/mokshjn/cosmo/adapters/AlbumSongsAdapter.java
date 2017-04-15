@@ -18,6 +18,7 @@ import io.mokshjn.cosmo.R;
  */
 
 public class AlbumSongsAdapter extends RecyclerView.Adapter<AlbumSongsAdapter.ViewHolder> {
+    int bgColor;
     private AlbumSongsAdapter.ClickListener clickListener;
     private ArrayList<MediaBrowserCompat.MediaItem> tracks = new ArrayList<>();
 
@@ -38,7 +39,7 @@ public class AlbumSongsAdapter extends RecyclerView.Adapter<AlbumSongsAdapter.Vi
     public void onBindViewHolder(AlbumSongsAdapter.ViewHolder holder, int position) {
         MediaBrowserCompat.MediaItem item = tracks.get(position);
         MediaDescriptionCompat descriptionCompat = item.getDescription();
-
+        holder.cvSong.setBackgroundColor(bgColor);
         holder.tvSongTitle.setText(descriptionCompat.getTitle());
         holder.tvSongArtist.setText(descriptionCompat.getSubtitle());
         holder.tvTrackNumber.setText(String.valueOf(position + 1));
@@ -55,6 +56,10 @@ public class AlbumSongsAdapter extends RecyclerView.Adapter<AlbumSongsAdapter.Vi
 
     public void setTracks(ArrayList<MediaBrowserCompat.MediaItem> tracks) {
         this.tracks = tracks;
+    }
+
+    public void setBgColor(int color) {
+        this.bgColor = color;
     }
 
     public interface ClickListener {
