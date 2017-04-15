@@ -38,7 +38,7 @@ public class SongsFragment extends android.support.v4.app.Fragment implements So
     private static final String ARG_MEDIA_ID = "media_id";
 
     private FastScrollRecyclerView rvSongList;
-    private ArrayList<MediaBrowserCompat.MediaItem> tracks;
+    private ArrayList<MediaBrowserCompat.MediaItem> tracks = new ArrayList<>();
     private SongAdapter adapter;
 
     private final MediaControllerCompat.Callback mMediaControllerCallback =
@@ -67,8 +67,7 @@ public class SongsFragment extends android.support.v4.app.Fragment implements So
                 public void onChildrenLoaded(@NonNull String parentId,
                                              @NonNull List<MediaBrowserCompat.MediaItem> children) {
                     try {
-                        LogHelper.d(TAG, "fragment onChildrenLoaded, parentId=" + parentId +
-                                "  count=" + children.size());
+                        Log.d(TAG, "onChildrenLoaded: Executed");
                         tracks.clear();
                         for (MediaBrowserCompat.MediaItem item : children) {
                             tracks.add(item);
@@ -90,6 +89,13 @@ public class SongsFragment extends android.support.v4.app.Fragment implements So
     private MediaFragmentListener mMediaFragmentlistener;
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCreate: Called");
+        setRetainInstance(true);
+    }
+
+    @Override
     public void onAttach(Activity context) {
         super.onAttach(context);
         Log.d(TAG, "Initialised fragment listener");
@@ -101,20 +107,28 @@ public class SongsFragment extends android.support.v4.app.Fragment implements So
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-//        return super.onCreateView(inflater, container, savedInstanceState);
         View rootView = inflater.inflate(R.layout.fragment_song_list, container, false);
+        Log.d(TAG, "onCreateView: Called");
         rvSongList = (FastScrollRecyclerView) rootView.findViewById(R.id.rvSongList);
         rvSongList.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter = new SongAdapter(getContext());
         rvSongList.setAdapter(adapter);
         adapter.setClickListener(this);
+        if (savedInstanceState != null) {
+            tracks = new ArrayList<>();
+            ArrayList<MediaBrowserCompat.MediaItem> tra = savedInstanceState.getParcelableArrayList("songs");
+            if (tra != null) {
+                tracks.addAll(tra);
+                adapter.setTracks(tracks);
+                adapter.notifyDataSetChanged();
+            }
+        }
         return rootView;
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        tracks = new ArrayList<>();
+    public void onResume() {
+        super.onResume();
         // fetch browsing information to fill the listview:
         MediaBrowserCompat mediaBrowser = mMediaFragmentlistener.getMediaBrowser();
 
@@ -124,8 +138,34 @@ public class SongsFragment extends android.support.v4.app.Fragment implements So
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        Log.d(TAG, "onStart: Called");
+        // fetch browsing information to fill the listview:
+        MediaBrowserCompat mediaBrowser = mMediaFragmentlistener.getMediaBrowser();
+
+        if (mediaBrowser.isConnected()) {
+            onConnected();
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Log.d(TAG, "onSaveInstanceState: Saved");
+        outState.putParcelableArrayList("songs", tracks);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy: called");
+    }
+
+    @Override
     public void onStop() {
         super.onStop();
+        Log.d(TAG, "onStop: Called");
         MediaBrowserCompat mediaBrowser = mMediaFragmentlistener.getMediaBrowser();
         if (mediaBrowser != null && mediaBrowser.isConnected() && mMediaId != null) {
             mediaBrowser.unsubscribe(mMediaId);
@@ -140,6 +180,7 @@ public class SongsFragment extends android.support.v4.app.Fragment implements So
     @Override
     public void onDetach() {
         super.onDetach();
+        Log.d(TAG, "onDetach: called");
         mMediaFragmentlistener = null;
     }
 
@@ -155,10 +196,11 @@ public class SongsFragment extends android.support.v4.app.Fragment implements So
         if (isDetached()) {
             return;
         }
+
+        Log.d(TAG, "onConnected: Here");
         mMediaId = getMediaId();
-        if (mMediaId == null) {
-            mMediaId = mMediaFragmentlistener.getMediaBrowser().getRoot();
-        }
+        mMediaId = mMediaFragmentlistener.getMediaBrowser().getRoot();
+
 
         mMediaFragmentlistener.getMediaBrowser().unsubscribe(mMediaId);
 

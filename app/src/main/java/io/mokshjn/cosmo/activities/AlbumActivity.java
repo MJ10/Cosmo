@@ -120,7 +120,6 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
         rvAlbumSongs.setAdapter(adapter);
         adapter.setClickListener(this);
         rvAlbumSongs.setNestedScrollingEnabled(false);
-        setPalette();
         libraryProvider = new LibraryProvider(getContentResolver());
         libraryProvider.retrieveMediaAsync(new LibraryProvider.Callback() {
             @Override
@@ -128,9 +127,6 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
                 setupSongs();
             }
         });
-    }
-
-    private void setPalette() {
     }
 
     private void setEnterTransitions() {
@@ -223,7 +219,10 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
     }
 
     private void onConnected() {
-
+//        MediaControllerCompat controller = getSupportMediaController();
+//        if (controller != null) {
+//            controller.registerCallback(mMediaControllerCallback);
+//        }
     }
 
     @Override
