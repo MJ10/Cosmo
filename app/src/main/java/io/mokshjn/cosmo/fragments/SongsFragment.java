@@ -11,7 +11,6 @@ import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.widget.LinearLayoutManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -67,7 +66,6 @@ public class SongsFragment extends android.support.v4.app.Fragment implements So
                 public void onChildrenLoaded(@NonNull String parentId,
                                              @NonNull List<MediaBrowserCompat.MediaItem> children) {
                     try {
-                        Log.d(TAG, "onChildrenLoaded: Executed");
                         tracks.clear();
                         for (MediaBrowserCompat.MediaItem item : children) {
                             tracks.add(item);
@@ -91,14 +89,12 @@ public class SongsFragment extends android.support.v4.app.Fragment implements So
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "onCreate: Called");
         setRetainInstance(true);
     }
 
     @Override
     public void onAttach(Activity context) {
         super.onAttach(context);
-        Log.d(TAG, "Initialised fragment listener");
         mMediaFragmentlistener = (MediaFragmentListener) context;
     }
 
@@ -108,14 +104,12 @@ public class SongsFragment extends android.support.v4.app.Fragment implements So
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_song_list, container, false);
-        Log.d(TAG, "onCreateView: Called");
         rvSongList = (FastScrollRecyclerView) rootView.findViewById(R.id.rvSongList);
         rvSongList.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter = new SongAdapter(getContext());
         rvSongList.setAdapter(adapter);
         adapter.setClickListener(this);
         if (savedInstanceState != null) {
-            tracks = new ArrayList<>();
             ArrayList<MediaBrowserCompat.MediaItem> tra = savedInstanceState.getParcelableArrayList("songs");
             if (tra != null) {
                 tracks.addAll(tra);
@@ -129,7 +123,6 @@ public class SongsFragment extends android.support.v4.app.Fragment implements So
     @Override
     public void onResume() {
         super.onResume();
-        // fetch browsing information to fill the listview:
         MediaBrowserCompat mediaBrowser = mMediaFragmentlistener.getMediaBrowser();
 
         if (mediaBrowser.isConnected()) {
@@ -140,7 +133,6 @@ public class SongsFragment extends android.support.v4.app.Fragment implements So
     @Override
     public void onStart() {
         super.onStart();
-        Log.d(TAG, "onStart: Called");
         // fetch browsing information to fill the listview:
         MediaBrowserCompat mediaBrowser = mMediaFragmentlistener.getMediaBrowser();
 
@@ -152,20 +144,12 @@ public class SongsFragment extends android.support.v4.app.Fragment implements So
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        Log.d(TAG, "onSaveInstanceState: Saved");
         outState.putParcelableArrayList("songs", tracks);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Log.d(TAG, "onDestroy: called");
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        Log.d(TAG, "onStop: Called");
         MediaBrowserCompat mediaBrowser = mMediaFragmentlistener.getMediaBrowser();
         if (mediaBrowser != null && mediaBrowser.isConnected() && mMediaId != null) {
             mediaBrowser.unsubscribe(mMediaId);
@@ -180,7 +164,6 @@ public class SongsFragment extends android.support.v4.app.Fragment implements So
     @Override
     public void onDetach() {
         super.onDetach();
-        Log.d(TAG, "onDetach: called");
         mMediaFragmentlistener = null;
     }
 
@@ -197,7 +180,6 @@ public class SongsFragment extends android.support.v4.app.Fragment implements So
             return;
         }
 
-        Log.d(TAG, "onConnected: Here");
         mMediaId = getMediaId();
         mMediaId = mMediaFragmentlistener.getMediaBrowser().getRoot();
 

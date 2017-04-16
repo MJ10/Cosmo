@@ -53,8 +53,9 @@ public class FullScreenPlayerActivity extends ActionBarCastActivity {
     private TextView mStart;
     private TextView mEnd;
     private SeekBar mSeekbar;
-    private TextView mLine1;
-    private TextView mLine2;
+    private TextView mLineSong;
+    private TextView mLineArtist;
+    private TextView mLineAlbum;
     private TextView mLine3;
     private ProgressBar mLoading;
     private View mControllers;
@@ -119,8 +120,9 @@ public class FullScreenPlayerActivity extends ActionBarCastActivity {
         mStart = (TextView) findViewById(R.id.startText);
         mEnd = (TextView) findViewById(R.id.endText);
         mSeekbar = (SeekBar) findViewById(R.id.seekBar1);
-        mLine1 = (TextView) findViewById(R.id.line1);
-        mLine2 = (TextView) findViewById(R.id.line2);
+        mLineSong = (TextView) findViewById(R.id.lineSong);
+        mLineArtist = (TextView) findViewById(R.id.lineArtist);
+        mLineAlbum = (TextView) findViewById(R.id.lineAlbum);
         mLine3 = (TextView) findViewById(R.id.line3);
         mLoading = (ProgressBar) findViewById(R.id.progressBar1);
         mControllers = findViewById(R.id.controllers);
@@ -279,8 +281,9 @@ public class FullScreenPlayerActivity extends ActionBarCastActivity {
             return;
         }
         LogHelper.d(TAG, "updateMediaDescription called ");
-        mLine1.setText(description.getTitle());
-        mLine2.setText(description.getSubtitle());
+        mLineSong.setText(description.getTitle());
+        mLineArtist.setText(description.getSubtitle());
+        mLineAlbum.setText(description.getDescription());
         Glide.with(this)
                 .loadFromMediaStore(description.getIconUri())
                 .diskCacheStrategy(DiskCacheStrategy.SOURCE)

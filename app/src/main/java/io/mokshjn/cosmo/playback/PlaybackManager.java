@@ -53,7 +53,6 @@ public class PlaybackManager implements Playback.Callback {
      * Handle a request to play music
      */
     public void handlePlayRequest() {
-        Log.d(TAG, "handlePlayRequest: mState=" + mPlayback.getState());
         MediaSessionCompat.QueueItem currentMusic = mQueueManager.getCurrentMusic();
         if (currentMusic != null) {
             mServiceCallback.onPlaybackStart();
@@ -272,9 +271,7 @@ public class PlaybackManager implements Playback.Callback {
 
         @Override
         public void onPlayFromMediaId(String mediaId, Bundle extras) {
-            Log.d(TAG, "playFromMediaId mediaId:" + mediaId+ "  extras="+ extras);
             mQueueManager.setQueueFromMusic(mediaId);
-            Log.d(TAG, "onPlayFromMediaId: hander");
             handlePlayRequest();
         }
 
@@ -294,7 +291,6 @@ public class PlaybackManager implements Playback.Callback {
         public void onSkipToNext() {
             LogHelper.d(TAG, "skipToNext");
             if (mQueueManager.skipQueuePosition(1)) {
-                Log.d(TAG, "onSkipToNext: ");
                 handlePlayRequest();
             } else {
                 handleStopRequest("Cannot skip");

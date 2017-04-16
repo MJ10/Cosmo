@@ -1,7 +1,6 @@
 package io.mokshjn.cosmo.provider;
 
 import android.content.ContentResolver;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.support.v4.media.MediaBrowserCompat;
@@ -193,7 +192,7 @@ public class LibraryProvider {
         mMusicListByAlbum = newMusicListByAlbum;
     }
 
-    public List<MediaBrowserCompat.MediaItem> getChildren(String mediaId, Resources resources) {
+    public List<MediaBrowserCompat.MediaItem> getChildren(String mediaId) {
         List<MediaBrowserCompat.MediaItem> mediaItems = new ArrayList<>();
 
         if (!MediaIDHelper.isBrowseable(mediaId)) {

@@ -35,9 +35,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> im
         this.tracks = tracks;
     }
 
-    public SongAdapter() {
-    }
-
     public SongAdapter(Context context) {
         this.context = context;
     }
@@ -52,7 +49,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> im
     public void onBindViewHolder(ViewHolder holder, int position) {
         MediaBrowserCompat.MediaItem item = tracks.get(position);
         MediaDescriptionCompat descriptionCompat = item.getDescription();
-
         holder.tvSongTitle.setText(descriptionCompat.getTitle());
         holder.tvSongArtist.setText(descriptionCompat.getSubtitle());
         Glide.with(context)

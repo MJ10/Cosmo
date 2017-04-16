@@ -36,10 +36,10 @@ limitations under the License.
         android:background="@drawable/fullscreen_bg_gradient" >
 
         <TextView
-            android:id="@+id/line1"
+            android:id="@+id/lineSong"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/line2"
+            android:layout_above="@+id/lineArtist"
             android:ellipsize="end"
             android:gravity="center_horizontal"
             android:maxLines="1"
@@ -49,7 +49,21 @@ limitations under the License.
             android:textColor="@color/fullscreen_line_color" />
 
         <TextView
-            android:id="@+id/line2"
+            android:id="@+id/lineArtist"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/lineAlbum"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-light"
+            android:gravity="center_horizontal"
+            android:maxLines="1"
+            android:shadowColor="@android:color/black"
+            android:shadowRadius="20"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/fullscreen_secondary_line_color" />
+
+        <TextView
+            android:id="@+id/lineAlbum"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_above="@+id/line3"

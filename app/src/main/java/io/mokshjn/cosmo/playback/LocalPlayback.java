@@ -13,7 +13,6 @@ import android.provider.MediaStore;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.text.TextUtils;
-import android.util.Log;
 
 import java.io.IOException;
 
@@ -169,7 +168,6 @@ public class LocalPlayback implements Playback, AudioManager.OnAudioFocusChangeL
                 mState = PlaybackStateCompat.STATE_BUFFERING;
 
                 mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-                Log.d(TAG, "play: " + source);
                 mMediaPlayer.setDataSource(mContext, ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, Long.parseLong(MediaIDHelper.extractMusicIDFromMediaID(mediaId))));
 
                 // Starts preparing the media player in the background. When
