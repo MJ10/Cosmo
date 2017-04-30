@@ -16,6 +16,7 @@ import io.mokshjn.cosmo.helpers.MediaIDHelper;
 
 public class LibUtils {
     public static final String TAG = LibUtils.class.getSimpleName();
+    public static final String ALBUM_TITLE = "ALBUM_TITLE";
 
     public static Uri getMediaStoreAlbumCoverUri(long albumId) {
         final Uri sArtworkUri = Uri

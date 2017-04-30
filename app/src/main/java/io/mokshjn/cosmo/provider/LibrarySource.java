@@ -33,12 +33,13 @@ public class LibrarySource implements MusicProviderSource {
             do {
                 MediaMetadataCompat metadata = new MediaMetadataCompat.Builder()
                         .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, String.valueOf(cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.AudioColumns._ID))))
-                        .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, cursor.getString(cursor.getColumnIndex(MediaStore.Audio.AudioColumns.ALBUM)))
+                        .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, cursor.getString(cursor.getColumnIndex(MediaStore.Audio.AudioColumns.ALBUM_ID)))
                         .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, cursor.getString(cursor.getColumnIndex(MediaStore.Audio.AudioColumns.ARTIST)))
                         .putString(MediaMetadataCompat.METADATA_KEY_TITLE, cursor.getString(cursor.getColumnIndex(MediaStore.Audio.AudioColumns.TITLE)))
                         .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.AudioColumns.DURATION)))
                         .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.AudioColumns.TRACK)))
                         .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, LibUtils.getMediaStoreAlbumCoverUri(cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID))).toString())
+                        .putString(LibUtils.ALBUM_TITLE, cursor.getString(cursor.getColumnIndex(MediaStore.Audio.AudioColumns.ALBUM)))
                         .build();
                 tracks.add(metadata);
             } while (cursor.moveToNext());
