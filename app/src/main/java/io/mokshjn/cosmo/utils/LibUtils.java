@@ -8,6 +8,8 @@ import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import io.mokshjn.cosmo.helpers.MediaIDHelper;
+
 /**
  * Created by moksh on 15/3/17.
  */
@@ -38,6 +40,24 @@ public class LibUtils {
         return album;
     }
 
+    public static SongInfo getTrackInfo(String mediaId, ContentResolver resolver) {
+        SongInfo info = null;
+        long id = Long.parseLong(MediaIDHelper.extractMusicIDFromMediaID(mediaId));
+        String selection = "_id = " + String.valueOf(id);
+        Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        Cursor cursor = resolver.query(uri, null, selection, null, null);
+
+        if (cursor != null && cursor.moveToFirst()) {
+            long duration = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.AudioColumns.DURATION));
+            long trackNumber = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.AudioColumns.TRACK));
+
+            info = new SongInfo(duration, trackNumber);
+        }
+
+        return info;
+    }
+
+
     public static String getReadableDurationString(long songDurationMillis) {
         long minutes = (songDurationMillis / 1000) / 60;
         long seconds = (songDurationMillis / 1000) % 60;
@@ -48,5 +68,32 @@ public class LibUtils {
         if (TextUtils.isEmpty(artistName)) return false;
         artistName = artistName.trim().toLowerCase();
         return artistName.equals("unknown") || artistName.equals("<unknown>");
+    }
+
+    public static class SongInfo {
+        private long duration, trackNumber;
+
+        SongInfo(long duration, long trackNumber) {
+            this.duration = duration;
+            this.trackNumber = trackNumber;
+        }
+
+        public long getDuration() {
+            return duration;
+        }
+
+        public void setDuration(long duration) {
+            this.duration = duration;
+        }
+
+        public long getTrackNumber() {
+            return trackNumber;
+        }
+
+        public void setTrackNumber(long trackNumber) {
+            this.trackNumber = trackNumber;
+        }
+
+
     }
 }
