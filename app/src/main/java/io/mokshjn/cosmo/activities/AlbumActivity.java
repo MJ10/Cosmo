@@ -147,11 +147,11 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
             public void run() {
                 rvAlbumSongs.setVisibility(View.VISIBLE);
             }
-        }, 500);
+        }, 450);
     }
 
     private void setupSongs() {
-        for (MediaSessionCompat.QueueItem item : QueueHelper.getPlayingQueueFromAlbum(album, libraryProvider)) {
+        for (MediaSessionCompat.QueueItem item : QueueHelper.getPlayingQueueFromAlbum(String.valueOf(albumID), libraryProvider)) {
             tracks.add(new MediaBrowserCompat.MediaItem(item.getDescription(), MediaBrowserCompat.MediaItem.FLAG_PLAYABLE));
         }
         if (tracks != null && tracks.size() > 0) {

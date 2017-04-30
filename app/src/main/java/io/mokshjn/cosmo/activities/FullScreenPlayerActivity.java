@@ -32,6 +32,7 @@ import java.util.concurrent.TimeUnit;
 import io.mokshjn.cosmo.R;
 import io.mokshjn.cosmo.helpers.LogHelper;
 import io.mokshjn.cosmo.services.MusicService;
+import io.mokshjn.cosmo.utils.LibUtils;
 
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
@@ -283,7 +284,7 @@ public class FullScreenPlayerActivity extends ActionBarCastActivity {
         LogHelper.d(TAG, "updateMediaDescription called ");
         mLineSong.setText(description.getTitle());
         mLineArtist.setText(description.getSubtitle());
-        mLineAlbum.setText(description.getDescription());
+        mLineAlbum.setText(LibUtils.getAlbumByAlbumId(Long.parseLong(description.getDescription().toString()), getContentResolver()));
         Glide.with(this)
                 .loadFromMediaStore(description.getIconUri())
                 .diskCacheStrategy(DiskCacheStrategy.SOURCE)
