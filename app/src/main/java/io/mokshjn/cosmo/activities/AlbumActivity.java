@@ -115,7 +115,7 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
             album = LibUtils.getAlbumByAlbumId(albumID, getContentResolver());
         }
         setupToolbar();
-        adapter = new AlbumSongsAdapter();
+        adapter = new AlbumSongsAdapter(this);
         rvAlbumSongs.setLayoutManager(new LinearLayoutManager(this));
         rvAlbumSongs.setAdapter(adapter);
         adapter.setClickListener(this);

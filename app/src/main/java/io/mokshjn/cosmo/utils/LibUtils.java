@@ -64,6 +64,16 @@ public class LibUtils {
         return String.format("%01d:%02d", minutes, seconds);
     }
 
+    public static String getTrackNumber(long track) {
+        if (track == 0) {
+            return "-";
+        } else if (track > 2000) {
+            return String.valueOf(track % 2000);
+        } else {
+            return String.valueOf(track % 1000);
+        }
+    }
+
     public static boolean isArtistNameUnknown(@Nullable String artistName) {
         if (TextUtils.isEmpty(artistName)) return false;
         artistName = artistName.trim().toLowerCase();
