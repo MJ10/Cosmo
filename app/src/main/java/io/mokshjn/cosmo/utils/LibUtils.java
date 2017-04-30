@@ -53,6 +53,7 @@ public class LibUtils {
 
             info = new SongInfo(duration, trackNumber);
         }
+        cursor.close();
 
         return info;
     }
