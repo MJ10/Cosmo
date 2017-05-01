@@ -1,5 +1,6 @@
 package io.mokshjn.cosmo.fragments;
 
+import android.app.ActivityOptions;
 import android.app.Fragment;
 import android.content.Intent;
 import android.graphics.drawable.AnimatedVectorDrawable;
@@ -11,6 +12,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -89,7 +91,7 @@ public class PlaybackControlsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_playback_controls, container, false);
+        final View rootView = inflater.inflate(R.layout.fragment_playback_controls, container, false);
 
         mPlayPause = (ImageButton) rootView.findViewById(R.id.play_pause);
         mPlayPause.setEnabled(true);
@@ -111,7 +113,11 @@ public class PlaybackControlsFragment extends Fragment {
                     intent.putExtra(MainActivity.EXTRA_CURRENT_MEDIA_DESCRIPTION,
                             metadata.getDescription());
                 }
-                startActivity(intent);
+                startActivity(intent,
+                        ActivityOptions.makeSceneTransitionAnimation(getActivity(),
+                                Pair.create(rootView.findViewById(R.id.album_art), getString(R.string.player_art)),
+                                Pair.create(rootView.findViewById(R.id.title), getString(R.string.player_song)),
+                                Pair.create(rootView.findViewById(R.id.artist), getString(R.string.player_artist))).toBundle());
             }
         });
         return rootView;

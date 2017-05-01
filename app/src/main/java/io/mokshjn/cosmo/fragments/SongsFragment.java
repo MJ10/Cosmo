@@ -197,7 +197,7 @@ public class SongsFragment extends android.support.v4.app.Fragment implements So
     }
 
     @Override
-    public void onSongClick(View v, int position) {
+    public void onSongClick(final View v, int position) {
         final MediaBrowserCompat.MediaItem item = tracks.get(position);
         if (item.isPlayable()) {
             android.os.Handler handler = new android.os.Handler();
@@ -207,7 +207,7 @@ public class SongsFragment extends android.support.v4.app.Fragment implements So
                     getActivity().getSupportMediaController().getTransportControls()
                             .playFromMediaId(item.getMediaId(), null);
                 }
-            }, 300);
+            }, 50);
         }
     }
 

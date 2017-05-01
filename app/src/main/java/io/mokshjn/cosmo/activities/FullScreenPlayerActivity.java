@@ -15,7 +15,10 @@ import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.text.format.DateUtils;
+import android.transition.Slide;
+import android.view.Gravity;
 import android.view.View;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
@@ -107,6 +110,7 @@ public class FullScreenPlayerActivity extends ActionBarCastActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_full_player);
         initializeToolbar();
+        setEnterTransitions();
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setTitle("");
@@ -196,6 +200,15 @@ public class FullScreenPlayerActivity extends ActionBarCastActivity {
 
         mMediaBrowser = new MediaBrowserCompat(this,
                 new ComponentName(this, MusicService.class), mConnectionCallback, null);
+    }
+
+    private void setEnterTransitions() {
+        Slide slide = new Slide(Gravity.BOTTOM);
+        slide.addTarget(R.id.controllers);
+        slide.setInterpolator(AnimationUtils.loadInterpolator(this, android.R.interpolator.linear_out_slow_in));
+        slide.setDuration(450);
+        getWindow().setEnterTransition(slide);
+        getWindow().setExitTransition(slide);
     }
 
     private void connectToSession(MediaSessionCompat.Token token) throws RemoteException {
