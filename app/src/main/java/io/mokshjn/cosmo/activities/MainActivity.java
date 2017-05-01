@@ -24,7 +24,6 @@ import android.widget.Toast;
 
 import io.mokshjn.cosmo.R;
 import io.mokshjn.cosmo.fragments.AlbumListFragment;
-import io.mokshjn.cosmo.fragments.ArtistListFragment;
 import io.mokshjn.cosmo.fragments.SongsFragment;
 import io.mokshjn.cosmo.helpers.LogHelper;
 
@@ -207,8 +206,8 @@ public class MainActivity extends BaseActivity implements SongsFragment.MediaFra
                     return new SongsFragment();
                 case 1:
                     return AlbumListFragment.newInstance();
-                case 2:
-                    return ArtistListFragment.newInstance();
+//                case 2:
+//                    return ArtistListFragment.newInstance();
                 default:
                     return null;
             }
@@ -216,7 +215,7 @@ public class MainActivity extends BaseActivity implements SongsFragment.MediaFra
 
         @Override
         public int getCount() {
-            return 3;
+            return 2;
         }
 
         @Override
@@ -226,8 +225,8 @@ public class MainActivity extends BaseActivity implements SongsFragment.MediaFra
                     return "Songs";
                 case 1:
                     return "Albums";
-                case 2:
-                    return "Artists";
+//                case 2:
+//                    return "Artists";
             }
             return null;
         }
