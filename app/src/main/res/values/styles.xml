@@ -78,4 +78,12 @@
         <item name="android:windowTranslucentStatus">true</item>
     </style>
 
+    <style name="AppTheme.Player">
+        <item name="android:windowActivityTransitions">true</item>
+        <item name="android:windowContentTransitions">true</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowSharedElementsUseOverlay">true</item>
+        <item name="android:windowTranslucentStatus">true</item>
+    </style>
+
 </resources>
