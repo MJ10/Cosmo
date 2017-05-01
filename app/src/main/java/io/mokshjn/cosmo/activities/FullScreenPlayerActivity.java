@@ -17,6 +17,7 @@ import android.support.v4.media.session.PlaybackStateCompat;
 import android.text.format.DateUtils;
 import android.transition.Slide;
 import android.view.Gravity;
+import android.view.Menu;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
@@ -232,6 +233,12 @@ public class FullScreenPlayerActivity extends ActionBarCastActivity {
                 state.getState() == PlaybackStateCompat.STATE_BUFFERING)) {
             scheduleSeekbarUpdate();
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.player_menu, menu);
+        return true;
     }
 
     private void updateFromParams(Intent intent) {
