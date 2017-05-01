@@ -2,6 +2,7 @@ package io.mokshjn.cosmo.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaMetadataCompat;
 
 import com.google.gson.Gson;
@@ -20,6 +21,7 @@ public class StorageUtils {
     private final static String STORAGE = " io.mokshjn.cosmo.STORAGE";
     private SharedPreferences preferences;
     private String AUDIO_LIST = "io.mokshjn.cosmo.AUDIO_LIST";
+    private String CURRENT_QUEUE = "io.mokshjn.cosmo.CURRENT_QUEUE";
     private Context context;
 
     public StorageUtils(Context context) {
@@ -52,7 +54,7 @@ public class StorageUtils {
 
     public ArrayList<MediaMetadataCompat> loadSongs() {
         preferences = context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
-        String json = preferences.getString("audioArrayList", null);
+        String json = preferences.getString(AUDIO_LIST, null);
         Type type = new TypeToken<ArrayList<MediaMetadataCompat>>() {
         }.getType();
         Gson gson = new Gson();
@@ -71,10 +73,21 @@ public class StorageUtils {
         return preferences.getInt("audioPosition", -1);//return -1 if no data found
     }
 
-    public void clearCachedAudioPlaylist() {
+    public void storeCurrentPlayingQueue(ArrayList<MediaBrowserCompat.MediaItem> tracks) {
         preferences = context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
-        editor.clear();
-        editor.commit();
+        Gson gson = new Gson();
+        String json = gson.toJson(tracks);
+        editor.putString(CURRENT_QUEUE, json);
+        editor.apply();
+    }
+
+    public ArrayList<MediaBrowserCompat.MediaItem> getCurrentPlayingQueue() {
+        preferences = context.getSharedPreferences(STORAGE, Context.MODE_PRIVATE);
+        String json = preferences.getString(CURRENT_QUEUE, null);
+        Type type = new TypeToken<ArrayList<MediaMetadataCompat>>() {
+        }.getType();
+        Gson gson = new Gson();
+        return gson.fromJson(json, type);
     }
 }
