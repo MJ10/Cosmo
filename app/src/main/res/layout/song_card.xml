@@ -9,6 +9,7 @@
     android:clickable="true"
     android:foreground="?android:attr/selectableItemBackground"
     android:stateListAnimator="@animator/card_raise"
+    android:transitionName="@string/player_bg"
     card_view:cardCornerRadius="1dp"
     card_view:cardElevation="4dp">
 
@@ -23,7 +24,8 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginEnd="10dp"
-            android:layout_weight="0.15" />
+            android:layout_weight="0.15"
+            android:transitionName="@string/player_art" />
 
         <LinearLayout
             android:layout_width="0dp"
@@ -39,13 +41,15 @@
                 android:lines="1"
                 android:text="@string/tvSongTitleNullTag"
                 android:textSize="20sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:transitionName="@string/player_song" />
 
             <TextView
                 android:id="@+id/tvSongArtist"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/tvSongArtistNullTag" />
+                android:text="@string/tvSongArtistNullTag"
+                android:transitionName="@string/player_artist" />
         </LinearLayout>
 
         <TextView

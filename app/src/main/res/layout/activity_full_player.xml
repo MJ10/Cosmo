@@ -19,14 +19,16 @@ limitations under the License.
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/black"
-    android:fitsSystemWindows="true">
+    android:fitsSystemWindows="true"
+    android:transitionName="@string/player_bg">
 
     <ImageView
         android:id="@+id/background_image"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:contentDescription="@string/background_image_str"
-        android:scaleType="centerCrop" />
+        android:scaleType="centerCrop"
+        android:transitionName="@string/player_art" />
 
     <RelativeLayout
         android:layout_width="fill_parent"
@@ -46,7 +48,8 @@ limitations under the License.
             android:shadowColor="@android:color/black"
             android:shadowRadius="20"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textColor="@color/fullscreen_line_color" />
+            android:textColor="@color/fullscreen_line_color"
+            android:transitionName="@string/player_song" />
 
         <TextView
             android:id="@+id/lineArtist"
@@ -60,7 +63,8 @@ limitations under the License.
             android:shadowColor="@android:color/black"
             android:shadowRadius="20"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="@color/fullscreen_secondary_line_color" />
+            android:textColor="@color/fullscreen_secondary_line_color"
+            android:transitionName="@string/player_artist" />
 
         <TextView
             android:id="@+id/lineAlbum"
