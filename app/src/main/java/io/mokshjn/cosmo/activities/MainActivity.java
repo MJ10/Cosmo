@@ -123,11 +123,16 @@ public class MainActivity extends BaseActivity implements SongsFragment.MediaFra
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        View searchMenuView = toolbar.findViewById(R.id.action_search);
-        Bundle options = ActivityOptions.makeSceneTransitionAnimation(this, searchMenuView,
-                getString(R.string.transition_search_back)).toBundle();
-        startActivityForResult(new Intent(this, SearchActivity.class), RC_SEARCH, options);
-        return true;
+        switch (item.getItemId()) {
+            case R.id.action_search:
+                View searchMenuView = toolbar.findViewById(R.id.action_search);
+                Bundle options = ActivityOptions.makeSceneTransitionAnimation(this, searchMenuView,
+                        getString(R.string.transition_search_back)).toBundle();
+                startActivityForResult(new Intent(this, SearchActivity.class), RC_SEARCH, options);
+                return true;
+            default:
+                return false;
+        }
     }
 
     private void askPermission() {
