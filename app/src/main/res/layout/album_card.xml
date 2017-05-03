@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="wrap_content"
-    android:layout_weight="0.3"
-    android:paddingLeft="5dp"
-    android:paddingRight="5dp">
+    android:layout_weight="0.3">
     <android.support.v7.widget.CardView
         xmlns:card_view="http://schemas.android.com/apk/res-auto"
         android:id="@+id/cvAlbum"
@@ -21,7 +19,7 @@
             <ImageView
                 android:id="@+id/ivAlbumArt"
                 android:layout_width="match_parent"
-                android:layout_height="160dp"
+                android:layout_height="170dp"
                 android:contentDescription="@string/albumart"
                 android:src="@drawable/nav_bg"
                 android:transitionName="@string/transition_album_art" />
@@ -40,6 +38,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="25dp"
                     android:ellipsize="end"
+                    android:fontFamily="sans-serif-condensed"
                     android:lines="1"
                     android:text="@string/album_name"
                     android:textSize="20sp"
