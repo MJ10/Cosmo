@@ -18,6 +18,7 @@ import android.text.format.DateUtils;
 import android.transition.Slide;
 import android.view.Gravity;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
@@ -37,6 +38,7 @@ import io.mokshjn.cosmo.R;
 import io.mokshjn.cosmo.helpers.LogHelper;
 import io.mokshjn.cosmo.services.MusicService;
 import io.mokshjn.cosmo.utils.LibUtils;
+import io.mokshjn.cosmo.utils.SettingsUtils;
 
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
@@ -238,7 +240,20 @@ public class FullScreenPlayerActivity extends ActionBarCastActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.player_menu, menu);
+        menu.findItem(R.id.action_repeat).setChecked(SettingsUtils.isRepeatEnabled(this));
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_repeat:
+                SettingsUtils.toggleRepeat(this);
+                item.setChecked(SettingsUtils.isRepeatEnabled(this));
+                return true;
+            default:
+                return false;
+        }
     }
 
     private void updateFromParams(Intent intent) {
