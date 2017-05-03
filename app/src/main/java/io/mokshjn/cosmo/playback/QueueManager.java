@@ -19,6 +19,7 @@ import io.mokshjn.cosmo.helpers.LogHelper;
 import io.mokshjn.cosmo.helpers.MediaIDHelper;
 import io.mokshjn.cosmo.helpers.QueueHelper;
 import io.mokshjn.cosmo.provider.LibraryProvider;
+import io.mokshjn.cosmo.utils.SettingsUtils;
 
 /**
  * Created by moksh on 19/3/17.
@@ -86,8 +87,13 @@ public class QueueManager {
         if (index < 0) {
             // skip backwards before the first song will keep you on the first song
             index = 0;
+        } else if (index >= mPlayingQueue.size()) {
+            if (SettingsUtils.isRepeatEnabled(mContext)) {
+                index %= mPlayingQueue.size();
+            } else {
+                return false;
+            }
         } else {
-            // skip forwards when in last song will cycle back to start of the queue
             index %= mPlayingQueue.size();
         }
         if (!QueueHelper.isIndexPlayable(index, mPlayingQueue)) {

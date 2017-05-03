@@ -26,6 +26,7 @@ import io.mokshjn.cosmo.R;
 import io.mokshjn.cosmo.fragments.AlbumListFragment;
 import io.mokshjn.cosmo.fragments.SongsFragment;
 import io.mokshjn.cosmo.helpers.LogHelper;
+import io.mokshjn.cosmo.utils.SettingsUtils;
 
 public class MainActivity extends BaseActivity implements SongsFragment.MediaFragmentListener {
 
@@ -111,6 +112,7 @@ public class MainActivity extends BaseActivity implements SongsFragment.MediaFra
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.search_menu, menu);
+        menu.findItem(R.id.action_repeat).setChecked(SettingsUtils.isRepeatEnabled(this));
         return true;
     }
 
@@ -129,6 +131,10 @@ public class MainActivity extends BaseActivity implements SongsFragment.MediaFra
                 Bundle options = ActivityOptions.makeSceneTransitionAnimation(this, searchMenuView,
                         getString(R.string.transition_search_back)).toBundle();
                 startActivityForResult(new Intent(this, SearchActivity.class), RC_SEARCH, options);
+                return true;
+            case R.id.action_repeat:
+                SettingsUtils.toggleRepeat(this);
+                item.setChecked(SettingsUtils.isRepeatEnabled(this));
                 return true;
             default:
                 return false;

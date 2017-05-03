@@ -18,7 +18,7 @@ import java.util.ArrayList;
 
 public class StorageUtils {
 
-    private final static String STORAGE = " io.mokshjn.cosmo.STORAGE";
+    public final static String STORAGE = " io.mokshjn.cosmo.STORAGE";
     private SharedPreferences preferences;
     private String AUDIO_LIST = "io.mokshjn.cosmo.AUDIO_LIST";
     private String CURRENT_QUEUE = "io.mokshjn.cosmo.CURRENT_QUEUE";

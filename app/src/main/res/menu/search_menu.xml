@@ -14,4 +14,9 @@
         android:id="@+id/action_settings"
         android:title="@string/settings"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_repeat"
+        android:checkable="true"
+        android:title="@string/repeat"
+        app:showAsAction="never" />
 </menu>
