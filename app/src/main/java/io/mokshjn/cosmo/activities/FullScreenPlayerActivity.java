@@ -34,6 +34,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import io.mokshjn.cosmo.R;
 import io.mokshjn.cosmo.helpers.LogHelper;
 import io.mokshjn.cosmo.services.MusicService;
@@ -54,22 +56,38 @@ public class FullScreenPlayerActivity extends ActionBarCastActivity {
     private final Handler mHandler = new Handler();
     private final ScheduledExecutorService mExecutorService =
             Executors.newSingleThreadScheduledExecutor();
-    private ImageView mSkipPrev;
-    private ImageView mSkipNext;
-    private ImageView mPlayPause;
-    private TextView mStart;
-    private TextView mEnd;
-    private SeekBar mSeekbar;
-    private TextView mLineSong;
-    private TextView mLineArtist;
-    private TextView mLineAlbum;
-    private TextView mLine3;
-    private ProgressBar mLoading;
-    private View mControllers;
-    private AnimatedVectorDrawable mPauseDrawable;
-    private AnimatedVectorDrawable mPlayDrawable;
-    private ImageView mBackgroundImage;
-    private String mCurrentArtUrl;
+
+    @BindView(R.id.background_image)
+    ImageView mBackgroundImage;
+    @BindView(R.id.play_pause)
+    ImageView mPlayPause;
+    @BindView(R.id.prev)
+    ImageView mSkipPrev;
+    @BindView(R.id.next)
+    ImageView mSkipNext;
+    @BindView(R.id.lineSong)
+    TextView mLineSong;
+    @BindView(R.id.lineAlbum)
+    TextView mLineAlbum;
+    @BindView(R.id.lineArtist)
+    TextView mLineArtist;
+    @BindView(R.id.line3)
+    TextView mLine3;
+    @BindView(R.id.startText)
+    TextView mStart;
+    @BindView(R.id.endText)
+    TextView mEnd;
+
+    @BindView(R.id.seekBar1)
+    SeekBar mSeekbar;
+    @BindView(R.id.progressBar1)
+    ProgressBar mLoading;
+    @BindView(R.id.controllers)
+    View mControllers;
+
+    AnimatedVectorDrawable mPlayDrawable;
+    AnimatedVectorDrawable mPauseDrawable;
+
     private MediaBrowserCompat mMediaBrowser;
     private ScheduledFuture<?> mScheduleFuture;
     private PlaybackStateCompat mLastPlaybackState;
@@ -111,7 +129,8 @@ public class FullScreenPlayerActivity extends ActionBarCastActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_full_player);
+        setContentView(R.layout.activity_player);
+        ButterKnife.bind(this);
         initializeToolbar();
         setEnterTransitions();
         if (getSupportActionBar() != null) {
@@ -119,21 +138,8 @@ public class FullScreenPlayerActivity extends ActionBarCastActivity {
             getSupportActionBar().setTitle("");
         }
 
-        mBackgroundImage = (ImageView) findViewById(R.id.background_image);
-        mPauseDrawable = (AnimatedVectorDrawable) getDrawable(R.drawable.avd_play_to_pause);
         mPlayDrawable = (AnimatedVectorDrawable) getDrawable(R.drawable.avd_pause_to_play);
-        mPlayPause = (ImageView) findViewById(R.id.play_pause);
-        mSkipNext = (ImageView) findViewById(R.id.next);
-        mSkipPrev = (ImageView) findViewById(R.id.prev);
-        mStart = (TextView) findViewById(R.id.startText);
-        mEnd = (TextView) findViewById(R.id.endText);
-        mSeekbar = (SeekBar) findViewById(R.id.seekBar1);
-        mLineSong = (TextView) findViewById(R.id.lineSong);
-        mLineArtist = (TextView) findViewById(R.id.lineArtist);
-        mLineAlbum = (TextView) findViewById(R.id.lineAlbum);
-        mLine3 = (TextView) findViewById(R.id.line3);
-        mLoading = (ProgressBar) findViewById(R.id.progressBar1);
-        mControllers = findViewById(R.id.controllers);
+        mPauseDrawable = (AnimatedVectorDrawable) getDrawable(R.drawable.avd_play_to_pause);
 
         mSkipNext.setOnClickListener(new View.OnClickListener() {
             @Override
