@@ -11,6 +11,7 @@ import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.widget.LinearLayoutManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -182,7 +183,7 @@ public class SongsFragment extends android.support.v4.app.Fragment implements So
 
         mMediaId = getMediaId();
         mMediaId = mMediaFragmentlistener.getMediaBrowser().getRoot();
-
+        Log.d(TAG, "onConnected: " + mMediaId);
 
         mMediaFragmentlistener.getMediaBrowser().unsubscribe(mMediaId);
 

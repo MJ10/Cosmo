@@ -18,7 +18,6 @@ import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.graphics.Palette;
 import android.text.format.DateUtils;
 import android.transition.Slide;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -100,7 +99,6 @@ public class FullScreenPlayerActivity extends ActionBarCastActivity {
             int defaultColor = getResources().getColor(R.color.colorPrimary);
             int darkVibrantColor = palette.getMutedColor(defaultColor);
             mControllers.setBackgroundColor(darkVibrantColor);
-            Log.d(TAG, "onGenerated: " + String.valueOf(darkVibrantColor));
         }
     };
 
