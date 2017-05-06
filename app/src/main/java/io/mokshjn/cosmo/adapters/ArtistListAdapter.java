@@ -58,6 +58,10 @@ public class ArtistListAdapter extends RecyclerView.Adapter<ArtistListAdapter.Vi
         return artistList.get(position).getName().substring(0,1);
     }
 
+    public interface artistClickListener {
+        void onArtistClick(View v, int p);
+    }
+
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private TextView tvArtistName, tvDiscogDetails;
         private CardView cvArtist;
@@ -79,8 +83,5 @@ public class ArtistListAdapter extends RecyclerView.Adapter<ArtistListAdapter.Vi
                 clickListener.onArtistClick(view, getLayoutPosition());
             }
         }
-    }
-    public interface artistClickListener{
-        void  onArtistClick(View v, int p);
     }
 }

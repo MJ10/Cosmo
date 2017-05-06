@@ -26,8 +26,8 @@
         <fade />
         <transition
             class="io.mokshjn.cosmo.transitions.CircularReveal"
-            app:centerOn="@id/searchback"
-            android:interpolator="@android:interpolator/linear_out_slow_in" />
+            android:interpolator="@android:interpolator/linear_out_slow_in"
+            app:centerOn="@id/searchback" />
     </transitionSet>
 
     <fade
@@ -39,9 +39,9 @@
     </fade>
 
     <fade
-        android:startDelay="400"
         android:duration="400"
-        android:interpolator="@android:interpolator/linear_out_slow_in">
+        android:interpolator="@android:interpolator/linear_out_slow_in"
+        android:startDelay="400">
         <targets>
             <target android:targetId="@id/search_view" />
         </targets>

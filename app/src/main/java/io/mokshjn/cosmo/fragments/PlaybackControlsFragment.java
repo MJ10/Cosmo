@@ -115,9 +115,7 @@ public class PlaybackControlsFragment extends Fragment {
                 }
                 startActivity(intent,
                         ActivityOptions.makeSceneTransitionAnimation(getActivity(),
-                                Pair.create(rootView.findViewById(R.id.album_art), getString(R.string.player_art)),
-                                Pair.create(rootView.findViewById(R.id.title), getString(R.string.player_song)),
-                                Pair.create(rootView.findViewById(R.id.artist), getString(R.string.player_artist))).toBundle());
+                                Pair.create(rootView.findViewById(R.id.album_art), getString(R.string.player_art))).toBundle());
             }
         });
         return rootView;

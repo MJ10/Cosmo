@@ -11,9 +11,9 @@ public interface Playback {
 
     void stop(boolean notifyListeners);
 
-    void setState(int state);
-
     int getState();
+
+    void setState(int state);
 
     boolean isConnected();
 
@@ -31,9 +31,11 @@ public interface Playback {
 
     void seekTo(int position);
 
+    String getCurrentMediaId();
+
     void setCurrentMediaId(String mediaId);
 
-    String getCurrentMediaId();
+    void setCallback(Callback callback);
 
     interface Callback {
 
@@ -45,6 +47,4 @@ public interface Playback {
 
         void setCurrentMediaId(String mediaId);
     }
-
-    void setCallback(Callback callback);
 }

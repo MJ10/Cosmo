@@ -35,9 +35,9 @@
     </fade>
 
     <fade
-        android:startDelay="300"
         android:duration="160"
-        android:interpolator="@android:interpolator/fast_out_linear_in">
+        android:interpolator="@android:interpolator/fast_out_linear_in"
+        android:startDelay="300">
         <targets>
             <target android:targetId="@id/search_background" />
         </targets>

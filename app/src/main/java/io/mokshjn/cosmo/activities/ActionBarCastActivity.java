@@ -28,15 +28,18 @@ public abstract class ActionBarCastActivity extends AppCompatActivity {
     private static final String TAG = LogHelper.makeLogTag(ActionBarCastActivity.class);
 
     private static final int DELAY_MILLIS = 1000;
+    private final FragmentManager.OnBackStackChangedListener mBackStackChangedListener =
+            new FragmentManager.OnBackStackChangedListener() {
+                @Override
+                public void onBackStackChanged() {
 
+                }
+            };
     private CastContext mCastContext;
     private MenuItem mMediaRouteMenuItem;
     private Toolbar mToolbar;
-
     private boolean mToolbarInitialized;
-
     private int mItemToOpenWhenDrawerCloses = -1;
-
     private CastStateListener mCastStateListener = new CastStateListener() {
         @Override
         public void onCastStateChanged(int newState) {
@@ -53,14 +56,6 @@ public abstract class ActionBarCastActivity extends AppCompatActivity {
             }
         }
     };
-
-    private final FragmentManager.OnBackStackChangedListener mBackStackChangedListener =
-            new FragmentManager.OnBackStackChangedListener() {
-                @Override
-                public void onBackStackChanged() {
-
-                }
-            };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
