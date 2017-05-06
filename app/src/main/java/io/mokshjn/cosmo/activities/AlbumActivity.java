@@ -74,7 +74,6 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
     private long albumID;
     private AlbumSongsAdapter adapter;
     private LibraryProvider libraryProvider;
-    private String album;
     private MediaBrowserCompat mediaBrowser;
     private final MediaBrowserCompat.ConnectionCallback mConnectionCallback =
             new MediaBrowserCompat.ConnectionCallback() {
@@ -112,7 +111,6 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
         Intent intent = getIntent();
         if (intent != null) {
             albumID = intent.getLongExtra("albumID", 0);
-            album = LibUtils.getAlbumByAlbumId(albumID, getContentResolver());
         }
         setupToolbar();
         adapter = new AlbumSongsAdapter(this);
