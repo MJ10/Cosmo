@@ -2,6 +2,7 @@ package io.mokshjn.cosmo.activities;
 
 import android.content.ComponentName;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.drawable.AnimatedVectorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -14,8 +15,10 @@ import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.support.v7.graphics.Palette;
 import android.text.format.DateUtils;
 import android.transition.Slide;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,6 +31,9 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.bitmap.GlideBitmapDrawable;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.target.ImageViewTarget;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -87,6 +93,16 @@ public class FullScreenPlayerActivity extends ActionBarCastActivity {
 
     AnimatedVectorDrawable mPlayDrawable;
     AnimatedVectorDrawable mPauseDrawable;
+
+    Palette.PaletteAsyncListener listener = new Palette.PaletteAsyncListener() {
+        @Override
+        public void onGenerated(Palette palette) {
+            int defaultColor = getResources().getColor(R.color.colorPrimary);
+            int darkVibrantColor = palette.getMutedColor(defaultColor);
+            mControllers.setBackgroundColor(darkVibrantColor);
+            Log.d(TAG, "onGenerated: " + String.valueOf(darkVibrantColor));
+        }
+    };
 
     private MediaBrowserCompat mMediaBrowser;
     private ScheduledFuture<?> mScheduleFuture;
@@ -330,7 +346,19 @@ public class FullScreenPlayerActivity extends ActionBarCastActivity {
                 .loadFromMediaStore(description.getIconUri())
                 .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                 .crossFade()
-                .into(mBackgroundImage);
+                .into(new ImageViewTarget<GlideDrawable>(mBackgroundImage) {
+                    @Override
+                    protected void setResource(GlideDrawable resource) {
+                        mBackgroundImage.setImageDrawable(resource.getCurrent());
+
+                        extractAndApplyColors(resource);
+                    }
+                });
+    }
+
+    private void extractAndApplyColors(GlideDrawable resource) {
+        Bitmap bitmap = ((GlideBitmapDrawable) resource.getCurrent()).getBitmap();
+        Palette.from(bitmap).generate(listener);
     }
 
     private void updateDuration(MediaMetadataCompat metadata) {
