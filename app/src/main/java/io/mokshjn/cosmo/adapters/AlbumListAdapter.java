@@ -2,6 +2,7 @@ package io.mokshjn.cosmo.adapters;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,6 +13,9 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.bitmap.GlideBitmapDrawable;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.target.ImageViewTarget;
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import java.util.ArrayList;
@@ -55,7 +59,14 @@ public class AlbumListAdapter extends RecyclerView.Adapter<AlbumListAdapter.View
                     .load(LibUtils.getMediaStoreAlbumCoverUri(alb.getAlbumId()))
                     .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                     .crossFade()
-                    .into(holder.ivAlbumArt);
+                    .into(new ImageViewTarget<GlideDrawable>(holder.ivAlbumArt) {
+                        @Override
+                        protected void setResource(GlideDrawable resource) {
+                            holder.ivAlbumArt.setImageDrawable(resource.getCurrent());
+                            Palette palette = Palette.from(((GlideBitmapDrawable) resource.getCurrent()).getBitmap()).generate();
+                            holder.cvAlbum.setBackgroundColor(palette.getMutedColor(context.getColor(R.color.colorPrimary)));
+                        }
+                    });
         }
     }
 
