@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.os.RemoteException;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaDescriptionCompat;
 import android.support.v4.media.MediaMetadataCompat;
@@ -22,6 +23,7 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -44,6 +46,8 @@ import butterknife.ButterKnife;
 import io.mokshjn.cosmo.R;
 import io.mokshjn.cosmo.helpers.LogHelper;
 import io.mokshjn.cosmo.services.MusicService;
+import io.mokshjn.cosmo.transitions.FabTransform;
+import io.mokshjn.cosmo.transitions.MorphTransform;
 import io.mokshjn.cosmo.utils.LibUtils;
 import io.mokshjn.cosmo.utils.SettingsUtils;
 
@@ -89,6 +93,8 @@ public class FullScreenPlayerActivity extends ActionBarCastActivity {
     ProgressBar mLoading;
     @BindView(R.id.controllers)
     View mControllers;
+    @BindView(R.id.container)
+    ViewGroup container;
 
     AnimatedVectorDrawable mPlayDrawable;
     AnimatedVectorDrawable mPauseDrawable;
@@ -145,6 +151,9 @@ public class FullScreenPlayerActivity extends ActionBarCastActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
         ButterKnife.bind(this);
+        if (!FabTransform.setup(this, container)) {
+            MorphTransform.setup(this, container, ContextCompat.getColor(this, R.color.background_light), getResources().getDimensionPixelSize(R.dimen.dialog_corners));
+        }
         initializeToolbar();
         setEnterTransitions();
         if (getSupportActionBar() != null) {
