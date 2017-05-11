@@ -3,10 +3,12 @@ package io.mokshjn.cosmo.activities;
 import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.AnimatedVectorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
@@ -29,32 +31,36 @@ public abstract class BaseActivity extends ActionBarCastActivity implements Medi
     private static final String TAG = LogHelper.makeLogTag(BaseActivity.class);
 
     private MediaBrowserCompat mMediaBrowser;
-    private PlaybackControlsFragment mControlsFragment;
+    private FloatingActionButton fab;
+    private AnimatedVectorDrawable mPlayDrawable;
+    private AnimatedVectorDrawable mPauseDrawable;
     // Callback that ensures that we are showing the controls
     private final MediaControllerCompat.Callback mMediaControllerCallback =
             new MediaControllerCompat.Callback() {
                 @Override
                 public void onPlaybackStateChanged(@NonNull PlaybackStateCompat state) {
                     if (shouldShowControls()) {
-                        showPlaybackControls();
+//                        showPlaybackControls();
                     } else {
                         LogHelper.d(TAG, "mediaControllerCallback.onPlaybackStateChanged: " +
                                 "hiding controls because state is ", state.getState());
-                        hidePlaybackControls();
+//                        hidePlaybackControls();
                     }
+                    updatePlaybackState(state);
                 }
 
                 @Override
                 public void onMetadataChanged(MediaMetadataCompat metadata) {
                     if (shouldShowControls()) {
-                        showPlaybackControls();
+//                        showPlaybackControls();
                     } else {
                         LogHelper.d(TAG, "mediaControllerCallback.onMetadataChanged: " +
                                 "hiding controls because metadata is null");
-                        hidePlaybackControls();
+//                        hidePlaybackControls();
                     }
                 }
             };
+    private PlaybackControlsFragment mControlsFragment;
     private final MediaBrowserCompat.ConnectionCallback mConnectionCallback =
             new MediaBrowserCompat.ConnectionCallback() {
                 @Override
@@ -64,7 +70,7 @@ public abstract class BaseActivity extends ActionBarCastActivity implements Medi
                         connectToSession(mMediaBrowser.getSessionToken());
                     } catch (RemoteException e) {
                         LogHelper.e(TAG, e, "could not connect media controller");
-                        hidePlaybackControls();
+//                        hidePlaybackControls();
                     }
                 }
             };
@@ -75,7 +81,7 @@ public abstract class BaseActivity extends ActionBarCastActivity implements Medi
 
         LogHelper.d(TAG, "Activity onCreate");
 
-        if (Build.VERSION.SDK_INT >= 21) {
+        if (Build.VERSION.SDK_INT >= 23) {
             // Since our app icon has the same color as colorPrimary, our entry in the Recent Apps
             // list gets weird. We need to change either the icon or the color
             // of the TaskDescription.
@@ -87,6 +93,10 @@ public abstract class BaseActivity extends ActionBarCastActivity implements Medi
             setTaskDescription(taskDesc);
         }
 
+        mPlayDrawable = (AnimatedVectorDrawable) getDrawable(R.drawable.avd_pause_to_play);
+        mPauseDrawable = (AnimatedVectorDrawable) getDrawable(R.drawable.avd_play_to_pause);
+
+
         // Connect a media browser just to get the media session token. There are other ways
         // this can be done, for example by sharing the session token directly.
         mMediaBrowser = new MediaBrowserCompat(this,
@@ -97,14 +107,14 @@ public abstract class BaseActivity extends ActionBarCastActivity implements Medi
     protected void onStart() {
         super.onStart();
         LogHelper.d(TAG, "Activity onStart");
-
-        mControlsFragment = (PlaybackControlsFragment) getFragmentManager()
-                .findFragmentById(R.id.fragment_playback_controls);
-        if (mControlsFragment == null) {
-            throw new IllegalStateException("Mising fragment with id 'controls'. Cannot continue.");
-        }
-
-        hidePlaybackControls();
+        fab = (FloatingActionButton) findViewById(R.id.fab);
+//        mControlsFragment = (PlaybackControlsFragment) getFragmentManager()
+//                .findFragmentById(R.id.fragment_playback_controls);
+//        if (mControlsFragment == null) {
+//            throw new IllegalStateException("Mising fragment with id 'controls'. Cannot continue.");
+//        }
+//
+//        hidePlaybackControls();
 
         mMediaBrowser.connect();
     }
@@ -122,6 +132,30 @@ public abstract class BaseActivity extends ActionBarCastActivity implements Medi
     @Override
     public MediaBrowserCompat getMediaBrowser() {
         return mMediaBrowser;
+    }
+
+    private void updatePlaybackState(PlaybackStateCompat state) {
+        if (state == null) {
+            return;
+        }
+
+        switch (state.getState()) {
+            case PlaybackStateCompat.STATE_PLAYING:
+                fab.setImageDrawable(mPauseDrawable);
+                mPauseDrawable.start();
+                break;
+            case PlaybackStateCompat.STATE_PAUSED:
+                fab.setImageDrawable(mPlayDrawable);
+                mPlayDrawable.start();
+                break;
+            case PlaybackStateCompat.STATE_NONE:
+            case PlaybackStateCompat.STATE_STOPPED:
+                fab.setImageDrawable(mPlayDrawable);
+                mPlayDrawable.start();
+                break;
+            default:
+                LogHelper.d(TAG, "Unhandled state ", state.getState());
+        }
     }
 
     protected void onMediaControllerConnected() {
@@ -172,11 +206,11 @@ public abstract class BaseActivity extends ActionBarCastActivity implements Medi
         mediaController.registerCallback(mMediaControllerCallback);
 
         if (shouldShowControls()) {
-            showPlaybackControls();
+//            showPlaybackControls();
         } else {
             LogHelper.d(TAG, "connectionCallback.onConnected: " +
                     "hiding controls because metadata is null");
-            hidePlaybackControls();
+//            hidePlaybackControls();
         }
 
         if (mControlsFragment != null) {
