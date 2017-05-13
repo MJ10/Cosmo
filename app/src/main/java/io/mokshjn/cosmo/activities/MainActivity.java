@@ -7,14 +7,16 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.media.session.MediaControllerCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -22,10 +24,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.OnLongClick;
 import io.mokshjn.cosmo.R;
 import io.mokshjn.cosmo.fragments.AlbumListFragment;
 import io.mokshjn.cosmo.fragments.SongsFragment;
 import io.mokshjn.cosmo.helpers.LogHelper;
+import io.mokshjn.cosmo.transitions.FabTransform;
 import io.mokshjn.cosmo.utils.SettingsUtils;
 
 public class MainActivity extends BaseActivity implements SongsFragment.MediaFragmentListener {
@@ -42,6 +49,8 @@ public class MainActivity extends BaseActivity implements SongsFragment.MediaFra
     private static final String SAVED_MEDIA_ID = "io.mokshjn.cosmo.MEDIA_ID";
     private static final int RC_SEARCH = 0;
     private static final int PERMISSION_REQUEST_CODE = 1;
+    @BindView(R.id.fab)
+    FloatingActionButton fab;
     private Bundle mVoiceSearchParams;
     private ViewPager mViewPager;
     private PagerAdapter mPagerAdapter;
@@ -51,6 +60,7 @@ public class MainActivity extends BaseActivity implements SongsFragment.MediaFra
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         intializePager();
         if (Build.VERSION.SDK_INT >= 23) {
@@ -61,28 +71,59 @@ public class MainActivity extends BaseActivity implements SongsFragment.MediaFra
 
         setSupportActionBar(toolbar);
         initializeToolbar();
-        initializeFromParams(savedInstanceState, getIntent());
+//        initializeFromParams(savedInstanceState, getIntent());
         if (savedInstanceState == null) {
             startFullScreenActivityIfNeeded(getIntent());
         }
     }
 
-    protected void initializeFromParams(Bundle savedInstanceState, Intent intent) {
-        String mediaId = null;
-        // check if we were started from a "Play XYZ" voice search. If so, we save the extras
-        // (which contain the query details) in a parameter, so we can reuse it later, when the
-        // MediaSession is connected.
-        if (intent.getAction() != null
-                && intent.getAction().equals(MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH)) {
-            mVoiceSearchParams = intent.getExtras();
-            LogHelper.d(TAG, "Starting from voice search query=",
-                    mVoiceSearchParams.getString(SearchManager.QUERY));
-        } else {
-            if (savedInstanceState != null) {
-                // If there is a saved media ID, use it
-                mediaId = savedInstanceState.getString(SAVED_MEDIA_ID);
+    @OnClick(R.id.fab)
+    public void onFabClick(View v) {
+        PlaybackStateCompat state = getSupportMediaController().getPlaybackState();
+        if (state != null) {
+            MediaControllerCompat.TransportControls controls = getSupportMediaController().getTransportControls();
+            switch (state.getState()) {
+                case PlaybackStateCompat.STATE_PLAYING: // fall through
+                case PlaybackStateCompat.STATE_BUFFERING:
+                    controls.pause();
+                    break;
+                case PlaybackStateCompat.STATE_PAUSED:
+                case PlaybackStateCompat.STATE_STOPPED:
+                    controls.play();
+                    break;
+                default:
+                    LogHelper.d(TAG, "onClick with state ", state.getState());
             }
         }
+    }
+
+    @OnLongClick(R.id.fab)
+    public boolean onFabLongClick(View v) {
+        Intent intent = new Intent(MainActivity.this, FullScreenPlayerActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.putExtra(EXTRA_CURRENT_MEDIA_DESCRIPTION, intent.getParcelableArrayExtra(EXTRA_CURRENT_MEDIA_DESCRIPTION));
+        FabTransform.addExtras(intent, ContextCompat.getColor(MainActivity.this, R.color.colorAccent), R.drawable.ic_play_arrow_24dp);
+        ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(MainActivity.this, fab, getString(R.string.transition_player));
+        startActivity(intent, options.toBundle());
+        return true;
+    }
+
+    protected void initializeFromParams(Bundle savedInstanceState, Intent intent) {
+//        String mediaId = null;
+//        // check if we were started from a "Play XYZ" voice search. If so, we save the extras
+//        // (which contain the query details) in a parameter, so we can reuse it later, when the
+//        // MediaSession is connected.
+//        if (intent.getAction() != null
+//                && intent.getAction().equals(MediaStore.INTENT_ACTION_MEDIA_PLAY_FROM_SEARCH)) {
+//            mVoiceSearchParams = intent.getExtras();
+//            LogHelper.d(TAG, "Starting from voice search query=",
+//                    mVoiceSearchParams.getString(SearchManager.QUERY));
+//        } else {
+//            if (savedInstanceState != null) {
+//                // If there is a saved media ID, use it
+//                mediaId = savedInstanceState.getString(SAVED_MEDIA_ID);
+//            }
+//        }
     }
 
     private void startFullScreenActivityIfNeeded(Intent intent) {
@@ -92,7 +133,9 @@ public class MainActivity extends BaseActivity implements SongsFragment.MediaFra
                             Intent.FLAG_ACTIVITY_CLEAR_TOP)
                     .putExtra(EXTRA_CURRENT_MEDIA_DESCRIPTION,
                             intent.getParcelableExtra(EXTRA_CURRENT_MEDIA_DESCRIPTION));
-            startActivity(fullScreenIntent);
+            FabTransform.addExtras(intent, ContextCompat.getColor(MainActivity.this, R.color.colorAccent), R.drawable.ic_play_arrow_24dp);
+            ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(MainActivity.this, fab, getString(R.string.transition_player));
+            startActivity(fullScreenIntent, options.toBundle());
         }
     }
 
@@ -119,7 +162,7 @@ public class MainActivity extends BaseActivity implements SongsFragment.MediaFra
     @Override
     protected void onNewIntent(Intent intent) {
         LogHelper.d(TAG, "onNewIntent, intent=" + intent);
-        initializeFromParams(null, intent);
+//        initializeFromParams(null, intent);
         startFullScreenActivityIfNeeded(intent);
     }
 
