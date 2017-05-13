@@ -16,7 +16,6 @@ import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 
 import io.mokshjn.cosmo.R;
-import io.mokshjn.cosmo.fragments.PlaybackControlsFragment;
 import io.mokshjn.cosmo.helpers.LogHelper;
 import io.mokshjn.cosmo.helpers.ResourceHelper;
 import io.mokshjn.cosmo.interfaces.MediaBrowserProvider;
@@ -31,6 +30,19 @@ public abstract class BaseActivity extends ActionBarCastActivity implements Medi
     private static final String TAG = LogHelper.makeLogTag(BaseActivity.class);
 
     private MediaBrowserCompat mMediaBrowser;
+    private final MediaBrowserCompat.ConnectionCallback mConnectionCallback =
+            new MediaBrowserCompat.ConnectionCallback() {
+                @Override
+                public void onConnected() {
+                    LogHelper.d(TAG, "onConnected");
+                    try {
+                        connectToSession(mMediaBrowser.getSessionToken());
+                    } catch (RemoteException e) {
+                        LogHelper.e(TAG, e, "could not connect media controller");
+//                        hidePlaybackControls();
+                    }
+                }
+            };
     private FloatingActionButton fab;
     private AnimatedVectorDrawable mPlayDrawable;
     private AnimatedVectorDrawable mPauseDrawable;
@@ -60,20 +72,6 @@ public abstract class BaseActivity extends ActionBarCastActivity implements Medi
                     }
                 }
             };
-    private PlaybackControlsFragment mControlsFragment;
-    private final MediaBrowserCompat.ConnectionCallback mConnectionCallback =
-            new MediaBrowserCompat.ConnectionCallback() {
-                @Override
-                public void onConnected() {
-                    LogHelper.d(TAG, "onConnected");
-                    try {
-                        connectToSession(mMediaBrowser.getSessionToken());
-                    } catch (RemoteException e) {
-                        LogHelper.e(TAG, e, "could not connect media controller");
-//                        hidePlaybackControls();
-                    }
-                }
-            };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -96,7 +94,6 @@ public abstract class BaseActivity extends ActionBarCastActivity implements Medi
         mPlayDrawable = (AnimatedVectorDrawable) getDrawable(R.drawable.avd_pause_to_play);
         mPauseDrawable = (AnimatedVectorDrawable) getDrawable(R.drawable.avd_play_to_pause);
 
-
         // Connect a media browser just to get the media session token. There are other ways
         // this can be done, for example by sharing the session token directly.
         mMediaBrowser = new MediaBrowserCompat(this,
@@ -115,6 +112,7 @@ public abstract class BaseActivity extends ActionBarCastActivity implements Medi
 //        }
 //
 //        hidePlaybackControls();
+        fab.setImageDrawable(mPauseDrawable);
 
         mMediaBrowser.connect();
     }
@@ -165,7 +163,7 @@ public abstract class BaseActivity extends ActionBarCastActivity implements Medi
     protected void showPlaybackControls() {
         LogHelper.d(TAG, "showPlaybackControls");
         getFragmentManager().beginTransaction()
-                .show(mControlsFragment)
+//                .show(mControlsFragment)
                 .commit();
 
     }
@@ -173,7 +171,7 @@ public abstract class BaseActivity extends ActionBarCastActivity implements Medi
     protected void hidePlaybackControls() {
         LogHelper.d(TAG, "hidePlaybackControls");
         getFragmentManager().beginTransaction()
-                .hide(mControlsFragment)
+//                .hide(mControlsFragment)
                 .commit();
     }
 
@@ -213,9 +211,9 @@ public abstract class BaseActivity extends ActionBarCastActivity implements Medi
 //            hidePlaybackControls();
         }
 
-        if (mControlsFragment != null) {
-            mControlsFragment.onConnected();
-        }
+//        if (mControlsFragment != null) {
+//            mControlsFragment.onConnected();
+//        }
 
         onMediaControllerConnected();
     }
