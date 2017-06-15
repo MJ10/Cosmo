@@ -49,18 +49,18 @@ public class LibrarySource implements MusicProviderSource {
         return tracks.iterator();
     }
 
+    @Override
     public Iterator<MediaMetadataCompat> albums() {
         ArrayList<MediaMetadataCompat> album = new ArrayList<>();
         Uri uri = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI;
-        String sortOrder = MediaStore.Audio.AudioColumns.TITLE + " COLLATE LOCALIZED ASC";
+        String sortOrder = MediaStore.Audio.AlbumColumns.ALBUM + " COLLATE LOCALIZED ASC";
         Cursor cursor = resolver.query(uri, null, null, null, sortOrder);
         if (cursor != null && cursor.moveToFirst()) {
             do {
                 MediaMetadataCompat mediaMetadataCompat = new MediaMetadataCompat.Builder()
-                        .putString(MediaMetadataCompat.METADATA_KEY_TITLE, cursor.getString(cursor.getColumnIndex(MediaStore.Audio.AlbumColumns.ALBUM)))
-                        .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, cursor.getString(cursor.getColumnIndex(MediaStore.Audio.AlbumColumns.ARTIST)))
-                        .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, cursor.getString(cursor.getColumnIndex(MediaStore.Audio.AlbumColumns.ALBUM_ID)))
-                        .putString(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, cursor.getString(cursor.getColumnIndex(MediaStore.Audio.AlbumColumns.NUMBER_OF_SONGS)))
+                        .putString(MediaMetadataCompat.METADATA_KEY_TITLE, cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Albums.ALBUM)))
+                        .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Albums.ARTIST)))
+                        .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, String.valueOf(cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Albums._ID))))
                         .build();
                 album.add(mediaMetadataCompat);
             } while (cursor.moveToNext());
