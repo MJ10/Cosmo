@@ -5,7 +5,6 @@ import android.app.ActivityOptions;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -39,12 +38,10 @@ public class MainActivity extends BaseActivity implements SongsFragment.MediaFra
 
     public static final String EXTRA_START_FULLSCREEN =
             "io.mokshjn.cosmo.EXTRA_START_FULLSCREEN";
-    /**
-     * Optionally used with {@link #EXTRA_START_FULLSCREEN} to carry a MediaDescription to
-     * while the {@link android.support.v4.media.session.MediaControllerCompat} is connecting.
-     */
+
     public static final String EXTRA_CURRENT_MEDIA_DESCRIPTION =
             "io.mokshjn.cosmo.CURRENT_MEDIA_DESCRIPTION";
+
     private static final String TAG = LogHelper.makeLogTag(MainActivity.class);
     private static final String SAVED_MEDIA_ID = "io.mokshjn.cosmo.MEDIA_ID";
     private static final int RC_SEARCH = 0;
@@ -62,11 +59,11 @@ public class MainActivity extends BaseActivity implements SongsFragment.MediaFra
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        intializePager();
-        if (Build.VERSION.SDK_INT >= 23) {
-            if (!checkPermission()) {
-                askPermission();
-            }
+        if (!checkPermission()) {
+            askPermission();
+        } else {
+            initializeMediaBrowser();
+            intializePager();
         }
 
         setSupportActionBar(toolbar);
@@ -203,6 +200,8 @@ public class MainActivity extends BaseActivity implements SongsFragment.MediaFra
         switch (requestCode) {
             case PERMISSION_REQUEST_CODE: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    initializeMediaBrowser();
+                    intializePager();
                 } else {
                     Toast.makeText(this, "Permsission not granted shutting down app", Toast.LENGTH_SHORT).show();
                     finish();

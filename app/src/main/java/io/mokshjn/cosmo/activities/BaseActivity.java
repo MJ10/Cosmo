@@ -30,19 +30,6 @@ public abstract class BaseActivity extends ActionBarCastActivity implements Medi
     private static final String TAG = LogHelper.makeLogTag(BaseActivity.class);
 
     private MediaBrowserCompat mMediaBrowser;
-    private final MediaBrowserCompat.ConnectionCallback mConnectionCallback =
-            new MediaBrowserCompat.ConnectionCallback() {
-                @Override
-                public void onConnected() {
-                    LogHelper.d(TAG, "onConnected");
-                    try {
-                        connectToSession(mMediaBrowser.getSessionToken());
-                    } catch (RemoteException e) {
-                        LogHelper.e(TAG, e, "could not connect media controller");
-//                        hidePlaybackControls();
-                    }
-                }
-            };
     private FloatingActionButton fab;
     private AnimatedVectorDrawable mPlayDrawable;
     private AnimatedVectorDrawable mPauseDrawable;
@@ -72,6 +59,19 @@ public abstract class BaseActivity extends ActionBarCastActivity implements Medi
                     }
                 }
             };
+    private final MediaBrowserCompat.ConnectionCallback mConnectionCallback =
+            new MediaBrowserCompat.ConnectionCallback() {
+                @Override
+                public void onConnected() {
+                    LogHelper.d(TAG, "onConnected");
+                    try {
+                        connectToSession(mMediaBrowser.getSessionToken());
+                    } catch (RemoteException e) {
+                        LogHelper.e(TAG, e, "could not connect media controller");
+//                        hidePlaybackControls();
+                    }
+                }
+            };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -96,8 +96,12 @@ public abstract class BaseActivity extends ActionBarCastActivity implements Medi
 
         // Connect a media browser just to get the media session token. There are other ways
         // this can be done, for example by sharing the session token directly.
+    }
+
+    protected void initializeMediaBrowser() {
         mMediaBrowser = new MediaBrowserCompat(this,
                 new ComponentName(this, MusicService.class), mConnectionCallback, null);
+        mMediaBrowser.connect();
     }
 
     @Override
@@ -114,7 +118,6 @@ public abstract class BaseActivity extends ActionBarCastActivity implements Medi
 //        hidePlaybackControls();
         fab.setImageDrawable(mPauseDrawable);
 
-        mMediaBrowser.connect();
     }
 
     @Override
@@ -160,20 +163,20 @@ public abstract class BaseActivity extends ActionBarCastActivity implements Medi
         // empty implementation, can be overridden by clients.
     }
 
-    protected void showPlaybackControls() {
-        LogHelper.d(TAG, "showPlaybackControls");
-        getFragmentManager().beginTransaction()
+//    protected void showPlaybackControls() {
+//        LogHelper.d(TAG, "showPlaybackControls");
+//        getFragmentManager().beginTransaction()
 //                .show(mControlsFragment)
-                .commit();
-
-    }
-
-    protected void hidePlaybackControls() {
-        LogHelper.d(TAG, "hidePlaybackControls");
-        getFragmentManager().beginTransaction()
+//                .commit();
+//
+//    }
+//
+//    protected void hidePlaybackControls() {
+//        LogHelper.d(TAG, "hidePlaybackControls");
+//        getFragmentManager().beginTransaction()
 //                .hide(mControlsFragment)
-                .commit();
-    }
+//                .commit();
+//    }
 
     /**
      * Check if the MediaSession is active and in a "playback-able" state
