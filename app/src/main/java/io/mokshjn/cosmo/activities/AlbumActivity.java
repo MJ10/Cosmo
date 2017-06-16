@@ -19,10 +19,12 @@ import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.transition.Slide;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -31,15 +33,15 @@ import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.target.ImageViewTarget;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.mokshjn.cosmo.R;
 import io.mokshjn.cosmo.adapters.AlbumSongsAdapter;
 import io.mokshjn.cosmo.helpers.LogHelper;
-import io.mokshjn.cosmo.helpers.QueueHelper;
+import io.mokshjn.cosmo.helpers.MediaIDHelper;
 import io.mokshjn.cosmo.interfaces.MediaBrowserProvider;
-import io.mokshjn.cosmo.provider.LibraryProvider;
 import io.mokshjn.cosmo.services.MusicService;
 import io.mokshjn.cosmo.utils.LibUtils;
 
@@ -72,14 +74,14 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
     View bgView;
 
     private long albumID;
+    private String mediaID;
     private AlbumSongsAdapter adapter;
-    private LibraryProvider libraryProvider;
     private MediaBrowserCompat mediaBrowser;
     private final MediaBrowserCompat.ConnectionCallback mConnectionCallback =
             new MediaBrowserCompat.ConnectionCallback() {
                 @Override
                 public void onConnected() {
-                    LogHelper.d(TAG, "onConnected");
+                    Log.d(TAG, "onConnected: ");
                     try {
                         connectToSession(mediaBrowser.getSessionToken());
                     } catch (RemoteException e) {
@@ -99,6 +101,30 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
         }
     };
     private ArrayList<MediaBrowserCompat.MediaItem> tracks = new ArrayList<>();
+    private final MediaBrowserCompat.SubscriptionCallback mSubscriptionCallback =
+            new MediaBrowserCompat.SubscriptionCallback() {
+                @Override
+                public void onChildrenLoaded(@NonNull String parentId,
+                                             @NonNull List<MediaBrowserCompat.MediaItem> children) {
+                    Log.d(TAG, parentId);
+                    try {
+                        tracks.clear();
+                        for (MediaBrowserCompat.MediaItem item : children) {
+                            tracks.add(item);
+                        }
+                        adapter.setTracks(tracks);
+                        adapter.notifyDataSetChanged();
+                    } catch (Throwable t) {
+                        LogHelper.e(TAG, "Error on childrenloaded", t);
+                    }
+                }
+
+                @Override
+                public void onError(@NonNull String id) {
+                    LogHelper.e(TAG, "browse fragment subscription onError, id=" + id);
+                    Toast.makeText(AlbumActivity.this, getString(R.string.error_loading_media), Toast.LENGTH_LONG).show();
+                }
+            };
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -110,21 +136,10 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
                 new ComponentName(this, MusicService.class), mConnectionCallback, null);
         Intent intent = getIntent();
         if (intent != null) {
-            albumID = intent.getLongExtra("albumID", 0);
+            mediaID = intent.getStringExtra("albumID");
+            albumID = MediaIDHelper.extractAlbumID(mediaID);
         }
-        setupToolbar();
-        adapter = new AlbumSongsAdapter(this);
-        rvAlbumSongs.setLayoutManager(new LinearLayoutManager(this));
-        rvAlbumSongs.setAdapter(adapter);
-        adapter.setClickListener(this);
-        rvAlbumSongs.setNestedScrollingEnabled(false);
-        libraryProvider = new LibraryProvider(getContentResolver());
-        libraryProvider.retrieveMediaAsync(new LibraryProvider.Callback() {
-            @Override
-            public void onMusicLoaded(boolean success) {
-                setupSongs();
-            }
-        });
+        setupViews();
     }
 
     private void setEnterTransitions() {
@@ -148,18 +163,14 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
         }, 450);
     }
 
-    private void setupSongs() {
-        for (MediaSessionCompat.QueueItem item : QueueHelper.getPlayingQueueFromAlbum(String.valueOf(albumID), libraryProvider)) {
-            tracks.add(new MediaBrowserCompat.MediaItem(item.getDescription(), MediaBrowserCompat.MediaItem.FLAG_PLAYABLE));
-        }
-        if (tracks != null && tracks.size() > 0) {
-            adapter.setTracks(tracks);
-            adapter.notifyDataSetChanged();
-        }
-    }
-
-    private void setupToolbar() {
+    private void setupViews() {
         setupAlbumArt();
+
+        adapter = new AlbumSongsAdapter(this);
+        rvAlbumSongs.setLayoutManager(new LinearLayoutManager(this));
+        rvAlbumSongs.setAdapter(adapter);
+        adapter.setClickListener(this);
+        rvAlbumSongs.setNestedScrollingEnabled(false);
     }
 
     private void setupAlbumArt() {
@@ -185,6 +196,8 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
         MediaControllerCompat mediaController = new MediaControllerCompat(this, token);
         setSupportMediaController(mediaController);
         mediaController.registerCallback(mMediaControllerCallback);
+
+        onConnected();
     }
 
     @Override
@@ -217,10 +230,12 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
     }
 
     private void onConnected() {
-//        MediaControllerCompat controller = getSupportMediaController();
-//        if (controller != null) {
-//            controller.registerCallback(mMediaControllerCallback);
-//        }
+
+        Log.d(TAG, "onConnected: " + mediaID);
+
+        mediaBrowser.unsubscribe(mediaID);
+
+        mediaBrowser.subscribe(mediaID, mSubscriptionCallback);
     }
 
     @Override
