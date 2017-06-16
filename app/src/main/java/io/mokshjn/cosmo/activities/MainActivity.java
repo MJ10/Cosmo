@@ -28,7 +28,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnLongClick;
 import io.mokshjn.cosmo.R;
-import io.mokshjn.cosmo.fragments.AlbumListFragment;
+import io.mokshjn.cosmo.fragments.AlbumFragment;
 import io.mokshjn.cosmo.fragments.SongsFragment;
 import io.mokshjn.cosmo.helpers.LogHelper;
 import io.mokshjn.cosmo.transitions.FabTransform;
@@ -63,7 +63,7 @@ public class MainActivity extends BaseActivity implements SongsFragment.MediaFra
             askPermission();
         } else {
             initializeMediaBrowser();
-            intializePager();
+            initializePager();
         }
 
         setSupportActionBar(toolbar);
@@ -201,9 +201,9 @@ public class MainActivity extends BaseActivity implements SongsFragment.MediaFra
             case PERMISSION_REQUEST_CODE: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     initializeMediaBrowser();
-                    intializePager();
+                    initializePager();
                 } else {
-                    Toast.makeText(this, "Permsission not granted shutting down app", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Permission not granted shutting down app", Toast.LENGTH_SHORT).show();
                     finish();
                 }
             }
@@ -222,7 +222,7 @@ public class MainActivity extends BaseActivity implements SongsFragment.MediaFra
         }
     }
 
-    private void intializePager() {
+    private void initializePager() {
         mPagerAdapter = new PagerAdapter(getSupportFragmentManager());
 
         mViewPager = (ViewPager) findViewById(R.id.main_content);
@@ -257,10 +257,10 @@ public class MainActivity extends BaseActivity implements SongsFragment.MediaFra
             switch (position) {
                 case 0:
                     return new SongsFragment();
-                case 1:
-                    return AlbumListFragment.newInstance();
 //                case 2:
-//                    return ArtistListFragment.newInstance();
+//                    return AlbumListFragment.newInstance();
+                case 1:
+                    return new AlbumFragment();
                 default:
                     return null;
             }

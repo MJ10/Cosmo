@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<transitionSet xmlns:android="http://schemas.android.com/apk/res/android">
+    <transitionSet android:transitionOrdering="together">
+        <targets>
+            <target android:targetId="@id/fab" />
+        </targets>
+        <transition
+            class="io.mokshjn.cosmo.transitions.Pop"
+            android:duration="350"
+            android:interpolator="@android:interpolator/linear_out_slow_in"
+            android:startDelay="350" />
+        <slide
+            android:duration="360"
+            android:interpolator="@android:interpolator/linear_out_slow_in"
+            android:slideEdge="bottom"
+            android:startDelay="100" />
+    </transitionSet>
+</transitionSet>
