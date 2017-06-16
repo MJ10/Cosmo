@@ -6,10 +6,10 @@ import android.os.AsyncTask;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaDescriptionCompat;
 import android.support.v4.media.MediaMetadataCompat;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -222,10 +222,17 @@ public class LibraryProvider {
             }
         } else if (mediaId.startsWith(MEDIA_ID_MUSICS_BY_ALBUM)) {
             Long albumID = MediaIDHelper.extractAlbumID(mediaId);
-            Log.d(TAG, "getChildren: " + mediaId + " " + mMusicListByAlbum.get(albumID.toString()));
+            List<MediaMetadataCompat> tracks = mMusicListByAlbum.get(albumID.toString());
+            tracks.sort(new Comparator<MediaMetadataCompat>() {
+                @Override
+                public int compare(MediaMetadataCompat o1, MediaMetadataCompat o2) {
+                    return (int) (o1.getLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER) - o2.getLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER));
+                }
+            });
             for (MediaMetadataCompat item : mMusicListByAlbum.get(albumID.toString())) {
                 mediaItems.add(createMediaItem(item, mediaId));
             }
+
         } else {
             LogHelper.w(TAG, "Skipping unmatched mediaId: ", mediaId);
         }
