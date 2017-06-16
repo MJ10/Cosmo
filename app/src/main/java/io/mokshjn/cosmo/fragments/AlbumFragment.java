@@ -3,11 +3,9 @@ package io.mokshjn.cosmo.fragments;
 import android.app.Activity;
 import android.app.ActivityOptions;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
@@ -89,7 +87,7 @@ public class AlbumFragment extends android.support.v4.app.Fragment implements Al
                 }
             };
     private String mMediaId;
-    private SongsFragment.MediaFragmentListener mMediaFragmentlistener;
+    private SongsFragment.MediaFragmentListener mMediaFragmentListener;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -100,11 +98,9 @@ public class AlbumFragment extends android.support.v4.app.Fragment implements Al
     @Override
     public void onAttach(Activity context) {
         super.onAttach(context);
-        mMediaFragmentlistener = (SongsFragment.MediaFragmentListener) context;
+        mMediaFragmentListener = (SongsFragment.MediaFragmentListener) context;
     }
 
-
-    @RequiresApi(api = Build.VERSION_CODES.M)
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
@@ -121,7 +117,7 @@ public class AlbumFragment extends android.support.v4.app.Fragment implements Al
     @Override
     public void onResume() {
         super.onResume();
-        MediaBrowserCompat mediaBrowser = mMediaFragmentlistener.getMediaBrowser();
+        MediaBrowserCompat mediaBrowser = mMediaFragmentListener.getMediaBrowser();
 
         if (mediaBrowser.isConnected()) {
             onConnected();
@@ -132,7 +128,7 @@ public class AlbumFragment extends android.support.v4.app.Fragment implements Al
     public void onStart() {
         super.onStart();
         // fetch browsing information to fill the listview:
-        MediaBrowserCompat mediaBrowser = mMediaFragmentlistener.getMediaBrowser();
+        MediaBrowserCompat mediaBrowser = mMediaFragmentListener.getMediaBrowser();
 
         if (mediaBrowser.isConnected()) {
             onConnected();
@@ -140,15 +136,9 @@ public class AlbumFragment extends android.support.v4.app.Fragment implements Al
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putParcelableArrayList("songs", albumList);
-    }
-
-    @Override
     public void onStop() {
         super.onStop();
-        MediaBrowserCompat mediaBrowser = mMediaFragmentlistener.getMediaBrowser();
+        MediaBrowserCompat mediaBrowser = mMediaFragmentListener.getMediaBrowser();
         if (mediaBrowser != null && mediaBrowser.isConnected() && mMediaId != null) {
             mediaBrowser.unsubscribe(mMediaId);
         }
@@ -162,7 +152,7 @@ public class AlbumFragment extends android.support.v4.app.Fragment implements Al
     @Override
     public void onDetach() {
         super.onDetach();
-        mMediaFragmentlistener = null;
+        mMediaFragmentListener = null;
     }
 
     public String getMediaId() {
@@ -181,9 +171,9 @@ public class AlbumFragment extends android.support.v4.app.Fragment implements Al
         mMediaId = MediaIDHelper.MEDIA_ID_MUSICS_BY_ALBUM;
         Log.d(TAG, "onConnected: " + mMediaId);
 
-        mMediaFragmentlistener.getMediaBrowser().unsubscribe(mMediaId);
+        mMediaFragmentListener.getMediaBrowser().unsubscribe(mMediaId);
 
-        mMediaFragmentlistener.getMediaBrowser().subscribe(mMediaId, mSubscriptionCallback);
+        mMediaFragmentListener.getMediaBrowser().subscribe(mMediaId, mSubscriptionCallback);
 
         // Add MediaController callback so we can redraw the list when metadata changes:
         MediaControllerCompat controller = getActivity()
@@ -197,7 +187,7 @@ public class AlbumFragment extends android.support.v4.app.Fragment implements Al
     public void onAlbumClick(View v, int pos) {
         Intent intent = new Intent(getActivity(), AlbumActivity.class);
         Log.d(TAG, "onAlbumClick: " + albumList.get(pos).getMediaId());
-        intent.putExtra("albumID", MediaIDHelper.extractAlbumID(albumList.get(pos).getMediaId()));
+        intent.putExtra("albumID", albumList.get(pos).getMediaId());
         startActivity(intent,
                 ActivityOptions.makeSceneTransitionAnimation(getActivity(),
                         Pair.create(v.findViewById(R.id.ivAlbumArt), getString(R.string.transition_album_art)),
