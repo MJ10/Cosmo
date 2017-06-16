@@ -44,9 +44,9 @@ public class MediaIDHelper {
         StringBuilder sb = new StringBuilder();
         if (categories != null) {
             for (int i=0; i < categories.length; i++) {
-                if (!isValidCategory(categories[i])) {
-                    throw new IllegalArgumentException("Invalid category: " + categories[0]);
-                }
+//                if (!isValidCategory(categories[i])) {
+//                    throw new IllegalArgumentException("Invalid category: " + categories[0]);
+//                }
                 sb.append(categories[i]);
                 if (i < categories.length - 1) {
                     sb.append(CATEGORY_SEPARATOR);
