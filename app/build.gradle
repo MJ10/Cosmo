@@ -41,5 +41,5 @@ dependencies {
     compile 'com.android.support:mediarouter-v7:25.3.1'
     compile 'com.android.support:leanback-v17:25.3.1'
 
-    compile group: 'com.google.code.gson', name: 'gson', version: '2.7', changing: true
+//    compile group: 'com.google.code.gson', name: 'gson', version: '2.7', changing: true
 }
