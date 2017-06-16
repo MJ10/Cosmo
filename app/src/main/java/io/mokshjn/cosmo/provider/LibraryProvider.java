@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaDescriptionCompat;
 import android.support.v4.media.MediaMetadataCompat;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -219,6 +220,12 @@ public class LibraryProvider {
             for (MediaMetadataCompat item : albums) {
                 mediaItems.add(createAlbumItem(item));
             }
+        } else if (mediaId.startsWith(MEDIA_ID_MUSICS_BY_ALBUM)) {
+            Long albumID = MediaIDHelper.extractAlbumID(mediaId);
+            Log.d(TAG, "getChildren: " + mediaId + " " + mMusicListByAlbum.get(albumID.toString()));
+            for (MediaMetadataCompat item : mMusicListByAlbum.get(albumID.toString())) {
+                mediaItems.add(createMediaItem(item, mediaId));
+            }
         } else {
             LogHelper.w(TAG, "Skipping unmatched mediaId: ", mediaId);
         }
@@ -236,7 +243,9 @@ public class LibraryProvider {
                 MediaBrowserCompat.MediaItem.FLAG_BROWSABLE);
     }
 
-    public MediaBrowserCompat.MediaItem createMediaItem(MediaMetadataCompat metadata, String id) {
+//    private MediaBrowserCompat.MediaItem createAlbumMediai
+
+    private MediaBrowserCompat.MediaItem createMediaItem(MediaMetadataCompat metadata, String id) {
         // Since mediaMetadata fields are immutable, we need to create a copy, so we
         // can set a hierarchy-aware mediaID. We will need to know the media hierarchy
         // when we get a onPlayFromMusicID call, so we can create the proper queue based
@@ -251,7 +260,7 @@ public class LibraryProvider {
 
     }
 
-    enum State {
+    private enum State {
         NON_INITIALIZED, INITIALIZING, INITIALIZED
     }
 
