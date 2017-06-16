@@ -84,6 +84,14 @@ public class MediaIDHelper {
         return null;
     }
 
+    public static long extractAlbumID(String mediaID) {
+        int pos = mediaID.indexOf(CATEGORY_SEPARATOR);
+        if (pos >= 0) {
+            return Long.parseLong(mediaID.substring(pos + 1));
+        }
+        return -1;
+    }
+
     /**
      * Extracts category and categoryValue from the mediaID. mediaID is, by this sample's
      * convention, a concatenation of category (eg "by_genre"), categoryValue (eg "Classical") and
