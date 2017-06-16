@@ -244,9 +244,10 @@ public class MainActivity extends BaseActivity implements SongsFragment.MediaFra
             mVoiceSearchParams = null;
         }
         ((SongsFragment) getSupportFragmentManager().findFragmentByTag("android:switcher:" + R.id.main_content + ":" + 0)).onConnected();
+        ((AlbumFragment) getSupportFragmentManager().findFragmentByTag("android:switcher:" + R.id.main_content + ":" + 1)).onConnected();
     }
 
-    public class PagerAdapter extends FragmentPagerAdapter {
+    private class PagerAdapter extends FragmentPagerAdapter {
 
         PagerAdapter(FragmentManager fm) {
             super(fm);
