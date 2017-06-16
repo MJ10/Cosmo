@@ -216,7 +216,7 @@ public class LibraryProvider {
                 mediaItems.add(createMediaItem(item, MEDIA_ID_ROOT));
             }
         } else if (mediaId.equals(MEDIA_ID_MUSICS_BY_ALBUM)) {
-            for (MediaMetadataCompat item : tracks) {
+            for (MediaMetadataCompat item : albums) {
                 mediaItems.add(createAlbumItem(item));
             }
         } else {
