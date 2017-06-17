@@ -44,25 +44,4 @@ tools:context=".activities.MainActivity">
         android:src="@drawable/ic_play_arrow_black_36dp"
         app:rippleColor="@color/cardview_light_background" />
 
-    <!--<android.support.v7.widget.CardView-->
-    <!--android:id="@+id/controls_container"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_alignParentBottom="true"-->
-    <!--android:layout_gravity="bottom"-->
-    <!--app:cardBackgroundColor="@color/colorPrimary"-->
-    <!--app:cardElevation="8dp"-->
-    <!--tools:layout_editor_absoluteX="8dp"-->
-    <!--tools:layout_editor_absoluteY="0dp">-->
-
-    <!--<fragment-->
-    <!--android:id="@+id/fragment_playback_controls"-->
-    <!--android:name="io.mokshjn.cosmo.fragments.PlaybackControlsFragment"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:layout_alignParentBottom="true"-->
-    <!--tools:layout="@layout/fragment_playback_controls" />-->
-
-    <!--</android.support.v7.widget.CardView>-->
-
 </android.support.design.widget.CoordinatorLayout>
