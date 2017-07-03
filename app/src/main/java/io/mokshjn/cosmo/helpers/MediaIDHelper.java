@@ -44,9 +44,9 @@ public class MediaIDHelper {
         StringBuilder sb = new StringBuilder();
         if (categories != null) {
             for (int i=0; i < categories.length; i++) {
-                if (!isValidCategory(categories[i])) {
-                    throw new IllegalArgumentException("Invalid category: " + categories[0]);
-                }
+//                if (!isValidCategory(categories[i])) {
+//                    throw new IllegalArgumentException("Invalid category: " + categories[0]);
+//                }
                 sb.append(categories[i]);
                 if (i < categories.length - 1) {
                     sb.append(CATEGORY_SEPARATOR);
@@ -82,6 +82,14 @@ public class MediaIDHelper {
             return mediaID.substring(pos+1);
         }
         return null;
+    }
+
+    public static long extractAlbumID(String mediaID) {
+        int pos = mediaID.indexOf(CATEGORY_SEPARATOR);
+        if (pos >= 0) {
+            return Long.parseLong(mediaID.substring(pos + 1));
+        }
+        return -1;
     }
 
     /**

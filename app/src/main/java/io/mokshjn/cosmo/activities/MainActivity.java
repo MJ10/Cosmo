@@ -5,7 +5,6 @@ import android.app.ActivityOptions;
 import android.app.SearchManager;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -29,7 +28,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnLongClick;
 import io.mokshjn.cosmo.R;
-import io.mokshjn.cosmo.fragments.AlbumListFragment;
+import io.mokshjn.cosmo.fragments.AlbumFragment;
 import io.mokshjn.cosmo.fragments.SongsFragment;
 import io.mokshjn.cosmo.helpers.LogHelper;
 import io.mokshjn.cosmo.transitions.FabTransform;
@@ -39,12 +38,10 @@ public class MainActivity extends BaseActivity implements SongsFragment.MediaFra
 
     public static final String EXTRA_START_FULLSCREEN =
             "io.mokshjn.cosmo.EXTRA_START_FULLSCREEN";
-    /**
-     * Optionally used with {@link #EXTRA_START_FULLSCREEN} to carry a MediaDescription to
-     * while the {@link android.support.v4.media.session.MediaControllerCompat} is connecting.
-     */
+
     public static final String EXTRA_CURRENT_MEDIA_DESCRIPTION =
             "io.mokshjn.cosmo.CURRENT_MEDIA_DESCRIPTION";
+
     private static final String TAG = LogHelper.makeLogTag(MainActivity.class);
     private static final String SAVED_MEDIA_ID = "io.mokshjn.cosmo.MEDIA_ID";
     private static final int RC_SEARCH = 0;
@@ -62,11 +59,11 @@ public class MainActivity extends BaseActivity implements SongsFragment.MediaFra
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        intializePager();
-        if (Build.VERSION.SDK_INT >= 23) {
-            if (!checkPermission()) {
-                askPermission();
-            }
+        if (!checkPermission()) {
+            askPermission();
+        } else {
+            initializeMediaBrowser();
+            initializePager();
         }
 
         setSupportActionBar(toolbar);
@@ -203,8 +200,10 @@ public class MainActivity extends BaseActivity implements SongsFragment.MediaFra
         switch (requestCode) {
             case PERMISSION_REQUEST_CODE: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    initializeMediaBrowser();
+                    initializePager();
                 } else {
-                    Toast.makeText(this, "Permsission not granted shutting down app", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Permission not granted shutting down app", Toast.LENGTH_SHORT).show();
                     finish();
                 }
             }
@@ -223,7 +222,7 @@ public class MainActivity extends BaseActivity implements SongsFragment.MediaFra
         }
     }
 
-    private void intializePager() {
+    private void initializePager() {
         mPagerAdapter = new PagerAdapter(getSupportFragmentManager());
 
         mViewPager = (ViewPager) findViewById(R.id.main_content);
@@ -245,9 +244,10 @@ public class MainActivity extends BaseActivity implements SongsFragment.MediaFra
             mVoiceSearchParams = null;
         }
         ((SongsFragment) getSupportFragmentManager().findFragmentByTag("android:switcher:" + R.id.main_content + ":" + 0)).onConnected();
+        ((AlbumFragment) getSupportFragmentManager().findFragmentByTag("android:switcher:" + R.id.main_content + ":" + 1)).onConnected();
     }
 
-    public class PagerAdapter extends FragmentPagerAdapter {
+    private class PagerAdapter extends FragmentPagerAdapter {
 
         PagerAdapter(FragmentManager fm) {
             super(fm);
@@ -258,10 +258,10 @@ public class MainActivity extends BaseActivity implements SongsFragment.MediaFra
             switch (position) {
                 case 0:
                     return new SongsFragment();
-                case 1:
-                    return AlbumListFragment.newInstance();
 //                case 2:
-//                    return ArtistListFragment.newInstance();
+//                    return AlbumListFragment.newInstance();
+                case 1:
+                    return new AlbumFragment();
                 default:
                     return null;
             }

@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.net.wifi.WifiManager;
 import android.os.PowerManager;
 import android.provider.MediaStore;
 import android.support.v4.media.session.MediaSessionCompat;
@@ -20,7 +19,6 @@ import io.mokshjn.cosmo.helpers.LogHelper;
 import io.mokshjn.cosmo.helpers.MediaIDHelper;
 import io.mokshjn.cosmo.provider.LibraryProvider;
 import io.mokshjn.cosmo.services.MusicService;
-import io.mokshjn.cosmo.utils.LibUtils;
 
 /**
  * Created by moksh on 19/3/17.
@@ -43,7 +41,6 @@ public class LocalPlayback implements Playback, AudioManager.OnAudioFocusChangeL
     private static final int AUDIO_FOCUSED  = 2;
 
     private final Context mContext;
-    private final WifiManager.WifiLock mWifiLock;
     private final LibraryProvider mMusicProvider;
     private final AudioManager mAudioManager;
     private final IntentFilter mAudioNoisyIntentFilter =
@@ -76,9 +73,6 @@ public class LocalPlayback implements Playback, AudioManager.OnAudioFocusChangeL
         this.mContext = context;
         this.mMusicProvider = musicProvider;
         this.mAudioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-        // Create the Wifi lock (this does not acquire the lock, this just creates it)
-        this.mWifiLock = ((WifiManager) context.getSystemService(Context.WIFI_SERVICE))
-                .createWifiLock(WifiManager.WIFI_MODE_FULL, "uAmp_lock");
         this.mState = PlaybackStateCompat.STATE_NONE;
     }
 
@@ -155,12 +149,6 @@ public class LocalPlayback implements Playback, AudioManager.OnAudioFocusChangeL
         } else {
             mState = PlaybackStateCompat.STATE_STOPPED;
             relaxResources(false); // release everything except MediaPlayer
-            long id = Long.parseLong(MediaIDHelper.extractMusicIDFromMediaID(item.getDescription().getMediaId()));
-            //noinspection ResourceType
-            String source = LibUtils.getSongFileUri(id).toString();
-            if (source != null) {
-                source = source.replaceAll(" ", "%20"); // Escape spaces for URLs
-            }
 
             try {
                 createMediaPlayerIfNeeded();
@@ -176,11 +164,6 @@ public class LocalPlayback implements Playback, AudioManager.OnAudioFocusChangeL
                 // listener to 'this'). Until the media player is prepared,
                 // we *cannot* call start() on it!
                 mMediaPlayer.prepareAsync();
-
-                // If we are streaming from the internet, we want to hold a
-                // Wifi lock, which prevents the Wifi radio from going to
-                // sleep while the song is playing.
-                mWifiLock.acquire();
 
                 if (mCallback != null) {
                     mCallback.onPlaybackStatusChanged(mState);
@@ -457,10 +440,6 @@ public class LocalPlayback implements Playback, AudioManager.OnAudioFocusChangeL
             mMediaPlayer = null;
         }
 
-        // we can also release the Wifi lock, if we're holding it
-        if (mWifiLock.isHeld()) {
-            mWifiLock.release();
-        }
     }
 
     private void registerAudioNoisyReceiver() {
