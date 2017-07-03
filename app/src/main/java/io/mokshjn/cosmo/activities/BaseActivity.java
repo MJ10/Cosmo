@@ -30,35 +30,6 @@ public abstract class BaseActivity extends ActionBarCastActivity implements Medi
     private static final String TAG = LogHelper.makeLogTag(BaseActivity.class);
 
     private MediaBrowserCompat mMediaBrowser;
-    private FloatingActionButton fab;
-    private AnimatedVectorDrawable mPlayDrawable;
-    private AnimatedVectorDrawable mPauseDrawable;
-    // Callback that ensures that we are showing the controls
-    private final MediaControllerCompat.Callback mMediaControllerCallback =
-            new MediaControllerCompat.Callback() {
-                @Override
-                public void onPlaybackStateChanged(@NonNull PlaybackStateCompat state) {
-                    if (shouldShowControls()) {
-//                        showPlaybackControls();
-                    } else {
-                        LogHelper.d(TAG, "mediaControllerCallback.onPlaybackStateChanged: " +
-                                "hiding controls because state is ", state.getState());
-//                        hidePlaybackControls();
-                    }
-                    updatePlaybackState(state);
-                }
-
-                @Override
-                public void onMetadataChanged(MediaMetadataCompat metadata) {
-                    if (shouldShowControls()) {
-//                        showPlaybackControls();
-                    } else {
-                        LogHelper.d(TAG, "mediaControllerCallback.onMetadataChanged: " +
-                                "hiding controls because metadata is null");
-//                        hidePlaybackControls();
-                    }
-                }
-            };
     private final MediaBrowserCompat.ConnectionCallback mConnectionCallback =
             new MediaBrowserCompat.ConnectionCallback() {
                 @Override
@@ -70,6 +41,35 @@ public abstract class BaseActivity extends ActionBarCastActivity implements Medi
                         LogHelper.e(TAG, e, "could not connect media controller");
 //                        hidePlaybackControls();
                     }
+                }
+            };
+    private FloatingActionButton fab;
+    private AnimatedVectorDrawable mPlayDrawable;
+    private AnimatedVectorDrawable mPauseDrawable;
+    // Callback that ensures that we are showing the controls
+    private final MediaControllerCompat.Callback mMediaControllerCallback =
+            new MediaControllerCompat.Callback() {
+                @Override
+                public void onPlaybackStateChanged(@NonNull PlaybackStateCompat state) {
+//                    if (shouldShowControls()) {
+////                        showPlaybackControls();
+//                    } else {
+//                        LogHelper.d(TAG, "mediaControllerCallback.onPlaybackStateChanged: " +
+//                                "hiding controls because state is ", state.getState());
+////                        hidePlaybackControls();
+//                    }
+                    updatePlaybackState(state);
+                }
+
+                @Override
+                public void onMetadataChanged(MediaMetadataCompat metadata) {
+//                    if (shouldShowControls()) {
+////                        showPlaybackControls();
+//                    } else {
+//                        LogHelper.d(TAG, "mediaControllerCallback.onMetadataChanged: " +
+//                                "hiding controls because metadata is null");
+////                        hidePlaybackControls();
+//                    }
                 }
             };
 
@@ -184,35 +184,35 @@ public abstract class BaseActivity extends ActionBarCastActivity implements Medi
      *
      * @return true if the MediaSession's state requires playback controls to be visible.
      */
-    protected boolean shouldShowControls() {
-        MediaControllerCompat mediaController = getSupportMediaController();
-        if (mediaController == null ||
-                mediaController.getMetadata() == null ||
-                mediaController.getPlaybackState() == null) {
-            return false;
-        }
-        switch (mediaController.getPlaybackState().getState()) {
-            case PlaybackStateCompat.STATE_ERROR:
-            case PlaybackStateCompat.STATE_NONE:
-            case PlaybackStateCompat.STATE_STOPPED:
-                return false;
-            default:
-                return true;
-        }
-    }
+//    protected boolean shouldShowControls() {
+//        MediaControllerCompat mediaController = getSupportMediaController();
+//        if (mediaController == null ||
+//                mediaController.getMetadata() == null ||
+//                mediaController.getPlaybackState() == null) {
+//            return false;
+//        }
+//        switch (mediaController.getPlaybackState().getState()) {
+//            case PlaybackStateCompat.STATE_ERROR:
+//            case PlaybackStateCompat.STATE_NONE:
+//            case PlaybackStateCompat.STATE_STOPPED:
+//                return false;
+//            default:
+//                return true;
+//        }
+//    }
 
     private void connectToSession(MediaSessionCompat.Token token) throws RemoteException {
         MediaControllerCompat mediaController = new MediaControllerCompat(this, token);
         setSupportMediaController(mediaController);
         mediaController.registerCallback(mMediaControllerCallback);
 
-        if (shouldShowControls()) {
-//            showPlaybackControls();
-        } else {
-            LogHelper.d(TAG, "connectionCallback.onConnected: " +
-                    "hiding controls because metadata is null");
-//            hidePlaybackControls();
-        }
+//        if (shouldShowControls()) {
+////            showPlaybackControls();
+//        } else {
+//            LogHelper.d(TAG, "connectionCallback.onConnected: " +
+//                    "hiding controls because metadata is null");
+////            hidePlaybackControls();
+//        }
 
 //        if (mControlsFragment != null) {
 //            mControlsFragment.onConnected();
