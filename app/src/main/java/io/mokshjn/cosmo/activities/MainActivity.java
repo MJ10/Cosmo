@@ -166,6 +166,9 @@ public class MainActivity extends BaseActivity implements SongsFragment.MediaFra
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.action_cosmo:
+                startActivity(new Intent(MainActivity.this, CosmoActivity.class));
+                return true;
             case R.id.action_search:
                 View searchMenuView = toolbar.findViewById(R.id.action_search);
                 Bundle options = ActivityOptions.makeSceneTransitionAnimation(this, searchMenuView,
