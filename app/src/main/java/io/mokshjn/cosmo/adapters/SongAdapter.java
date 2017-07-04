@@ -20,7 +20,6 @@ import java.util.ArrayList;
 
 import io.mokshjn.cosmo.R;
 import io.mokshjn.cosmo.helpers.CircleTransform;
-import io.mokshjn.cosmo.utils.LibUtils;
 
 /**
  * Created by moksh on 19/3/17.
@@ -52,13 +51,13 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> im
         MediaDescriptionCompat descriptionCompat = item.getDescription();
         holder.tvSongTitle.setText(descriptionCompat.getTitle());
         holder.tvSongArtist.setText(descriptionCompat.getSubtitle());
-        LibUtils.SongInfo info = LibUtils.getTrackInfo(item.getMediaId(), context.getContentResolver());
-        if (info != null) {
-            String duration = LibUtils.getReadableDurationString(info.getDuration());
-            if (duration != null) {
-                holder.tvDuration.setText(duration);
-            }
-        }
+//        LibUtils.SongInfo info = LibUtils.getTrackInfo(item.getMediaId(), context.getContentResolver());
+//        if (info != null) {
+//            String duration = LibUtils.getReadableDurationString(info.getDuration());
+//            if (duration != null) {
+//                holder.tvDuration.setText(duration);
+//            }
+//        }
         Glide.with(context)
                 .load(descriptionCompat.getIconUri())
                 .diskCacheStrategy(DiskCacheStrategy.SOURCE)
