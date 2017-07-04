@@ -63,7 +63,19 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
                         protected void setResource(GlideDrawable resource) {
                             holder.ivAlbumArt.setImageDrawable(resource.getCurrent());
                             Palette palette = Palette.from(((GlideBitmapDrawable) resource.getCurrent()).getBitmap()).generate();
-                            holder.cvAlbum.setBackgroundColor(palette.getMutedColor(context.getColor(R.color.colorPrimary)));
+                            Palette.Swatch vibrant = palette.getVibrantSwatch();
+                            if (vibrant != null) {
+                                holder.cvAlbum.setBackgroundColor(vibrant.getRgb());
+                                holder.tvAlbumTitle.setTextColor(vibrant.getTitleTextColor());
+                                holder.tvArtist.setTextColor(vibrant.getBodyTextColor());
+                            } else {
+                                Palette.Swatch muted = palette.getDarkVibrantSwatch();
+                                if (muted != null) {
+                                    holder.cvAlbum.setBackgroundColor(muted.getRgb());
+                                    holder.tvAlbumTitle.setTextColor(muted.getTitleTextColor());
+                                    holder.tvArtist.setTextColor(muted.getBodyTextColor());
+                                }
+                            }
                         }
                     });
         }
