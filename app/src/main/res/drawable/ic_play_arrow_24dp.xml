@@ -3,10 +3,7 @@
     android:height="24dp"
     android:viewportHeight="24.0"
     android:viewportWidth="24.0">
-    <group
-        android:name="@string/groupPlayPause"
-        android:pivotX="0"
-        android:pivotY="0">
+    <group android:name="@string/groupPlayPause">
 
         <path
             android:name="@string/play"
