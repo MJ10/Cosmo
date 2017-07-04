@@ -56,7 +56,9 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:layout_weight="0"
-        android:background="?android:attr/windowBackground"
+        android:background="@color/colorPrimary"
+        app:itemIconTint="@animator/bottom_navbar"
+        app:itemTextColor="@animator/bottom_navbar"
         app:menu="@menu/navigation" />
 
 </LinearLayout>
