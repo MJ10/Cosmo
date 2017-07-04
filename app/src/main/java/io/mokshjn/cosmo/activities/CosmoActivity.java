@@ -61,17 +61,20 @@ public class CosmoActivity extends BaseActivity implements SongsFragment.MediaFr
     private ViewPager.OnPageChangeListener pageChangeListener = new ViewPager.OnPageChangeListener() {
         @Override
         public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
         }
-
-        @Override
-        public void onPageSelected(int position) {
-
-        }
-
         @Override
         public void onPageScrollStateChanged(int state) {
-
+        }
+        @Override
+        public void onPageSelected(int position) {
+            switch (position) {
+                case 0:
+                    navigation.setSelectedItemId(R.id.navigation_songs);
+                    break;
+                case 1:
+                    navigation.setSelectedItemId(R.id.navigation_albums);
+                    break;
+            }
         }
     };
 
@@ -82,8 +85,10 @@ public class CosmoActivity extends BaseActivity implements SongsFragment.MediaFr
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.navigation_songs:
+                    mViewPager.setCurrentItem(0, true);
                     return true;
                 case R.id.navigation_albums:
+                    mViewPager.setCurrentItem(1, true);
                     return true;
             }
             return false;
@@ -134,6 +139,8 @@ public class CosmoActivity extends BaseActivity implements SongsFragment.MediaFr
 
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         mViewPager.setAdapter(mPagerAdapter);
+        mViewPager.setOnPageChangeListener(pageChangeListener);
+
         setSupportActionBar(toolbar);
         initializeToolbar();
         setTitle("Cosmo");
