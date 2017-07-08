@@ -40,6 +40,7 @@
                 android:ellipsize="end"
                 android:lines="1"
                 android:text="@string/tvSongTitleNullTag"
+                android:textColor="@android:color/white"
                 android:textSize="20sp"
                 android:textStyle="bold"
                 android:transitionName="@string/player_song" />
