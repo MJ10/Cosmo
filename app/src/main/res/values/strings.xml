@@ -55,4 +55,7 @@
     <string name="appbar_scrolling_view_behavior" translatable="false">android.support.design.widget.AppBarLayout$ScrollingViewBehavior</string>
     <string name="repeat">Repeat</string>
     <string name="transition_player">transition_player</string>
+    <string name="title_activity_cosmo">CosmoActivity</string>
+    <string name="title_songs">Songs</string>
+    <string name="title_albums">Albums</string>
 </resources>

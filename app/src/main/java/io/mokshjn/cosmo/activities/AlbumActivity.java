@@ -77,18 +77,6 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
     private String mediaID;
     private AlbumSongsAdapter adapter;
     private MediaBrowserCompat mediaBrowser;
-    private final MediaBrowserCompat.ConnectionCallback mConnectionCallback =
-            new MediaBrowserCompat.ConnectionCallback() {
-                @Override
-                public void onConnected() {
-                    Log.d(TAG, "onConnected: ");
-                    try {
-                        connectToSession(mediaBrowser.getSessionToken());
-                    } catch (RemoteException e) {
-                        LogHelper.e(TAG, e, "could not connect media controller");
-                    }
-                }
-            };
     private Palette.PaletteAsyncListener listener = new Palette.PaletteAsyncListener() {
         @Override
         public void onGenerated(Palette palette) {
@@ -125,6 +113,18 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
                     Toast.makeText(AlbumActivity.this, getString(R.string.error_loading_media), Toast.LENGTH_LONG).show();
                 }
             };
+    private final MediaBrowserCompat.ConnectionCallback mConnectionCallback =
+            new MediaBrowserCompat.ConnectionCallback() {
+                @Override
+                public void onConnected() {
+                    Log.d(TAG, "onConnected: ");
+                    try {
+                        connectToSession(mediaBrowser.getSessionToken());
+                    } catch (RemoteException e) {
+                        LogHelper.e(TAG, e, "could not connect media controller");
+                    }
+                }
+            };
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -144,7 +144,7 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
 
     private void setEnterTransitions() {
         Slide slide = new Slide(Gravity.BOTTOM);
-        slide.addTarget(R.id.rvAlbumList);
+        slide.addTarget(R.id.rvAlbumSongs);
         slide.addTarget(R.id.bgView);
         slide.setInterpolator(AnimationUtils.loadInterpolator(this, android.R.interpolator.linear_out_slow_in));
         slide.setDuration(450);
