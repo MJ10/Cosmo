@@ -19,8 +19,5 @@
         android:checkable="true"
         android:title="@string/repeat"
         app:showAsAction="never" />
-    <item
-        android:id="@+id/action_cosmo"
-        android:title="@string/app_name"
-        app:showAsAction="never" />
+
 </menu>
