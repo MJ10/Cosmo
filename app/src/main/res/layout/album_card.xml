@@ -37,10 +37,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="25dp"
                     android:ellipsize="end"
-                    android:fontFamily="sans-serif-condensed"
                     android:lines="1"
                     android:text="@string/album_name"
-                    android:textSize="20sp"
+                    android:textSize="18sp"
                     android:textStyle="bold" />
 
                 <TextView

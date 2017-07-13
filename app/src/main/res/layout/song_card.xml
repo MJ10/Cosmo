@@ -21,16 +21,16 @@
 
         <ImageView
             android:id="@+id/ivAlbumArt"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="10dp"
-            android:layout_weight="0.15"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="8dp"
             android:transitionName="@string/player_art" />
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="0.85"
+            android:layout_gravity="center"
+            android:layout_weight="1"
             android:orientation="vertical">
 
             <TextView
@@ -41,7 +41,7 @@
                 android:lines="1"
                 android:text="@string/tvSongTitleNullTag"
                 android:textColor="@android:color/white"
-                android:textSize="20sp"
+                android:textSize="18sp"
                 android:textStyle="bold"
                 android:transitionName="@string/player_song" />
 
@@ -49,6 +49,7 @@
                 android:id="@+id/tvSongArtist"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-condensed"
                 android:text="@string/tvSongArtistNullTag"
                 android:transitionName="@string/player_artist" />
         </LinearLayout>
