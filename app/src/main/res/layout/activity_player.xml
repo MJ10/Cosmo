@@ -67,6 +67,17 @@
                 android:paddingRight="10dp">
 
                 <ImageView
+                    android:id="@+id/repeat"
+                    android:layout_width="0dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:background="?selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/skip_prev"
+                    android:src="@drawable/ic_repeat_24dp"
+                    android:tint="@color/background_light" />
+
+                <ImageView
                     android:id="@+id/prev"
                     android:layout_width="0dp"
                     android:layout_height="36dp"
@@ -95,6 +106,18 @@
                     android:background="?selectableItemBackgroundBorderless"
                     android:contentDescription="@string/skip_next"
                     android:src="@drawable/ic_skip_next_white_48dp" />
+
+                <ImageView
+                    android:id="@+id/shuffle"
+                    android:layout_width="0dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:background="?selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/skip_next"
+                    android:src="@drawable/ic_shuffle_24dp"
+                    android:tint="@color/background_light" />
+
             </LinearLayout>
 
             <LinearLayout
