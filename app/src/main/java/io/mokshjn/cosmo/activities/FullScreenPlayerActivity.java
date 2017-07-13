@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.os.RemoteException;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaDescriptionCompat;
@@ -69,7 +70,7 @@ public class FullScreenPlayerActivity extends ActionBarCastActivity {
     @BindView(R.id.background_image)
     ImageView mBackgroundImage;
     @BindView(R.id.play_pause)
-    ImageView mPlayPause;
+    FloatingActionButton mPlayPause;
     @BindView(R.id.prev)
     ImageView mSkipPrev;
     @BindView(R.id.next)
@@ -103,8 +104,8 @@ public class FullScreenPlayerActivity extends ActionBarCastActivity {
         @Override
         public void onGenerated(Palette palette) {
             int defaultColor = getResources().getColor(R.color.colorPrimary);
-            int darkVibrantColor = palette.getMutedColor(defaultColor);
-            mControllers.setBackgroundColor(darkVibrantColor);
+//            int darkVibrantColor = palette.getMutedColor(defaultColor);
+            mControllers.setBackgroundColor(defaultColor);
         }
     };
 
