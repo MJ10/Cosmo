@@ -20,7 +20,7 @@ import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.app.NotificationCompat;
 
 import io.mokshjn.cosmo.R;
-import io.mokshjn.cosmo.activities.MainActivity;
+import io.mokshjn.cosmo.activities.CosmoActivity;
 import io.mokshjn.cosmo.services.MusicService;
 import io.mokshjn.cosmo.utils.LibUtils;
 
@@ -214,11 +214,11 @@ public class MediaNotificationManager extends BroadcastReceiver {
     }
 
     private PendingIntent createContentIntent(MediaDescriptionCompat description) {
-        Intent openUI = new Intent(mService, MainActivity.class);
+        Intent openUI = new Intent(mService, CosmoActivity.class);
         openUI.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        openUI.putExtra(MainActivity.EXTRA_START_FULLSCREEN, true);
+        openUI.putExtra(CosmoActivity.EXTRA_START_FULLSCREEN, true);
         if (description != null) {
-            openUI.putExtra(MainActivity.EXTRA_CURRENT_MEDIA_DESCRIPTION, description);
+            openUI.putExtra(CosmoActivity.EXTRA_CURRENT_MEDIA_DESCRIPTION, description);
         }
         return PendingIntent.getActivity(mService, REQUEST_CODE, openUI,
                 PendingIntent.FLAG_CANCEL_CURRENT);
