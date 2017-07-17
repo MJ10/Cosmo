@@ -22,6 +22,7 @@ import io.mokshjn.cosmo.models.MutableMediaMetadata;
 import io.mokshjn.cosmo.utils.LibUtils;
 
 import static io.mokshjn.cosmo.helpers.MediaIDHelper.MEDIA_ID_MUSICS_BY_ALBUM;
+import static io.mokshjn.cosmo.helpers.MediaIDHelper.MEDIA_ID_MUSICS_BY_ARTIST;
 import static io.mokshjn.cosmo.helpers.MediaIDHelper.MEDIA_ID_ROOT;
 import static io.mokshjn.cosmo.helpers.MediaIDHelper.createMediaID;
 
@@ -39,6 +40,7 @@ public class LibraryProvider {
     private ConcurrentMap<String, MutableMediaMetadata> mMusicListById;
     private List<MediaMetadataCompat> tracks;
     private List<MediaMetadataCompat> albums;
+    private List<MediaMetadataCompat> artists;
     private volatile State mCurrentState = State.NON_INITIALIZED;
 
     public LibraryProvider(ContentResolver resolver) {this(new LibrarySource(resolver)); }
@@ -50,6 +52,7 @@ public class LibraryProvider {
         mMusicListByArtist = new ConcurrentHashMap<>();
         tracks = new ArrayList<>();
         albums = new ArrayList<>();
+        artists = new ArrayList<>();
     }
 
     public Iterable<MediaMetadataCompat> getShuffledMusic() {
@@ -180,7 +183,16 @@ public class LibraryProvider {
                     mMusicListByAlbum.put(musicId, list);
                     this.albums.add(item);
                 }
+                Iterator<MediaMetadataCompat> artists = mSource.artists();
+                while (albums.hasNext()) {
+                    MediaMetadataCompat item = artists.next();
+                    String musicId = item.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID);
+                    List<MediaMetadataCompat> artistlists = new ArrayList<>();
+                    mMusicListByArtist.put(musicId, artistlists);
+                    this.artists.add(item);
+                }
                 buildListsByAlbum();
+                buildListsByArtist();
                 mCurrentState = State.INITIALIZED;
             }
         } finally {
@@ -205,6 +217,19 @@ public class LibraryProvider {
         }
     }
 
+    private synchronized void buildListsByArtist() {
+
+        for (MutableMediaMetadata m : mMusicListById.values()) {
+            String artist = m.metadata.getString(MediaMetadataCompat.METADATA_KEY_ARTIST);
+            List<MediaMetadataCompat> list = mMusicListByArtist.get(artist);
+            if (list == null) {
+                list = new ArrayList<>();
+                mMusicListByArtist.put(artist, list);
+            }
+            mMusicListByArtist.get(artist).add(m.metadata);
+        }
+    }
+
     public List<MediaBrowserCompat.MediaItem> getChildren(String mediaId) {
         List<MediaBrowserCompat.MediaItem> mediaItems = new ArrayList<>();
 
@@ -219,6 +244,10 @@ public class LibraryProvider {
         } else if (mediaId.equals(MEDIA_ID_MUSICS_BY_ALBUM)) {
             for (MediaMetadataCompat item : albums) {
                 mediaItems.add(createAlbumItem(item));
+            }
+        } else if (mediaId.equals(MEDIA_ID_MUSICS_BY_ARTIST)) {
+            for (MediaMetadataCompat item : artists) {
+                mediaItems.add(createArtistItem(item));
             }
         } else if (mediaId.startsWith(MEDIA_ID_MUSICS_BY_ALBUM)) {
             Long albumID = MediaIDHelper.extractAlbumID(mediaId);
@@ -250,7 +279,15 @@ public class LibraryProvider {
                 MediaBrowserCompat.MediaItem.FLAG_BROWSABLE);
     }
 
-//    private MediaBrowserCompat.MediaItem createAlbumMediai
+    private MediaBrowserCompat.MediaItem createArtistItem(MediaMetadataCompat item) {
+        MediaDescriptionCompat description = new MediaDescriptionCompat.Builder()
+                .setMediaId(createMediaID(null, MEDIA_ID_MUSICS_BY_ARTIST, item.getDescription().getMediaId()))
+                .setTitle(item.getDescription().getTitle())
+                .setSubtitle(item.getDescription().getSubtitle())
+                .build();
+        return new MediaBrowserCompat.MediaItem(description,
+                MediaBrowserCompat.MediaItem.FLAG_BROWSABLE);
+    }
 
     private MediaBrowserCompat.MediaItem createMediaItem(MediaMetadataCompat metadata, String id) {
         // Since mediaMetadata fields are immutable, we need to create a copy, so we

@@ -22,7 +22,6 @@ import android.support.v7.app.NotificationCompat;
 import io.mokshjn.cosmo.R;
 import io.mokshjn.cosmo.activities.CosmoActivity;
 import io.mokshjn.cosmo.services.MusicService;
-import io.mokshjn.cosmo.utils.LibUtils;
 
 /**
  * Created by moksh on 19/3/17.
@@ -281,7 +280,7 @@ public class MediaNotificationManager extends BroadcastReceiver {
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setUsesChronometer(true)
                 .setContentIntent(createContentIntent(description))
-                .setSubText(mMetadata.getString(LibUtils.ALBUM_TITLE))
+                .setSubText(description.getDescription())
                 .setContentTitle(description.getTitle())
                 .setContentText(description.getSubtitle())
                 .setLargeIcon(art);
