@@ -184,7 +184,7 @@ public class LibraryProvider {
                     this.albums.add(item);
                 }
                 Iterator<MediaMetadataCompat> artists = mSource.artists();
-                while (albums.hasNext()) {
+                while (artists.hasNext()) {
                     MediaMetadataCompat item = artists.next();
                     String musicId = item.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID);
                     List<MediaMetadataCompat> artistlists = new ArrayList<>();

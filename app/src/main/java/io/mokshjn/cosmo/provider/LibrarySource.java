@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v4.media.MediaMetadataCompat;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -78,11 +79,15 @@ public class LibrarySource implements MusicProviderSource {
         Cursor cursor = resolver.query(uri, null, null, null, sortOrder);
         if (cursor != null && cursor.moveToFirst()) {
             do {
+                long tracks = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.ArtistColumns.NUMBER_OF_TRACKS));
+                long albs = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.ArtistColumns.NUMBER_OF_ALBUMS));
+                String subtitle = albs + " Albums - " + tracks + " Songs";
+                Log.d("TAG", "artists: " + String.valueOf(tracks));
                 MediaMetadataCompat mediaMetadataCompat = new MediaMetadataCompat.Builder()
                         .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, cursor.getString(cursor.getColumnIndex(MediaStore.Audio.ArtistColumns.ARTIST)))
-                        .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, cursor.getString(cursor.getColumnIndex(MediaStore.Audio.ArtistColumns.NUMBER_OF_ALBUMS)))
+                        .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, subtitle)
                         .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, String.valueOf(cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Artists._ID))))
-                        .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_DESCRIPTION, String.valueOf(cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.ArtistColumns.NUMBER_OF_TRACKS))))
+                        .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_DESCRIPTION, cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Artists.NUMBER_OF_TRACKS)))
                         .build();
                 artists.add(mediaMetadataCompat);
             } while (cursor.moveToNext());
