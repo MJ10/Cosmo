@@ -27,7 +27,7 @@ public class NowPlayingActivity extends Activity {
             newIntent = new Intent(this, TvPlaybackActivity.class);
         } else {
             LogHelper.d(TAG, "Running on a non-TV Device");
-            newIntent = new Intent(this, MainActivity.class);
+            newIntent = new Intent(this, CosmoActivity.class);
         }
         startActivity(newIntent);
         finish();

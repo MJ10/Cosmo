@@ -11,4 +11,9 @@
         android:icon="@drawable/ic_album_black"
         android:title="@string/title_albums" />
 
+    <item
+        android:id="@+id/navigation_artists"
+        android:icon="@drawable/ic_artists_24dp"
+        android:title="@string/artists" />
+
 </menu>

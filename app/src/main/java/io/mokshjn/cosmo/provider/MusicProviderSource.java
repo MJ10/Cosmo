@@ -12,4 +12,6 @@ public interface MusicProviderSource {
     Iterator<MediaMetadataCompat> iterator();
 
     Iterator<MediaMetadataCompat> albums();
+
+    Iterator<MediaMetadataCompat> artists();
 }

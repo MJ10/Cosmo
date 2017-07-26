@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v4.media.MediaMetadataCompat;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -39,7 +40,7 @@ public class LibrarySource implements MusicProviderSource {
                         .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.AudioColumns.DURATION)))
                         .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.AudioColumns.TRACK)))
                         .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, LibUtils.getMediaStoreAlbumCoverUri(cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID))).toString())
-                        .putString(LibUtils.ALBUM_TITLE, cursor.getString(cursor.getColumnIndex(MediaStore.Audio.AudioColumns.ALBUM)))
+                        .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_DESCRIPTION, cursor.getString(cursor.getColumnIndex(MediaStore.Audio.AudioColumns.ALBUM)))
                         .build();
                 tracks.add(metadata);
             } while (cursor.moveToNext());
@@ -69,4 +70,31 @@ public class LibrarySource implements MusicProviderSource {
 
         return album.iterator();
     }
+
+    @Override
+    public Iterator<MediaMetadataCompat> artists() {
+        ArrayList<MediaMetadataCompat> artists = new ArrayList<>();
+        Uri uri = MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI;
+        String sortOrder = MediaStore.Audio.ArtistColumns.ARTIST + " COLLATE LOCALIZED ASC";
+        Cursor cursor = resolver.query(uri, null, null, null, sortOrder);
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                long tracks = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.ArtistColumns.NUMBER_OF_TRACKS));
+                long albs = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.ArtistColumns.NUMBER_OF_ALBUMS));
+                String subtitle = albs + " Albums - " + tracks + " Songs";
+                Log.d("TAG", "artists: " + String.valueOf(tracks));
+                MediaMetadataCompat mediaMetadataCompat = new MediaMetadataCompat.Builder()
+                        .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, cursor.getString(cursor.getColumnIndex(MediaStore.Audio.ArtistColumns.ARTIST)))
+                        .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, subtitle)
+                        .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, String.valueOf(cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Artists._ID))))
+                        .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_DESCRIPTION, cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Artists.NUMBER_OF_TRACKS)))
+                        .build();
+                artists.add(mediaMetadataCompat);
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+
+        return artists.iterator();
+    }
+
 }
