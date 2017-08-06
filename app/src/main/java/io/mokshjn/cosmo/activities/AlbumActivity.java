@@ -2,7 +2,6 @@ package io.mokshjn.cosmo.activities;
 
 import android.content.ComponentName;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.RemoteException;
@@ -15,7 +14,6 @@ import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.transition.Slide;
@@ -27,10 +25,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.load.resource.bitmap.GlideBitmapDrawable;
-import com.bumptech.glide.load.resource.drawable.GlideDrawable;
-import com.bumptech.glide.request.target.ImageViewTarget;
+import com.github.florent37.glidepalette.GlidePalette;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,17 +72,18 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
     private String mediaID;
     private AlbumSongsAdapter adapter;
     private MediaBrowserCompat mediaBrowser;
-    private Palette.PaletteAsyncListener listener = new Palette.PaletteAsyncListener() {
-        @Override
-        public void onGenerated(Palette palette) {
-            int defaultColor = getResources().getColor(R.color.colorPrimary);
-            int lightMutedColor = palette.getLightMutedColor(defaultColor);
-            int darkVibrantColor = palette.getDarkVibrantColor(defaultColor);
-            bgView.setBackgroundColor(lightMutedColor);
-            adapter.setBgColor(darkVibrantColor);
-            adapter.notifyDataSetChanged();
-        }
-    };
+    private final MediaBrowserCompat.ConnectionCallback mConnectionCallback =
+            new MediaBrowserCompat.ConnectionCallback() {
+                @Override
+                public void onConnected() {
+                    Log.d(TAG, "onConnected: ");
+                    try {
+                        connectToSession(mediaBrowser.getSessionToken());
+                    } catch (RemoteException e) {
+                        LogHelper.e(TAG, e, "could not connect media controller");
+                    }
+                }
+            };
     private ArrayList<MediaBrowserCompat.MediaItem> tracks = new ArrayList<>();
     private final MediaBrowserCompat.SubscriptionCallback mSubscriptionCallback =
             new MediaBrowserCompat.SubscriptionCallback() {
@@ -111,18 +107,6 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
                 public void onError(@NonNull String id) {
                     LogHelper.e(TAG, "browse fragment subscription onError, id=" + id);
                     Toast.makeText(AlbumActivity.this, getString(R.string.error_loading_media), Toast.LENGTH_LONG).show();
-                }
-            };
-    private final MediaBrowserCompat.ConnectionCallback mConnectionCallback =
-            new MediaBrowserCompat.ConnectionCallback() {
-                @Override
-                public void onConnected() {
-                    Log.d(TAG, "onConnected: ");
-                    try {
-                        connectToSession(mediaBrowser.getSessionToken());
-                    } catch (RemoteException e) {
-                        LogHelper.e(TAG, e, "could not connect media controller");
-                    }
                 }
             };
 
@@ -176,20 +160,10 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
     private void setupAlbumArt() {
         Glide.with(this)
                 .load(LibUtils.getMediaStoreAlbumCoverUri(albumID))
-                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
-                .into(new ImageViewTarget<GlideDrawable>(ivAlbumArt) {
-                    @Override
-                    protected void setResource(GlideDrawable resource) {
-                        ivAlbumArt.setImageDrawable(resource.getCurrent());
-
-                        extractColors(resource);
-                    }
-                });
-    }
-
-    private void extractColors(GlideDrawable resource) {
-        Bitmap bitmap = ((GlideBitmapDrawable) resource.getCurrent()).getBitmap();
-        Palette.from(bitmap).generate(listener);
+                .listener(GlidePalette.with(LibUtils.getMediaStoreAlbumCoverUri(albumID).toString())
+                        .use(GlidePalette.Profile.MUTED)
+                        .intoBackground(bgView))
+                .into(ivAlbumArt);
     }
 
     private void connectToSession(MediaSessionCompat.Token token) throws RemoteException {
