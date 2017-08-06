@@ -39,6 +39,7 @@
                     android:ellipsize="end"
                     android:lines="1"
                     android:text="@string/album_name"
+                    android:textColor="@color/background_light"
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
