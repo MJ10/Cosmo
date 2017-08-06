@@ -13,13 +13,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
 import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import java.util.ArrayList;
 
 import io.mokshjn.cosmo.R;
-import io.mokshjn.cosmo.helpers.CircleTransform;
 
 /**
  * Created by moksh on 19/3/17.
@@ -54,9 +53,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.ViewHolder> im
 
         Glide.with(context)
                 .load(descriptionCompat.getIconUri())
-                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
-                .transform(new CircleTransform(context))
-                .crossFade()
+                .apply(RequestOptions.circleCropTransform())
                 .into(holder.ivAlbumArt);
     }
 
