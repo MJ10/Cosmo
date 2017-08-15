@@ -191,6 +191,7 @@ public class LibraryProvider {
                     mMusicListByArtist.put(musicId, artistlists);
                     this.artists.add(item);
                 }
+                Iterator<MediaMetadataCompat> playlists = mSource.playlists();
                 buildListsByAlbum();
                 buildListsByArtist();
                 mCurrentState = State.INITIALIZED;

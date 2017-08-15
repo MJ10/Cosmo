@@ -5,7 +5,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v4.media.MediaMetadataCompat;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -82,7 +81,6 @@ public class LibrarySource implements MusicProviderSource {
                 long tracks = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.ArtistColumns.NUMBER_OF_TRACKS));
                 long albs = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.ArtistColumns.NUMBER_OF_ALBUMS));
                 String subtitle = albs + " Albums - " + tracks + " Songs";
-                Log.d("TAG", "artists: " + String.valueOf(tracks));
                 MediaMetadataCompat mediaMetadataCompat = new MediaMetadataCompat.Builder()
                         .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, cursor.getString(cursor.getColumnIndex(MediaStore.Audio.ArtistColumns.ARTIST)))
                         .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, subtitle)
@@ -95,6 +93,46 @@ public class LibrarySource implements MusicProviderSource {
         }
 
         return artists.iterator();
+    }
+
+    @Override
+    public Iterator<MediaMetadataCompat> playlists() {
+        ArrayList<MediaMetadataCompat> playlist_list = new ArrayList<>();
+        Uri uri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
+        Cursor cursor = resolver.query(uri, null, null, null, null);
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                String name = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Playlists.NAME));
+                long id = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Playlists._ID));
+                int songCount = getPlaylistSongCount(id);
+                String subtitle = songCount + "";
+                if (songCount == 1) {
+                    subtitle += " Song";
+                } else {
+                    subtitle += " Songs";
+                }
+                MediaMetadataCompat metadataCompat = new MediaMetadataCompat.Builder()
+                        .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, name)
+                        .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, String.valueOf(id))
+                        .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, subtitle)
+                        .build();
+                playlist_list.add(metadataCompat);
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+        return playlist_list.iterator();
+    }
+
+    private int getPlaylistSongCount(long id) {
+        Cursor c = resolver.query(MediaStore.Audio.Playlists.Members.getContentUri("external", id), new String[]{MediaStore.Audio.Playlists._ID}, null, null, null);
+        int count = 0;
+        if (c != null) {
+            if (c.moveToFirst()) {
+                count = c.getCount();
+            }
+            c.close();
+        }
+        return count;
     }
 
 }
