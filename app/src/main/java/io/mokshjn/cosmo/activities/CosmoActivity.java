@@ -81,7 +81,7 @@ public class CosmoActivity extends BaseActivity implements SongsFragment.MediaFr
                     break;
                 case 3:
                     navigation.setSelectedItemId(R.id.navigation_playlists);
-//                    break;
+                    break;
             }
         }
     };
@@ -103,6 +103,7 @@ public class CosmoActivity extends BaseActivity implements SongsFragment.MediaFr
                     return true;
                 case R.id.navigation_playlists:
                     mViewPager.setCurrentItem(3, true);
+                    return true;
             }
             return false;
         }

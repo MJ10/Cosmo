@@ -72,6 +72,18 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
     private String mediaID;
     private AlbumSongsAdapter adapter;
     private MediaBrowserCompat mediaBrowser;
+    private final MediaBrowserCompat.ConnectionCallback mConnectionCallback =
+            new MediaBrowserCompat.ConnectionCallback() {
+                @Override
+                public void onConnected() {
+                    Log.d(TAG, "onConnected: ");
+                    try {
+                        connectToSession(mediaBrowser.getSessionToken());
+                    } catch (RemoteException e) {
+                        LogHelper.e(TAG, e, "could not connect media controller");
+                    }
+                }
+            };
     private ArrayList<MediaBrowserCompat.MediaItem> tracks = new ArrayList<>();
     private final MediaBrowserCompat.SubscriptionCallback mSubscriptionCallback =
             new MediaBrowserCompat.SubscriptionCallback() {
@@ -95,18 +107,6 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
                 public void onError(@NonNull String id) {
                     LogHelper.e(TAG, "browse fragment subscription onError, id=" + id);
                     Toast.makeText(AlbumActivity.this, getString(R.string.error_loading_media), Toast.LENGTH_LONG).show();
-                }
-            };
-    private final MediaBrowserCompat.ConnectionCallback mConnectionCallback =
-            new MediaBrowserCompat.ConnectionCallback() {
-                @Override
-                public void onConnected() {
-                    Log.d(TAG, "onConnected: ");
-                    try {
-                        connectToSession(mediaBrowser.getSessionToken());
-                    } catch (RemoteException e) {
-                        LogHelper.e(TAG, e, "could not connect media controller");
-                    }
                 }
             };
 
@@ -204,8 +204,6 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
     }
 
     private void onConnected() {
-
-        Log.d(TAG, "onConnected: " + mediaID);
 
         mediaBrowser.unsubscribe(mediaID);
 
