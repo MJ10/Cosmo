@@ -123,7 +123,8 @@ public class LibrarySource implements MusicProviderSource {
         return playlist_list.iterator();
     }
 
-    public Iterator<MediaMetadataCompat> getMusicFromPlaylist(long id) {
+    @Override
+    public ArrayList<MediaMetadataCompat> getMusicFromPlaylist(long id) {
         ArrayList<MediaMetadataCompat> tracks = new ArrayList<>();
         Uri uri = MediaStore.Audio.Playlists.Members.getContentUri("external", id);
 
@@ -145,7 +146,7 @@ public class LibrarySource implements MusicProviderSource {
             cursor.close();
         }
 
-        return tracks.iterator();
+        return tracks;
     }
 
     private int getPlaylistSongCount(long id) {

@@ -84,7 +84,7 @@ public class MediaIDHelper {
         return null;
     }
 
-    public static long extractAlbumID(String mediaID) {
+    public static long extractID(String mediaID) {
         int pos = mediaID.indexOf(CATEGORY_SEPARATOR);
         if (pos >= 0) {
             return Long.parseLong(mediaID.substring(pos + 1));

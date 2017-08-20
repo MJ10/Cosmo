@@ -265,7 +265,7 @@ public class LibraryProvider {
                 mediaItems.add(createPlaylistItem(item));
             }
         } else if (mediaId.startsWith(MEDIA_ID_MUSICS_BY_ALBUM)) {
-            Long albumID = MediaIDHelper.extractAlbumID(mediaId);
+            Long albumID = MediaIDHelper.extractID(mediaId);
             List<MediaMetadataCompat> tracks = mMusicListByAlbum.get(albumID.toString());
             tracks.sort(new Comparator<MediaMetadataCompat>() {
                 @Override
@@ -276,7 +276,11 @@ public class LibraryProvider {
             for (MediaMetadataCompat item : mMusicListByAlbum.get(albumID.toString())) {
                 mediaItems.add(createMediaItem(item, mediaId));
             }
-
+        } else if (mediaId.startsWith(MEDIA_ID_MUSICS_BY_PLAYLIST)) {
+            long playlistId = MediaIDHelper.extractID(mediaId);
+            for (MediaMetadataCompat item : mSource.getMusicFromPlaylist(playlistId)) {
+                mediaItems.add(createMediaItem(item, mediaId));
+            }
         } else {
             LogHelper.w(TAG, "Skipping unmatched mediaId: ", mediaId);
         }
