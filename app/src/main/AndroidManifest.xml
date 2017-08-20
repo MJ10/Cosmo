@@ -31,10 +31,6 @@
             android:value="io.mokshjn.cosmo.helpers.CastOptionsProvider" />
 
         <activity
-            android:name=".activities.MainActivity"
-            android:theme="@style/AppTheme.Main">
-        </activity>
-        <activity
             android:name=".activities.FullScreenPlayerActivity"
             android:label="@string/app_name"
             android:launchMode="singleTop"

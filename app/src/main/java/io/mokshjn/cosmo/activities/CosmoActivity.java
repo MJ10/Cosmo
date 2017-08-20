@@ -45,7 +45,7 @@ public class CosmoActivity extends BaseActivity implements SongsFragment.MediaFr
     public static final String EXTRA_CURRENT_MEDIA_DESCRIPTION =
             "io.mokshjn.cosmo.CURRENT_MEDIA_DESCRIPTION";
 
-    private static final String TAG = LogHelper.makeLogTag(MainActivity.class);
+    private static final String TAG = LogHelper.makeLogTag(CosmoActivity.class);
     private static final String SAVED_MEDIA_ID = "io.mokshjn.cosmo.MEDIA_ID";
     private static final int RC_SEARCH = 0;
     private static final int PERMISSION_REQUEST_CODE = 1;
