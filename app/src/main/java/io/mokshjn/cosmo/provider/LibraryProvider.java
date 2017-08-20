@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaDescriptionCompat;
 import android.support.v4.media.MediaMetadataCompat;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -173,7 +174,6 @@ public class LibraryProvider {
         try {
             if (mCurrentState == State.NON_INITIALIZED) {
                 mCurrentState = State.INITIALIZING;
-                List<MediaMetadataCompat> emptyList = new ArrayList<>();
                 Iterator<MediaMetadataCompat> iterator = mSource.iterator();
                 while (iterator.hasNext()) {
                     MediaMetadataCompat item = iterator.next();
@@ -185,6 +185,7 @@ public class LibraryProvider {
                 while (iterator.hasNext()) {
                     MediaMetadataCompat item = iterator.next();
                     String musicId = item.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID);
+                    List<MediaMetadataCompat> emptyList = new ArrayList<>();
                     mMusicListByAlbum.put(musicId, emptyList);
                     albums.add(item);
                 }
@@ -192,6 +193,7 @@ public class LibraryProvider {
                 while (iterator.hasNext()) {
                     MediaMetadataCompat item = iterator.next();
                     String musicId = item.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID);
+                    List<MediaMetadataCompat> emptyList = new ArrayList<>();
                     mMusicListByArtist.put(musicId, emptyList);
                     artists.add(item);
                 }
@@ -199,6 +201,7 @@ public class LibraryProvider {
                 while (iterator.hasNext()) {
                     MediaMetadataCompat item = iterator.next();
                     String id = item.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID);
+                    List<MediaMetadataCompat> emptyList = new ArrayList<>();
                     mMusicListByPlaylist.put(id, emptyList);
                     playlists.add(item);
                 }
@@ -265,15 +268,17 @@ public class LibraryProvider {
                 mediaItems.add(createPlaylistItem(item));
             }
         } else if (mediaId.startsWith(MEDIA_ID_MUSICS_BY_ALBUM)) {
-            Long albumID = MediaIDHelper.extractID(mediaId);
-            List<MediaMetadataCompat> tracks = mMusicListByAlbum.get(albumID.toString());
+            long albumID = MediaIDHelper.extractID(mediaId);
+            List<MediaMetadataCompat> tracks = mMusicListByAlbum.get(String.valueOf(albumID));
+
+            Log.d(TAG, "getChildren: " + tracks.size());
             tracks.sort(new Comparator<MediaMetadataCompat>() {
                 @Override
                 public int compare(MediaMetadataCompat o1, MediaMetadataCompat o2) {
                     return (int) (o1.getLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER) - o2.getLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER));
                 }
             });
-            for (MediaMetadataCompat item : mMusicListByAlbum.get(albumID.toString())) {
+            for (MediaMetadataCompat item : mMusicListByAlbum.get(String.valueOf(albumID))) {
                 mediaItems.add(createMediaItem(item, mediaId));
             }
         } else if (mediaId.startsWith(MEDIA_ID_MUSICS_BY_PLAYLIST)) {

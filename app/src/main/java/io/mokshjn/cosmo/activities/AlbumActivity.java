@@ -17,7 +17,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.transition.Slide;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.animation.AnimationUtils;
@@ -72,25 +71,12 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
     private String mediaID;
     private AlbumSongsAdapter adapter;
     private MediaBrowserCompat mediaBrowser;
-    private final MediaBrowserCompat.ConnectionCallback mConnectionCallback =
-            new MediaBrowserCompat.ConnectionCallback() {
-                @Override
-                public void onConnected() {
-                    Log.d(TAG, "onConnected: ");
-                    try {
-                        connectToSession(mediaBrowser.getSessionToken());
-                    } catch (RemoteException e) {
-                        LogHelper.e(TAG, e, "could not connect media controller");
-                    }
-                }
-            };
     private ArrayList<MediaBrowserCompat.MediaItem> tracks = new ArrayList<>();
     private final MediaBrowserCompat.SubscriptionCallback mSubscriptionCallback =
             new MediaBrowserCompat.SubscriptionCallback() {
                 @Override
                 public void onChildrenLoaded(@NonNull String parentId,
                                              @NonNull List<MediaBrowserCompat.MediaItem> children) {
-                    Log.d(TAG, parentId);
                     try {
                         tracks.clear();
                         for (MediaBrowserCompat.MediaItem item : children) {
@@ -107,6 +93,17 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
                 public void onError(@NonNull String id) {
                     LogHelper.e(TAG, "browse fragment subscription onError, id=" + id);
                     Toast.makeText(AlbumActivity.this, getString(R.string.error_loading_media), Toast.LENGTH_LONG).show();
+                }
+            };
+    private final MediaBrowserCompat.ConnectionCallback mConnectionCallback =
+            new MediaBrowserCompat.ConnectionCallback() {
+                @Override
+                public void onConnected() {
+                    try {
+                        connectToSession(mediaBrowser.getSessionToken());
+                    } catch (RemoteException e) {
+                        LogHelper.e(TAG, e, "could not connect media controller");
+                    }
                 }
             };
 
