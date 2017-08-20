@@ -123,6 +123,31 @@ public class LibrarySource implements MusicProviderSource {
         return playlist_list.iterator();
     }
 
+    public Iterator<MediaMetadataCompat> getMusicFromPlaylist(long id) {
+        ArrayList<MediaMetadataCompat> tracks = new ArrayList<>();
+        Uri uri = MediaStore.Audio.Playlists.Members.getContentUri("external", id);
+
+        Cursor cursor = resolver.query(uri, null, null, null, null);
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                MediaMetadataCompat metadata = new MediaMetadataCompat.Builder()
+                        .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, String.valueOf(cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.AudioColumns._ID))))
+                        .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, cursor.getString(cursor.getColumnIndex(MediaStore.Audio.AudioColumns.ALBUM_ID)))
+                        .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, cursor.getString(cursor.getColumnIndex(MediaStore.Audio.AudioColumns.ARTIST)))
+                        .putString(MediaMetadataCompat.METADATA_KEY_TITLE, cursor.getString(cursor.getColumnIndex(MediaStore.Audio.AudioColumns.TITLE)))
+                        .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.AudioColumns.DURATION)))
+                        .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.AudioColumns.TRACK)))
+                        .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, LibUtils.getMediaStoreAlbumCoverUri(cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID))).toString())
+                        .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_DESCRIPTION, cursor.getString(cursor.getColumnIndex(MediaStore.Audio.AudioColumns.ALBUM)))
+                        .build();
+                tracks.add(metadata);
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+
+        return tracks.iterator();
+    }
+
     private int getPlaylistSongCount(long id) {
         Cursor c = resolver.query(MediaStore.Audio.Playlists.Members.getContentUri("external", id), new String[]{MediaStore.Audio.Playlists._ID}, null, null, null);
         int count = 0;
