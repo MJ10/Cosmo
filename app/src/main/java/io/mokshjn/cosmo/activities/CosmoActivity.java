@@ -31,6 +31,7 @@ import butterknife.OnLongClick;
 import io.mokshjn.cosmo.R;
 import io.mokshjn.cosmo.fragments.AlbumFragment;
 import io.mokshjn.cosmo.fragments.ArtistFragment;
+import io.mokshjn.cosmo.fragments.PlaylistFragment;
 import io.mokshjn.cosmo.fragments.SongsFragment;
 import io.mokshjn.cosmo.helpers.LogHelper;
 import io.mokshjn.cosmo.transitions.FabTransform;
@@ -77,6 +78,10 @@ public class CosmoActivity extends BaseActivity implements SongsFragment.MediaFr
                     break;
                 case 2:
                     navigation.setSelectedItemId(R.id.navigation_artists);
+                    break;
+                case 3:
+                    navigation.setSelectedItemId(R.id.navigation_playlists);
+//                    break;
             }
         }
     };
@@ -96,6 +101,8 @@ public class CosmoActivity extends BaseActivity implements SongsFragment.MediaFr
                 case R.id.navigation_artists:
                     mViewPager.setCurrentItem(2, true);
                     return true;
+                case R.id.navigation_playlists:
+                    mViewPager.setCurrentItem(3, true);
             }
             return false;
         }
@@ -146,7 +153,7 @@ public class CosmoActivity extends BaseActivity implements SongsFragment.MediaFr
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         mViewPager.setAdapter(mPagerAdapter);
         mViewPager.setOnPageChangeListener(pageChangeListener);
-        mViewPager.setOffscreenPageLimit(2);
+        mViewPager.setOffscreenPageLimit(3);
 
         setSupportActionBar(toolbar);
         initializeToolbar();
@@ -244,6 +251,7 @@ public class CosmoActivity extends BaseActivity implements SongsFragment.MediaFr
         ((SongsFragment) getSupportFragmentManager().findFragmentByTag("android:switcher:" + R.id.main_content + ":" + 0)).onConnected();
         ((AlbumFragment) getSupportFragmentManager().findFragmentByTag("android:switcher:" + R.id.main_content + ":" + 1)).onConnected();
         ((ArtistFragment) getSupportFragmentManager().findFragmentByTag("android:switcher:" + R.id.main_content + ":" + 2)).onConnected();
+        ((PlaylistFragment) getSupportFragmentManager().findFragmentByTag("android:switcher:" + R.id.main_content + ":" + 3)).onConnected();
     }
 
     @OnClick(R.id.fab)
@@ -305,6 +313,8 @@ public class CosmoActivity extends BaseActivity implements SongsFragment.MediaFr
                     return new AlbumFragment();
                 case 2:
                     return new ArtistFragment();
+                case 3:
+                    return new PlaylistFragment();
                 default:
                     return null;
             }
@@ -312,7 +322,7 @@ public class CosmoActivity extends BaseActivity implements SongsFragment.MediaFr
 
         @Override
         public int getCount() {
-            return 3;
+            return 4;
         }
 
         @Override
@@ -324,6 +334,8 @@ public class CosmoActivity extends BaseActivity implements SongsFragment.MediaFr
                     return "Albums";
                 case 2:
                     return "Artists";
+                case 3:
+                    return "Playlists";
             }
             return null;
         }

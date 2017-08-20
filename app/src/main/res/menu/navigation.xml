@@ -16,4 +16,9 @@
         android:icon="@drawable/ic_artists_24dp"
         android:title="@string/artists" />
 
+    <item
+        android:id="@+id/navigation_playlists"
+        android:icon="@drawable/ic_playlist_24dp"
+        android:title="@string/playlists" />
+
 </menu>

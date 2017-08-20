@@ -72,18 +72,6 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
     private String mediaID;
     private AlbumSongsAdapter adapter;
     private MediaBrowserCompat mediaBrowser;
-    private final MediaBrowserCompat.ConnectionCallback mConnectionCallback =
-            new MediaBrowserCompat.ConnectionCallback() {
-                @Override
-                public void onConnected() {
-                    Log.d(TAG, "onConnected: ");
-                    try {
-                        connectToSession(mediaBrowser.getSessionToken());
-                    } catch (RemoteException e) {
-                        LogHelper.e(TAG, e, "could not connect media controller");
-                    }
-                }
-            };
     private ArrayList<MediaBrowserCompat.MediaItem> tracks = new ArrayList<>();
     private final MediaBrowserCompat.SubscriptionCallback mSubscriptionCallback =
             new MediaBrowserCompat.SubscriptionCallback() {
@@ -109,6 +97,18 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
                     Toast.makeText(AlbumActivity.this, getString(R.string.error_loading_media), Toast.LENGTH_LONG).show();
                 }
             };
+    private final MediaBrowserCompat.ConnectionCallback mConnectionCallback =
+            new MediaBrowserCompat.ConnectionCallback() {
+                @Override
+                public void onConnected() {
+                    Log.d(TAG, "onConnected: ");
+                    try {
+                        connectToSession(mediaBrowser.getSessionToken());
+                    } catch (RemoteException e) {
+                        LogHelper.e(TAG, e, "could not connect media controller");
+                    }
+                }
+            };
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -121,7 +121,7 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
         Intent intent = getIntent();
         if (intent != null) {
             mediaID = intent.getStringExtra("albumID");
-            albumID = MediaIDHelper.extractAlbumID(mediaID);
+            albumID = MediaIDHelper.extractID(mediaID);
         }
         setupViews();
     }
