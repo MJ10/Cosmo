@@ -34,8 +34,8 @@ public class PlaylistFragment extends android.support.v4.app.Fragment implements
 
     private static final String ARG_MEDIA_ID = "media_id";
 
-    private FastScrollRecyclerView rvArtistList;
-    private ArrayList<MediaBrowserCompat.MediaItem> artistList = new ArrayList<>();
+    private FastScrollRecyclerView rvPlaylists;
+    private ArrayList<MediaBrowserCompat.MediaItem> playlists = new ArrayList<>();
     private ArtistAdapter adapter;
 
     private final MediaControllerCompat.Callback mMediaControllerCallback =
@@ -65,9 +65,9 @@ public class PlaylistFragment extends android.support.v4.app.Fragment implements
                                              @NonNull List<MediaBrowserCompat.MediaItem> children) {
                     Log.d(TAG, parentId);
                     try {
-                        artistList.clear();
-                        artistList.addAll(children);
-                        adapter.setArtists(artistList);
+                        playlists.clear();
+                        playlists.addAll(children);
+                        adapter.setArtists(playlists);
                         adapter.notifyDataSetChanged();
                     } catch (Throwable t) {
                         LogHelper.e(TAG, "Error on childrenloaded", t);
@@ -99,10 +99,10 @@ public class PlaylistFragment extends android.support.v4.app.Fragment implements
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_song_list, container, false);
-        rvArtistList = (FastScrollRecyclerView) rootView.findViewById(R.id.rvSongList);
-        rvArtistList.setLayoutManager(new LinearLayoutManager(getContext()));
+        rvPlaylists = (FastScrollRecyclerView) rootView.findViewById(R.id.rvSongList);
+        rvPlaylists.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter = new ArtistAdapter(getContext());
-        rvArtistList.setAdapter(adapter);
+        rvPlaylists.setAdapter(adapter);
         adapter.setClickListener(this);
 
         return rootView;
