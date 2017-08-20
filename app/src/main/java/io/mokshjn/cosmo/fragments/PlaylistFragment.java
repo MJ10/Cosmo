@@ -1,6 +1,7 @@
 package io.mokshjn.cosmo.fragments;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -21,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.mokshjn.cosmo.R;
+import io.mokshjn.cosmo.activities.PlaylistActivity;
 import io.mokshjn.cosmo.adapters.ArtistAdapter;
 import io.mokshjn.cosmo.helpers.LogHelper;
 import io.mokshjn.cosmo.helpers.MediaIDHelper;
@@ -178,6 +180,8 @@ public class PlaylistFragment extends android.support.v4.app.Fragment implements
 
     @Override
     public void onArtistClick(View v, int position) {
-
+        Intent intent = new Intent(getActivity(), PlaylistActivity.class);
+        intent.putExtra("playlistID", playlists.get(position).getMediaId());
+        startActivity(intent);
     }
 }

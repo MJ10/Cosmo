@@ -263,7 +263,7 @@ public class LibraryProvider {
             for (MediaMetadataCompat item : artists) {
                 mediaItems.add(createArtistItem(item));
             }
-        } else if (mediaId.startsWith(MEDIA_ID_MUSICS_BY_PLAYLIST)) {
+        } else if (mediaId.equals(MEDIA_ID_MUSICS_BY_PLAYLIST)) {
             for (MediaMetadataCompat item : playlists) {
                 mediaItems.add(createPlaylistItem(item));
             }

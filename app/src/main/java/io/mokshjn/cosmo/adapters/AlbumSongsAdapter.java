@@ -13,7 +13,6 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import io.mokshjn.cosmo.R;
-import io.mokshjn.cosmo.utils.LibUtils;
 
 /**
  * Created by moksh on 9/4/17.
@@ -44,18 +43,18 @@ public class AlbumSongsAdapter extends RecyclerView.Adapter<AlbumSongsAdapter.Vi
         MediaBrowserCompat.MediaItem item = tracks.get(position);
         MediaDescriptionCompat descriptionCompat = item.getDescription();
         holder.cvSong.setBackgroundColor(bgColor);
-        LibUtils.SongInfo info = LibUtils.getTrackInfo(item.getMediaId(), context.getContentResolver());
-        if (info != null) {
-            String duration = LibUtils.getReadableDurationString(info.getDuration());
-            String trackNumber = LibUtils.getTrackNumber(info.getTrackNumber());
-
-            if (duration != null) {
-                holder.tvDuration.setText(duration);
-            }
-            if (trackNumber != null) {
-                holder.tvTrackNumber.setText(trackNumber);
-            }
-        }
+//        LibUtils.SongInfo info = LibUtils.getTrackInfo(item.getMediaId(), context.getContentResolver());
+//        if (info != null) {
+//            String duration = LibUtils.getReadableDurationString(info.getDuration());
+//            String trackNumber = LibUtils.getTrackNumber(info.getTrackNumber());
+//
+//            if (duration != null) {
+//                holder.tvDuration.setText(duration);
+//            }
+//            if (trackNumber != null) {
+//                holder.tvTrackNumber.setText(trackNumber);
+//            }
+//        }
         holder.tvSongTitle.setText(descriptionCompat.getTitle());
         holder.tvSongArtist.setText(descriptionCompat.getSubtitle());
     }

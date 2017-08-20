@@ -186,7 +186,6 @@ public class AlbumFragment extends android.support.v4.app.Fragment implements Al
     @Override
     public void onAlbumClick(View v, int pos) {
         Intent intent = new Intent(getActivity(), AlbumActivity.class);
-        Log.d(TAG, "onAlbumClick: " + albumList.get(pos).getMediaId());
         intent.putExtra("albumID", albumList.get(pos).getMediaId());
         startActivity(intent,
                 ActivityOptions.makeSceneTransitionAnimation(getActivity(),
