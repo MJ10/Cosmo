@@ -172,9 +172,7 @@ public class CosmoActivity extends BaseActivity implements SongsFragment.MediaFr
                             Intent.FLAG_ACTIVITY_CLEAR_TOP)
                     .putExtra(EXTRA_CURRENT_MEDIA_DESCRIPTION,
                             intent.getParcelableExtra(EXTRA_CURRENT_MEDIA_DESCRIPTION));
-            FabTransform.addExtras(intent, ContextCompat.getColor(CosmoActivity.this, R.color.colorAccent), R.drawable.ic_play_arrow_24dp);
-            ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(CosmoActivity.this, fab, getString(R.string.transition_player));
-            startActivity(fullScreenIntent, options.toBundle());
+            startActivity(fullScreenIntent);
         }
     }
 
