@@ -2,6 +2,7 @@ package io.mokshjn.cosmo.provider;
 
 import android.support.v4.media.MediaMetadataCompat;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
@@ -14,4 +15,8 @@ public interface MusicProviderSource {
     Iterator<MediaMetadataCompat> albums();
 
     Iterator<MediaMetadataCompat> artists();
+
+    Iterator<MediaMetadataCompat> playlists();
+
+    ArrayList<MediaMetadataCompat> getMusicFromPlaylist(long id);
 }

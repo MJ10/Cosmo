@@ -1,7 +1,6 @@
 package io.mokshjn.cosmo.fragments;
 
 import android.app.Activity;
-import android.app.ActivityOptions;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -10,9 +9,8 @@ import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
-import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,23 +22,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.mokshjn.cosmo.R;
-import io.mokshjn.cosmo.activities.AlbumActivity;
-import io.mokshjn.cosmo.adapters.AlbumAdapter;
+import io.mokshjn.cosmo.activities.PlaylistActivity;
+import io.mokshjn.cosmo.adapters.ArtistAdapter;
 import io.mokshjn.cosmo.helpers.LogHelper;
 import io.mokshjn.cosmo.helpers.MediaIDHelper;
 
 /**
- * Created by moksh on 16/6/17.
+ * Created by moksh on 25/7/17.
  */
 
-public class AlbumFragment extends android.support.v4.app.Fragment implements AlbumAdapter.albClickListener {
-    private static final String TAG = LogHelper.makeLogTag(SongsFragment.class);
+public class PlaylistFragment extends android.support.v4.app.Fragment implements ArtistAdapter.ClickListener {
+    private static final String TAG = LogHelper.makeLogTag(ArtistFragment.class);
 
     private static final String ARG_MEDIA_ID = "media_id";
 
-    private FastScrollRecyclerView rvAlbumList;
-    private ArrayList<MediaBrowserCompat.MediaItem> albumList = new ArrayList<>();
-    private AlbumAdapter adapter;
+    private FastScrollRecyclerView rvPlaylists;
+    private ArrayList<MediaBrowserCompat.MediaItem> playlists = new ArrayList<>();
+    private ArtistAdapter adapter;
 
     private final MediaControllerCompat.Callback mMediaControllerCallback =
             new MediaControllerCompat.Callback() {
@@ -69,11 +67,9 @@ public class AlbumFragment extends android.support.v4.app.Fragment implements Al
                                              @NonNull List<MediaBrowserCompat.MediaItem> children) {
                     Log.d(TAG, parentId);
                     try {
-                        albumList.clear();
-                        for (MediaBrowserCompat.MediaItem item : children) {
-                            albumList.add(item);
-                        }
-                        adapter.setAlbums(albumList);
+                        playlists.clear();
+                        playlists.addAll(children);
+                        adapter.setArtists(playlists);
                         adapter.notifyDataSetChanged();
                     } catch (Throwable t) {
                         LogHelper.e(TAG, "Error on childrenloaded", t);
@@ -105,10 +101,10 @@ public class AlbumFragment extends android.support.v4.app.Fragment implements Al
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_song_list, container, false);
-        rvAlbumList = (FastScrollRecyclerView) rootView.findViewById(R.id.rvSongList);
-        rvAlbumList.setLayoutManager(new GridLayoutManager(getContext(), 2));
-        adapter = new AlbumAdapter(getContext());
-        rvAlbumList.setAdapter(adapter);
+        rvPlaylists = (FastScrollRecyclerView) rootView.findViewById(R.id.rvSongList);
+        rvPlaylists.setLayoutManager(new LinearLayoutManager(getContext()));
+        adapter = new ArtistAdapter(getContext());
+        rvPlaylists.setAdapter(adapter);
         adapter.setClickListener(this);
 
         return rootView;
@@ -168,8 +164,7 @@ public class AlbumFragment extends android.support.v4.app.Fragment implements Al
             return;
         }
 
-        mMediaId = MediaIDHelper.MEDIA_ID_MUSICS_BY_ALBUM;
-        Log.d(TAG, "onConnected: " + mMediaId);
+        mMediaId = MediaIDHelper.MEDIA_ID_MUSICS_BY_PLAYLIST;
 
         mMediaFragmentListener.getMediaBrowser().unsubscribe(mMediaId);
 
@@ -184,12 +179,9 @@ public class AlbumFragment extends android.support.v4.app.Fragment implements Al
     }
 
     @Override
-    public void onAlbumClick(View v, int pos) {
-        Intent intent = new Intent(getActivity(), AlbumActivity.class);
-        intent.putExtra("albumID", albumList.get(pos).getMediaId());
-        startActivity(intent,
-                ActivityOptions.makeSceneTransitionAnimation(getActivity(),
-                        Pair.create(v.findViewById(R.id.ivAlbumArt), getString(R.string.transition_album_art)),
-                        Pair.create(v.findViewById(R.id.albumText), getString(R.string.transition_album_bg))).toBundle());
+    public void onArtistClick(View v, int position) {
+        Intent intent = new Intent(getActivity(), PlaylistActivity.class);
+        intent.putExtra("playlistID", playlists.get(position).getMediaId());
+        startActivity(intent);
     }
 }

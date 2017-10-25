@@ -59,4 +59,5 @@
     <string name="title_songs">Songs</string>
     <string name="title_albums">Albums</string>
     <string name="artists">Artists</string>
+    <string name="playlists">Playlists</string>
 </resources>

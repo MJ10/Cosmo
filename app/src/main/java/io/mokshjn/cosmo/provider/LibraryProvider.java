@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaDescriptionCompat;
 import android.support.v4.media.MediaMetadataCompat;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,6 +24,7 @@ import io.mokshjn.cosmo.utils.LibUtils;
 
 import static io.mokshjn.cosmo.helpers.MediaIDHelper.MEDIA_ID_MUSICS_BY_ALBUM;
 import static io.mokshjn.cosmo.helpers.MediaIDHelper.MEDIA_ID_MUSICS_BY_ARTIST;
+import static io.mokshjn.cosmo.helpers.MediaIDHelper.MEDIA_ID_MUSICS_BY_PLAYLIST;
 import static io.mokshjn.cosmo.helpers.MediaIDHelper.MEDIA_ID_ROOT;
 import static io.mokshjn.cosmo.helpers.MediaIDHelper.createMediaID;
 
@@ -36,11 +38,13 @@ public class LibraryProvider {
     private MusicProviderSource mSource;
 
     private ConcurrentMap<String, List<MediaMetadataCompat>> mMusicListByAlbum;
+    private ConcurrentMap<String, List<MediaMetadataCompat>> mMusicListByPlaylist;
     private ConcurrentMap<String, List<MediaMetadataCompat>> mMusicListByArtist;
     private ConcurrentMap<String, MutableMediaMetadata> mMusicListById;
     private List<MediaMetadataCompat> tracks;
     private List<MediaMetadataCompat> albums;
     private List<MediaMetadataCompat> artists;
+    private List<MediaMetadataCompat> playlists;
     private volatile State mCurrentState = State.NON_INITIALIZED;
 
     public LibraryProvider(ContentResolver resolver) {this(new LibrarySource(resolver)); }
@@ -49,10 +53,12 @@ public class LibraryProvider {
         mSource = source;
         mMusicListById = new ConcurrentHashMap<>();
         mMusicListByAlbum = new ConcurrentHashMap<>();
+        mMusicListByPlaylist = new ConcurrentHashMap<>();
         mMusicListByArtist = new ConcurrentHashMap<>();
         tracks = new ArrayList<>();
         albums = new ArrayList<>();
         artists = new ArrayList<>();
+        playlists = new ArrayList<>();
     }
 
     public Iterable<MediaMetadataCompat> getShuffledMusic() {
@@ -168,28 +174,36 @@ public class LibraryProvider {
         try {
             if (mCurrentState == State.NON_INITIALIZED) {
                 mCurrentState = State.INITIALIZING;
-                Iterator<MediaMetadataCompat> tracks = mSource.iterator();
-                while (tracks.hasNext()) {
-                    MediaMetadataCompat item = tracks.next();
+                Iterator<MediaMetadataCompat> iterator = mSource.iterator();
+                while (iterator.hasNext()) {
+                    MediaMetadataCompat item = iterator.next();
                     String musicId = item.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID);
                     mMusicListById.put(musicId, new MutableMediaMetadata(musicId, item));
-                    this.tracks.add(item);
+                    tracks.add(item);
                 }
-                Iterator<MediaMetadataCompat> albums = mSource.albums();
-                while (albums.hasNext()) {
-                    MediaMetadataCompat item = albums.next();
+                iterator = mSource.albums();
+                while (iterator.hasNext()) {
+                    MediaMetadataCompat item = iterator.next();
                     String musicId = item.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID);
-                    List<MediaMetadataCompat> list = new ArrayList<>();
-                    mMusicListByAlbum.put(musicId, list);
-                    this.albums.add(item);
+                    List<MediaMetadataCompat> emptyList = new ArrayList<>();
+                    mMusicListByAlbum.put(musicId, emptyList);
+                    albums.add(item);
                 }
-                Iterator<MediaMetadataCompat> artists = mSource.artists();
-                while (artists.hasNext()) {
-                    MediaMetadataCompat item = artists.next();
+                iterator = mSource.artists();
+                while (iterator.hasNext()) {
+                    MediaMetadataCompat item = iterator.next();
                     String musicId = item.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID);
-                    List<MediaMetadataCompat> artistlists = new ArrayList<>();
-                    mMusicListByArtist.put(musicId, artistlists);
-                    this.artists.add(item);
+                    List<MediaMetadataCompat> emptyList = new ArrayList<>();
+                    mMusicListByArtist.put(musicId, emptyList);
+                    artists.add(item);
+                }
+                iterator = mSource.playlists();
+                while (iterator.hasNext()) {
+                    MediaMetadataCompat item = iterator.next();
+                    String id = item.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID);
+                    List<MediaMetadataCompat> emptyList = new ArrayList<>();
+                    mMusicListByPlaylist.put(id, emptyList);
+                    playlists.add(item);
                 }
                 buildListsByAlbum();
                 buildListsByArtist();
@@ -249,19 +263,29 @@ public class LibraryProvider {
             for (MediaMetadataCompat item : artists) {
                 mediaItems.add(createArtistItem(item));
             }
+        } else if (mediaId.equals(MEDIA_ID_MUSICS_BY_PLAYLIST)) {
+            for (MediaMetadataCompat item : playlists) {
+                mediaItems.add(createPlaylistItem(item));
+            }
         } else if (mediaId.startsWith(MEDIA_ID_MUSICS_BY_ALBUM)) {
-            Long albumID = MediaIDHelper.extractAlbumID(mediaId);
-            List<MediaMetadataCompat> tracks = mMusicListByAlbum.get(albumID.toString());
+            long albumID = MediaIDHelper.extractID(mediaId);
+            List<MediaMetadataCompat> tracks = mMusicListByAlbum.get(String.valueOf(albumID));
+
+            Log.d(TAG, "getChildren: " + tracks.size());
             tracks.sort(new Comparator<MediaMetadataCompat>() {
                 @Override
                 public int compare(MediaMetadataCompat o1, MediaMetadataCompat o2) {
                     return (int) (o1.getLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER) - o2.getLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER));
                 }
             });
-            for (MediaMetadataCompat item : mMusicListByAlbum.get(albumID.toString())) {
+            for (MediaMetadataCompat item : mMusicListByAlbum.get(String.valueOf(albumID))) {
                 mediaItems.add(createMediaItem(item, mediaId));
             }
-
+        } else if (mediaId.startsWith(MEDIA_ID_MUSICS_BY_PLAYLIST)) {
+            long playlistId = MediaIDHelper.extractID(mediaId);
+            for (MediaMetadataCompat item : mSource.getMusicFromPlaylist(playlistId)) {
+                mediaItems.add(createMediaItem(item, mediaId));
+            }
         } else {
             LogHelper.w(TAG, "Skipping unmatched mediaId: ", mediaId);
         }
@@ -276,6 +300,16 @@ public class LibraryProvider {
                 .setIconUri(LibUtils.getMediaStoreAlbumCoverUri(Long.parseLong(item.getDescription().getMediaId())))
                 .build();
         return new MediaBrowserCompat.MediaItem(description,
+                MediaBrowserCompat.MediaItem.FLAG_BROWSABLE);
+    }
+
+    private MediaBrowserCompat.MediaItem createPlaylistItem(MediaMetadataCompat item) {
+        MediaDescriptionCompat descriptionCompat = new MediaDescriptionCompat.Builder()
+                .setMediaId(createMediaID(null, MEDIA_ID_MUSICS_BY_PLAYLIST, item.getDescription().getMediaId()))
+                .setTitle(item.getDescription().getTitle())
+                .setSubtitle(item.getDescription().getSubtitle())
+                .build();
+        return new MediaBrowserCompat.MediaItem(descriptionCompat,
                 MediaBrowserCompat.MediaItem.FLAG_BROWSABLE);
     }
 

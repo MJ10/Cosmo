@@ -3,28 +3,18 @@ package io.mokshjn.cosmo.activities;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
-import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.transition.Slide;
-import android.view.Gravity;
 import android.view.View;
-import android.view.animation.AnimationUtils;
-import android.widget.ImageView;
 import android.widget.Toast;
-
-import com.bumptech.glide.Glide;
-import com.github.florent37.glidepalette.GlidePalette;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,18 +24,12 @@ import butterknife.ButterKnife;
 import io.mokshjn.cosmo.R;
 import io.mokshjn.cosmo.adapters.AlbumSongsAdapter;
 import io.mokshjn.cosmo.helpers.LogHelper;
-import io.mokshjn.cosmo.helpers.MediaIDHelper;
 import io.mokshjn.cosmo.interfaces.MediaBrowserProvider;
 import io.mokshjn.cosmo.services.MusicService;
-import io.mokshjn.cosmo.utils.LibUtils;
 
-/**
- * Created by moksh on 22/3/17.
- */
+public class PlaylistActivity extends AppCompatActivity implements MediaBrowserProvider, AlbumSongsAdapter.ClickListener {
 
-public class AlbumActivity extends AppCompatActivity implements MediaBrowserProvider, AlbumSongsAdapter.ClickListener {
-
-    private static final String TAG = LogHelper.makeLogTag(AlbumActivity.class);
+    private static final String TAG = LogHelper.makeLogTag(PlaylistActivity.class);
     private final MediaControllerCompat.Callback mMediaControllerCallback =
             new MediaControllerCompat.Callback() {
                 @Override
@@ -58,16 +42,10 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
                     super.onMetadataChanged(metadata);
                 }
             };
-    @BindView(R.id.ivAlbumArt)
-    ImageView ivAlbumArt;
-    @BindView(R.id.rvAlbumSongs)
-    RecyclerView rvAlbumSongs;
-    @BindView(R.id.scrollView)
-    NestedScrollView scrollView;
-    @BindView(R.id.bgView)
-    View bgView;
 
-    private long albumID;
+    @BindView(R.id.rvPlaylistSongs)
+    RecyclerView rvPlaylistSongs;
+
     private String mediaID;
     private AlbumSongsAdapter adapter;
     private MediaBrowserCompat mediaBrowser;
@@ -101,83 +79,29 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
                 @Override
                 public void onError(@NonNull String id) {
                     LogHelper.e(TAG, "browse fragment subscription onError, id=" + id);
-                    Toast.makeText(AlbumActivity.this, getString(R.string.error_loading_media), Toast.LENGTH_LONG).show();
+                    Toast.makeText(PlaylistActivity.this, getString(R.string.error_loading_media), Toast.LENGTH_LONG).show();
                 }
             };
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_album);
+        setContentView(R.layout.activity_playlist);
         ButterKnife.bind(this);
-        setEnterTransitions();
+
         mediaBrowser = new MediaBrowserCompat(this,
                 new ComponentName(this, MusicService.class), mConnectionCallback, null);
         Intent intent = getIntent();
+
         if (intent != null) {
-            mediaID = intent.getStringExtra("albumID");
-            albumID = MediaIDHelper.extractID(mediaID);
+            mediaID = intent.getStringExtra("playlistID");
         }
-        setupViews();
-    }
-
-    private void setEnterTransitions() {
-        Slide slide = new Slide(Gravity.BOTTOM);
-        slide.addTarget(R.id.rvAlbumSongs);
-        slide.addTarget(R.id.bgView);
-        slide.setInterpolator(AnimationUtils.loadInterpolator(this, android.R.interpolator.linear_out_slow_in));
-        slide.setDuration(450);
-        getWindow().setEnterTransition(slide);
-        getWindow().setExitTransition(slide);
-    }
-
-    @Override
-    public void onEnterAnimationComplete() {
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                rvAlbumSongs.setVisibility(View.VISIBLE);
-            }
-        }, 450);
-    }
-
-    private void setupViews() {
-        setupAlbumArt();
 
         adapter = new AlbumSongsAdapter(this);
-        rvAlbumSongs.setLayoutManager(new LinearLayoutManager(this));
-        rvAlbumSongs.setAdapter(adapter);
+        rvPlaylistSongs.setLayoutManager(new LinearLayoutManager(this));
+        rvPlaylistSongs.setAdapter(adapter);
         adapter.setClickListener(this);
-        rvAlbumSongs.setNestedScrollingEnabled(false);
-    }
-
-    private void setupAlbumArt() {
-        Glide.with(this)
-                .load(LibUtils.getMediaStoreAlbumCoverUri(albumID))
-                .listener(GlidePalette.with(LibUtils.getMediaStoreAlbumCoverUri(albumID).toString())
-                        .use(GlidePalette.Profile.MUTED)
-                        .intoBackground(bgView))
-                .into(ivAlbumArt);
-    }
-
-    private void connectToSession(MediaSessionCompat.Token token) throws RemoteException {
-        MediaControllerCompat mediaController = new MediaControllerCompat(this, token);
-        setSupportMediaController(mediaController);
-        mediaController.registerCallback(mMediaControllerCallback);
-
-        onConnected();
-    }
-
-    @Override
-    public MediaBrowserCompat getMediaBrowser() {
-        return mediaBrowser;
-    }
-
-    @Override
-    public void onBackPressed() {
-        rvAlbumSongs.setVisibility(View.GONE);
-        finishAfterTransition();
+        rvPlaylistSongs.setNestedScrollingEnabled(false);
     }
 
     @Override
@@ -198,6 +122,19 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
         }
     }
 
+    private void connectToSession(MediaSessionCompat.Token token) throws RemoteException {
+        MediaControllerCompat mediaController = new MediaControllerCompat(this, token);
+        setSupportMediaController(mediaController);
+        mediaController.registerCallback(mMediaControllerCallback);
+
+        onConnected();
+    }
+
+    @Override
+    public MediaBrowserCompat getMediaBrowser() {
+        return mediaBrowser;
+    }
+
     private void onConnected() {
 
         mediaBrowser.unsubscribe(mediaID);
@@ -207,6 +144,6 @@ public class AlbumActivity extends AppCompatActivity implements MediaBrowserProv
 
     @Override
     public void onSongClick(View v, int position) {
-        getSupportMediaController().getTransportControls().playFromMediaId(tracks.get(position).getMediaId(), null);
+
     }
 }
