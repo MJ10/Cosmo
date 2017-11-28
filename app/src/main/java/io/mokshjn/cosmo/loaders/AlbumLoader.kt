@@ -12,7 +12,7 @@ import io.reactivex.Observable
  */
 class AlbumLoader {
     companion object {
-        fun getAllAlbums(context: Context): Observable<ArrayList<Album>> = splitIntoAlbums(
+        fun getAllAlbums(context: Context) = splitIntoAlbums(
                 SongLoader.getSongs(SongLoader.makeSongCursor(
                         context,
                         null,
@@ -21,8 +21,7 @@ class AlbumLoader {
                 ))
         )
 
-        fun getAlbums(context: Context,
-                      query: String): Observable<ArrayList<Album>> = splitIntoAlbums(
+        fun getAlbums(context: Context, query: String) = splitIntoAlbums(
                 SongLoader.getSongs(SongLoader.makeSongCursor(
                         context,
                         "${MediaStore.Audio.AudioColumns.ALBUM} LIKE ?",
@@ -31,7 +30,7 @@ class AlbumLoader {
                 ))
         )
 
-        fun getAlbum(context: Context, albumId: Int): Observable<Album> = Observable.create { e ->
+        fun getAlbum(context: Context, albumId: Int) = Observable.create<Album> { e ->
             val songs = SongLoader.getSongs(SongLoader.makeSongCursor(
                     context,
                     "${MediaStore.Audio.AudioColumns.ALBUM_ID} =?",
@@ -44,8 +43,8 @@ class AlbumLoader {
             }
         }
 
-        fun splitIntoAlbums(
-                songs: Observable<ArrayList<Song>>?): Observable<ArrayList<Album>> = Observable.create { e ->
+        fun splitIntoAlbums(songs: Observable<ArrayList<Song>>?) = Observable.create<ArrayList<Album>>
+        { e ->
             val albums = ArrayList<Album>()
             songs?.subscribe { albumSongs ->
                 for (song in albumSongs)
@@ -63,8 +62,8 @@ class AlbumLoader {
             return albums
         }
 
-        fun getOrCreateAlbum(albums: ArrayList<Album>,
-                             albumId: Int): Observable<Album> = Observable.create { e ->
+        fun getOrCreateAlbum(albums: ArrayList<Album>, albumId: Int) = Observable.create<Album>
+        { e ->
             for (album in albums)
                 if (!album.songs?.isEmpty()!! && album.songs[0].albumId == albumId) {
                     e.onNext(album)
