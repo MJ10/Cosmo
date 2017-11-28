@@ -11,7 +11,7 @@ import io.reactivex.Observable
 /**
  * Created by moksh on 28/11/17.
  */
-class SongLoader {
+open class SongLoader {
     companion object {
         val BASE_SELECTION = "${MediaStore.Audio.AudioColumns.IS_MUSIC}=1 AND" +
                 "${MediaStore.Audio.AudioColumns.TITLE} != ''"

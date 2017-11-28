@@ -69,11 +69,13 @@ class ArtistLoader {
         }
 
         fun getOrCreateArtist(artists: ArrayList<Artist>, artistId: Int): Artist {
-            for (artist in artists)
-                if (!artist.albums!!.isEmpty() &&
-                        !artist.albums.get(0).songs!!.isEmpty() &&
-                        artist.albums[0].songs!![0].artistId == artistId)
-                    return artist
+            artists
+                    .filter {
+                        !it.albums!!.isEmpty() &&
+                                !it.albums.get(0).songs!!.isEmpty() &&
+                                it.albums[0].songs!![0].artistId == artistId
+                    }
+                    .forEach { return it }
             val artist = Artist()
             artists.add(artist)
             return artist
