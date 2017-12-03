@@ -1,9 +1,12 @@
 package io.mokshjn.cosmo.playback
 
+import android.app.Notification
+import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
 import android.support.annotation.RequiresApi
+import io.mokshjn.cosmo.R
 
 /**
  * Created by moksh on 1/12/17.
@@ -41,10 +44,36 @@ abstract class PlayingNotification {
         }
     }
 
+    fun updateNotifyModeAndPostNotification(notification: Notification) {
+        val newNotifyMode = if (musicService.isPlaying())
+            NOTIFICATION_MODE_FOREGROUND
+        else
+            NOTIFICATION_MODE_BACKGROUND
+
+        if (notifyMode != newNotifyMode && newNotifyMode == NOTIFICATION_MODE_BACKGROUND)
+            musicService.stopForeground(false)
+
+        if (newNotifyMode == NOTIFICATION_MODE_FOREGROUND)
+            musicService.startForeground(NOTIFICATION_ID, notification)
+        else if (newNotifyMode == NOTIFICATION_MODE_BACKGROUND)
+            notificationManager.notify(NOTIFICATION_ID, notification)
+
+        notifyMode = newNotifyMode
+    }
+
     @RequiresApi(Build.VERSION_CODES.O)
     private fun createNotificationChannel() {
         var channel = notificationManager.getNotificationChannel(NOTIFICATION_CHANNEL_ID)
         if (channel == null) {
+            channel = NotificationChannel(NOTIFICATION_CHANNEL_ID,
+                    musicService.getString(R.string.playing_notification_description),
+                    NotificationManager.IMPORTANCE_LOW)
+            channel.description = musicService.getString(R.string.playing_notification_description)
+            channel.enableLights(false)
+            channel.enableVibration(false)
+            channel.setShowBadge(false)
+
+            notificationManager.createNotificationChannel(channel)
         }
     }
 }
