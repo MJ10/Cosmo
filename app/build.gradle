@@ -27,23 +27,30 @@ dependencies {
     })
 
 //    compile group: 'com.google.code.gson', name: 'gson', version: '2.7', changing: true
-    compile 'com.android.support:appcompat-v7:27.0.1'
-    compile 'com.github.bumptech.glide:glide:4.0.0'
-    compile 'com.github.florent37:glidepalette:2.1.0'
-    compile 'com.android.support:support-v4:27.0.1'
-    compile 'com.android.support:cardview-v7:27.0.1'
-    compile 'com.android.support:design:27.0.1'
-    compile 'com.simplecityapps:recyclerview-fastscroll:1.0.14'
-    compile 'com.jakewharton:butterknife:8.8.1'
-    compile 'com.google.android.gms:play-services-cast-framework:11.6.0'
-    compile 'com.google.android.support:wearable:2.1.0'
-    compile 'com.google.android.wearable:wearable:2.1.0'
-    compile 'com.android.support:palette-v7:27.0.1'
-    compile 'com.android.support:mediarouter-v7:27.0.1'
-    compile 'com.android.support:leanback-v17:27.0.1'
+    implementation 'com.android.support:appcompat-v7:27.0.1'
+    implementation 'com.github.bumptech.glide:glide:4.0.0'
+    implementation 'com.github.florent37:glidepalette:2.1.0'
+    implementation 'com.android.support:support-v4:27.0.1'
+    implementation 'com.android.support:cardview-v7:27.0.1'
+    implementation 'com.android.support:design:27.0.1'
+    implementation 'com.simplecityapps:recyclerview-fastscroll:1.0.14'
+    implementation 'com.jakewharton:butterknife:8.8.1'
+    implementation 'com.google.android.gms:play-services-cast-framework:11.6.0'
+    implementation 'com.google.android.support:wearable:2.1.0'
+    implementation 'com.google.android.wearable:wearable:2.1.0'
+    implementation 'com.android.support:palette-v7:27.0.1'
+    implementation 'com.android.support:mediarouter-v7:27.0.1'
+    implementation 'com.android.support:leanback-v17:27.0.1'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
+    implementation 'io.reactivex.rxjava2:rxjava:2.1.2'
+    implementation 'com.github.bumptech.glide:okhttp3-integration:1.5.0'
+    implementation 'com.squareup.retrofit2:retrofit:2.3.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
+    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
+    implementation 'com.squareup.okhttp3:okhttp:3.8.1'
     testCompile 'junit:junit:4.12'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
 }
 repositories {
     mavenCentral()
